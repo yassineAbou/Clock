@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--suppress ALL -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Controller.activities.RingActivity"
+    android:background="@color/gray"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/ring_txt"
+        android:layout_width="250dp"
+        android:text="Ring Ring"
+        android:layout_height="250dp"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/bell1"
+        android:layout_marginTop="5dp"
+        android:textSize="20sp"
+        android:textColor="@color/gray1"
+        android:layout_marginLeft="140dp"/>
+
+    <RelativeLayout
+        android:layout_above="@id/linear_layout_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/linear_layout_bell"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:id="@+id/bell_img"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/bell1"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <include layout="@layout/partial_line"/>
+
+    <LinearLayout
+        android:id="@+id/linear_layout_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="22dp"
+            android:textStyle="bold"
+            android:text="cancel"
+            android:background="@null"
+            android:textColor="@color/brown"/>
+
+
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--suppress ALL -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Controller.Fragments.timerFragment"
+    android:background="@color/gray">
+
+<RelativeLayout
+    android:layout_above="@id/linear_layout_buttons"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <ProgressBar
+        android:id="@+id/progress_bar_timer"
+        android:progress="100"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:progressDrawable="@drawable/circle_progress_bar"
+        />
+    
+    <TextView
+        android:id="@+id/timer_text"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:textSize="40sp"
+        android:textColor="@color/yellow"
+        android:gravity="center"
+        android:layout_centerInParent="true"/>
+
+
+</RelativeLayout>
+
+    <include layout="@layout/partial_line"/>
+
+    <LinearLayout
+        android:id="@+id/linear_layout_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/button_start_timer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="start"
+            android:background="@null"
+            android:padding="22dp"
+            android:visibility="visible"
+            android:textStyle="bold"
+           android:textColor="@color/brown"
+            />
+
+        <Button
+            android:id="@+id/button_stop_resume_timer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="stop"
+            android:visibility="gone"
+            android:layout_weight="1"
+            android:padding="22dp"
+            android:textStyle="bold"
+            android:textColor="@color/red"
+            />
+
+        <Button
+            android:id="@+id/button_reset_timer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="rest"
+            android:background="@null"
+            android:padding="22dp"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:textColor="@color/brown"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

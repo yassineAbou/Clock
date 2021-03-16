@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#546270"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="   Set time for timer  "
+            android:textSize="27sp"
+            android:background="@color/gray1"
+            android:textColor="@color/white"
+            android:padding="10dp"
+            android:id="@+id/heading"/>
+
+        <LinearLayout
+            android:layout_marginTop="55dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.Picker">
+
+            <NumberPicker
+                android:id="@+id/picker_hours"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+            <NumberPicker
+                android:id="@+id/picker_minutes"
+                android:layout_margin="1dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <NumberPicker
+                android:id="@+id/picker_seconds"
+                android:layout_weight="1"
+                android:layout_margin="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   OK   "
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:textSize="18sp"
+            android:background="@color/gray1"
+            android:textColor="@color/white"
+            android:padding="10dp"
+            android:layout_marginStart="10dp"
+            android:id="@+id/ok"
+            android:layout_marginLeft="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CANCEL"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:background="@color/gray1"
+            android:padding="10dp"
+            android:id="@+id/cancel"/>
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

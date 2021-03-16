@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--suppress ALL -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Controller.Fragments.alarmFragment"
+    android:background="@color/gray">
+
+    <RelativeLayout
+        android:layout_above="@id/linear_layout_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/activity_main_alarm_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/text_alarm_default_time"
+                android:textSize="50sp"
+                android:textColor="@color/yellow"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <include layout="@layout/partial_line"/>
+
+    <LinearLayout
+        android:id="@+id/linear_layout_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/activity_main_start_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="22dp"
+            android:textStyle="bold"
+            android:text="start"
+            android:visibility="visible"
+            android:background="@null"
+            android:textColor="@color/brown"/>
+
+        <Button
+            android:id="@+id/activity_main_stop_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="22dp"
+            android:text="stop"
+            android:background="@null"
+            android:visibility="gone"
+            android:textColor="#ff6666"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

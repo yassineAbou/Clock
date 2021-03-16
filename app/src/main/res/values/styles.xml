@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--suppress ALL -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="MyToolbarTitleTextAppearance" parent="Base.TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="MyPopupTheme" parent="Base.Widget.AppCompat.PopupMenu">
+        <item name="android:background">@color/gray</item>
+    </style>
+
+
+
+    <style name="MyTimePickerDialogStyle" parent="@style/ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="showTitle">false</item>
+        <item name="colorControlActivated">@color/yellow</item>
+        <item name="colorAccent">#546270</item>
+        <item name="android:textColorPrimary">#FF000000</item>
+        <item name="android:textColorSecondary">#FF000000</item>
+        <item name="android:background">#778899</item>
+
+
+    </style>
+
+    <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textSize">40sp</item>
+        <item name="colorControlNormal">@android:color/transparent</item>
+    </style>
+
+
+</resources>
