@@ -3,17 +3,10 @@ package com.example.clock
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,45 +15,50 @@ import com.example.clock.alarm.AlarmScreen
 import com.example.clock.components.BottomNavigationBar
 import com.example.clock.components.bottomBarItems
 import com.example.clock.stopwatch.StopwatchScreen
+import com.example.clock.stopwatch.StopwatchViewModel
 import com.example.clock.timer.TimerScreen
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.world.WorldClockScreen
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class MainActivity : ComponentActivity() {
+
+    private val stopwatchViewModel: StopwatchViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
-
-            ClockTheme {
-
-                val navController = rememberNavController()
-
-                Scaffold(
-                    bottomBar = {
-                        BottomNavigationBar(
-                            items = bottomBarItems,
-                            navController = navController,
-                            onItemClick = {
-                                navController.navigate(it.route)
-                            }
-                        )
+           // ProvideWindowInsets {
+                ClockTheme {
+                    val navController = rememberNavController()
+                    Scaffold(
+                        bottomBar = {
+                            BottomNavigationBar(
+                                items = bottomBarItems,
+                                navController = navController,
+                                onItemClick = {
+                                    navController.navigate(it.route)
+                                }
+                            )
+                        }
+                    ) {
+                        Navigation(navController = navController, stopwatchViewModel)
                     }
-                ) {
-
-                    ClockApp(navController = navController)
-
-                }
-
+               // }
             }
-
         }
     }
 }
 
+
+@OptIn(ExperimentalTime::class)
 @Composable
-fun ClockApp(navController: NavHostController) {
+fun Navigation(navController: NavHostController, stopwatchViewModel: StopwatchViewModel) {
 
     NavHost(navController = navController, startDestination = Screen.Alarm.route) {
         composable(Screen.Alarm.route) {
@@ -70,13 +68,32 @@ fun ClockApp(navController: NavHostController) {
             WorldClockScreen()
         }
         composable(Screen.Stopwatch.route) {
-            StopwatchScreen()
+            StopwatchScreen(
+                /*
+                isPlaying = stopwatchViewModel.isPlaying,
+                isZero = stopwatchViewModel.isZero,
+                seconds = stopwatchViewModel.seconds,
+                minutes = stopwatchViewModel.minutes,
+                hours = stopwatchViewModel.hours,
+                onStart = { stopwatchViewModel.start() },
+                onPause = { stopwatchViewModel.pause() },
+                onStop = { stopwatchViewModel.stop()  },
+                onLap = { stopwatchViewModel.onLap() },
+                onClear = { stopwatchViewModel.onClear() },
+                lapItems = stopwatchViewModel.lapItems
+
+                 */
+            )
         }
         composable(Screen.Timer.route) {
             TimerScreen()
         }
     }
 }
+
+// TODO: compose viewModel before commit
+// TODO: fix Experimental annotations
+// TODO: use weight instead of dp
 
 
 
