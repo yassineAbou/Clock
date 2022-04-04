@@ -68,22 +68,7 @@ fun Navigation(navController: NavHostController, stopwatchViewModel: StopwatchVi
             WorldClockScreen()
         }
         composable(Screen.Stopwatch.route) {
-            StopwatchScreen(
-                /*
-                isPlaying = stopwatchViewModel.isPlaying,
-                isZero = stopwatchViewModel.isZero,
-                seconds = stopwatchViewModel.seconds,
-                minutes = stopwatchViewModel.minutes,
-                hours = stopwatchViewModel.hours,
-                onStart = { stopwatchViewModel.start() },
-                onPause = { stopwatchViewModel.pause() },
-                onStop = { stopwatchViewModel.stop()  },
-                onLap = { stopwatchViewModel.onLap() },
-                onClear = { stopwatchViewModel.onClear() },
-                lapItems = stopwatchViewModel.lapItems
-
-                 */
-            )
+            StopwatchScreen()
         }
         composable(Screen.Timer.route) {
             TimerScreen()

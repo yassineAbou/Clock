@@ -37,9 +37,7 @@ fun BottomNavigationBar(
                 selected = selected,
                 onClick = { onItemClick(item) },
                 label = {
-                   // if (selected) {
                         Text(text = item.name)
-                   // }
                   },
                 icon = {
                     Icon(

@@ -8,3 +8,5 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 val Red100 = Color(0xFFed4a65)
 val Black100 = Color(0xFF686868)
+
+const val PrimaryLightAlpha = .25f

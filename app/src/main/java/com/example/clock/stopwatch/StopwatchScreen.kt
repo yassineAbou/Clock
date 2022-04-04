@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment.Companion as Alignment1
 
 
 
-@Preview(showBackground = true)
+@Preview(name = "StopwatchScreen")
 @OptIn(kotlin.time.ExperimentalTime::class)
 @Composable
 fun DefaultPreview() {
@@ -66,37 +66,35 @@ fun StopwatchScreen(
                     horizontalAlignment = Alignment1.CenterHorizontally
                 ) {
                     stopwatchViewModel.apply {
+                        Spacer(modifier = Modifier.height(122.dp))
+                        StopWatchTime(
+                            hours = hours,
+                            minutes = minutes,
+                            seconds = seconds
+                        )
+                        Spacer(modifier = Modifier.height(30.dp))
+                        AnimatedVisibility(visible = lapHeaderLine) {
+                            DividerItem()
+                        }
+
+                        LapsItems(
+                            lapsItems = lapItems,
+                            scrollState = scrollState
+                        )
+                        Buttons(
+                            isPlaying = isPlaying,
+                            onPause = { pause() },
+                            onStart = { start() },
+                            onStop = { stop() },
+                            onLap = { onLap() },
+                            onClear =  {onClear() },
+                            onLapHeadLine = { lapHeaderLine = it },
+                            scrollState = scrollState,
+                            scope = scope,
+                            lapsItems = lapItems
+                        )
 
                     }
-                    Spacer(modifier = Modifier.height(122.dp))
-                    StopWatchTime(
-                        hours = hours,
-                        minutes = minutes,
-                        seconds = seconds
-                    )
-                    Spacer(modifier = Modifier.height(30.dp))
-                    AnimatedVisibility(visible = lapHeaderLine) {
-                        DividerItem()
-                    }
-
-                    LapsItems(
-                        lapsItems = lapItems,
-                        scrollState = scrollState
-                    )
-
-                    Buttons(
-                        isPlaying = isPlaying,
-                        onPause = { pause() },
-                        onStart = { start() },
-                        onStop = { stop() },
-                        onLap = { onLap() },
-                        onClear =  {onClear() },
-                        onLapHeadLine = { lapHeaderLine = it },
-                        scrollState = scrollState,
-                        scope = scope,
-                        lapsItems = lapItems
-                    )
-
                 }
             }
 
