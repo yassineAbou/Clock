@@ -7,6 +7,8 @@ import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +20,9 @@ import com.example.clock.stopwatch.StopwatchScreen
 import com.example.clock.stopwatch.StopwatchViewModel
 import com.example.clock.timer.TimerScreen
 import com.example.clock.ui.theme.ClockTheme
-import com.example.clock.world.WorldClockScreen
+import com.example.clock.world.CurrentTimeScreen
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -30,26 +34,27 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-           // ProvideWindowInsets {
+           ProvideWindowInsets {
                 ClockTheme {
                     val navController = rememberNavController()
                     Scaffold(
                         bottomBar = {
                             BottomNavigationBar(
+                                modifier = Modifier.navigationBarsPadding(),
                                 items = bottomBarItems,
                                 navController = navController,
                                 onItemClick = {
                                     navController.navigate(it.route)
-                                }
+                                },
                             )
                         }
                     ) {
                         Navigation(navController = navController, stopwatchViewModel)
                     }
-               // }
+                }
             }
         }
     }
@@ -60,12 +65,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Navigation(navController: NavHostController, stopwatchViewModel: StopwatchViewModel) {
 
-    NavHost(navController = navController, startDestination = Screen.Alarm.route) {
+
+         NavHost(navController = navController, startDestination = Screen.Alarm.route) {
         composable(Screen.Alarm.route) {
             AlarmScreen()
         }
         composable(Screen.WorldClock.route) {
-            WorldClockScreen()
+            CurrentTimeScreen()
         }
         composable(Screen.Stopwatch.route) {
             StopwatchScreen()
@@ -76,9 +82,6 @@ fun Navigation(navController: NavHostController, stopwatchViewModel: StopwatchVi
     }
 }
 
-// TODO: compose viewModel before commit
-// TODO: fix Experimental annotations
-// TODO: use weight instead of dp
 
 
 

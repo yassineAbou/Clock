@@ -30,7 +30,7 @@ fun BottomNavigationBar(
     onItemClick: (BottomNavItem) -> Unit
 ) {
     val backStackEntry = navController.currentBackStackEntryAsState()
-    NavigationBar {
+    NavigationBar(modifier = modifier) {
         items.forEach { item ->
             val selected = item.route == backStackEntry.value?.destination?.route
             NavigationBarItem(
@@ -57,9 +57,9 @@ val bottomBarItems =  listOf(
         icon = Icons.Default.Alarm
     ),
     BottomNavItem(
-        name = "World Clock",
+        name = "Current Time",
         route = Screen.WorldClock.route,
-        icon = Icons.Default.Language,
+        icon = Icons.Default.Language
     ),
     BottomNavItem(
         name = "Stopwatch",
