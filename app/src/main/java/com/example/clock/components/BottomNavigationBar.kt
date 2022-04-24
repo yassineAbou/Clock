@@ -1,6 +1,8 @@
 package com.example.clock.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.clock.Screen
 
@@ -27,7 +30,7 @@ fun BottomNavigationBar(
     items: List<BottomNavItem>,
     navController: NavController,
     modifier: Modifier = Modifier,
-    onItemClick: (BottomNavItem) -> Unit
+    //onItemClick: (BottomNavItem) -> Unit
 ) {
     val backStackEntry = navController.currentBackStackEntryAsState()
     NavigationBar(modifier = modifier) {
@@ -35,16 +38,24 @@ fun BottomNavigationBar(
             val selected = item.route == backStackEntry.value?.destination?.route
             NavigationBarItem(
                 selected = selected,
-                onClick = { onItemClick(item) },
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                    },
                 label = {
-                        Text(text = item.name)
+                   Text(text = item.name)
                   },
                 icon = {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.name
                     )
-                }
+                },
             )
         }
     }

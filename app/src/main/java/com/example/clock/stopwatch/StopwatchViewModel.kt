@@ -5,91 +5,46 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.asLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.*
+import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class StopwatchViewModel : ViewModel() {
+@HiltViewModel
+class StopwatchViewModel @Inject constructor(
+    private val stopwatchManager: StopwatchManager
+) : ViewModel(), StopwatchScreenActions {
 
+    val stopwatchState = stopwatchManager.stopwatchState.asLiveData()
 
-    private var time: Duration = Duration.ZERO
-    private lateinit var timer: Timer
+    val lapItems = stopwatchManager.lapItems
 
-    var seconds by mutableStateOf("00")
-        private set
-    var minutes by mutableStateOf("00")
-        private set
-    var hours by mutableStateOf("00")
-        private set
-    var isPlaying by mutableStateOf(false)
-        private set
-    var isZero by mutableStateOf(true)
-        private set
-
-    var lapItems = mutableStateListOf<Lap>()
-        private set
-
-    fun start() {
-        timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
-            time = time.plus(Duration.seconds(1))
-            updateTimeStates()
-        }
-        isPlaying = true
-        isZero = false
+    override fun onStart() {
+        stopwatchManager.start()
     }
 
-    private fun updateTimeStates() {
-        time.toComponents { hours, minutes, seconds, _ ->
-            this.seconds = seconds.pad()
-            this.minutes = minutes.pad()
-            this.hours = hours.toInt().pad()
-        }
+    override fun onLap() {
+        stopwatchManager.onLap()
     }
 
-    fun onLap() {
-        val timeString =  time.toComponents { hours, minutes, seconds, _ ->
-            String.format("%02d:%02d:%02d", hours, minutes, seconds)
-        }
-        val lap = Lap(timeString)
-        lapItems.add(lap)
-        println(lapItems)
+    override fun onClear() {
+        stopwatchManager.onClear()
     }
 
-    fun onClear() {
-       lapItems.clear()
+    override fun onPause() {
+        stopwatchManager.pause()
     }
 
-    private fun Int.pad(): String {
-        return this.toString().padStart(2, '0')
+    override fun onStop() {
+        stopwatchManager.stop()
     }
 
-    fun pause() {
-        timer.cancel()
-        isPlaying = false
-    }
-
-    fun stop() {
-        pause()
-        time = Duration.ZERO
-        updateTimeStates()
-        isZero = true
-    }
 
 }
 
-data class Lap(val currentTime: String)
 
-val initialLapItems = listOf(
-    Lap("00:00:01"),
-    Lap("00:00:02"),
-    Lap("00:00:03"),
-    Lap("00:00:04"),
-    Lap("00:00:05"),
-    Lap("00:00:06"),
-    Lap("00:00:07"),
-    Lap("00:00:08"),
-    Lap("00:00:09"),
-    Lap("00:00:10")
-)
+

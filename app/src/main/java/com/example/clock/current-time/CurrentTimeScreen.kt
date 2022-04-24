@@ -192,12 +192,7 @@ data class TimeInFloat(
     var second: Float
 )
 
-data class TimeInString(
-    var hour: String,
-    var minute: String,
-    var second: String,
-    var meridiem: String
-)
+
 
 
 

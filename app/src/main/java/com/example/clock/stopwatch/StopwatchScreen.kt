@@ -1,7 +1,10 @@
 package com.example.clock.stopwatch
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import android.util.Log
+import androidx.compose.animation.*
+import androidx.compose.animation.core.ExperimentalTransitionApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,27 +13,24 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.clock.components.ClockButton
 import com.example.clock.ui.theme.Black100
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.theme.Red100
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 import androidx.compose.ui.Alignment.Companion as Alignment1
 
-
-// TODO: Design layout
-// TODO: Create logic
-// TODO: setup foreground service
-
-
-
+/*
 @Preview(name = "StopwatchScreen")
 @OptIn(kotlin.time.ExperimentalTime::class)
 @Composable
@@ -39,6 +39,9 @@ fun DefaultPreview() {
         StopwatchScreen()
     }
 }
+ */
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -48,31 +51,35 @@ fun LapItemPreview() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, kotlin.time.ExperimentalTime::class)
+private const val TAG = "StopwatchScreen"
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalTime::class, ExperimentalTransitionApi::class)
 @Composable
 fun StopwatchScreen(
     modifier: Modifier = Modifier,
-    stopwatchViewModel: StopwatchViewModel = viewModel(),
+    stopwatchState: StopwatchState,
+    stopwatchActions: StopwatchScreenActions,
+    lapItems: List<Lap>,
+
 ) {
-    var lapHeaderLine by remember { mutableStateOf(false) }
+    var lapHeaderLine by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    stopwatchViewModel.apply {
-        Surface(modifier = modifier) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment1.CenterHorizontally
-                ) {
-                    stopwatchViewModel.apply {
+
+    Surface(modifier = modifier) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                         Spacer(modifier = Modifier.height(122.dp))
                         StopWatchTime(
-                            hours = hours,
-                            minutes = minutes,
-                            seconds = seconds
+                            hours = stopwatchState.hours,
+                            minutes = stopwatchState.minutes,
+                            seconds = stopwatchState.seconds,
                         )
-                        Spacer(modifier = Modifier.height(30.dp))
+                        Spacer(modifier = Modifier.height(55.dp))
                         AnimatedVisibility(visible = lapHeaderLine) {
                             DividerItem()
                         }
@@ -82,24 +89,25 @@ fun StopwatchScreen(
                             scrollState = scrollState
                         )
                         Buttons(
-                            isPlaying = isPlaying,
-                            onPause = { pause() },
-                            onStart = { start() },
-                            onStop = { stop() },
-                            onLap = { onLap() },
-                            onClear =  {onClear() },
-                            onLapHeadLine = { lapHeaderLine = it },
+                            isPlaying = stopwatchState.isPlaying,
+                            onPause = { stopwatchActions.onPause() },
+                            onStart = { stopwatchActions.onStart() },
+                            onStop = { stopwatchActions.onStop() },
+                            onLap = { stopwatchActions.onLap() },
+                            onClear = { stopwatchActions.onClear() },
                             scrollState = scrollState,
                             scope = scope,
-                            lapsItems = lapItems
+                            lapsItems = lapItems,
+                            onChangeLapHeaderLine = {
+                                lapHeaderLine = it
+                            }
                         )
 
                     }
                 }
-            }
 
         }
-    }
+
 
 
 
@@ -109,7 +117,7 @@ fun StopwatchScreen(
 private fun StopWatchTime(
     hours: String,
     minutes: String,
-    seconds: String
+    seconds: String,
 ) {
     Row {
         TextTime(timeUnit = hours)
@@ -137,16 +145,21 @@ private fun LapsItems(
     lapsItems: List<Lap>,
     scrollState: LazyListState
 ) {
+
     LazyColumn (
         modifier = Modifier
             .height(300.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(vertical = 15.dp),
+        contentPadding = PaddingValues(vertical = 5.dp),
         reverseLayout = true,
         state = scrollState
         ) {
         itemsIndexed(lapsItems) {  index, lapItem ->
+            val prevLapItem = lapsItems.getOrNull(index - 1)?.currentTime
+            val currentLapItem = lapsItems.getOrNull(index)?.currentTime
+            val lapItemsAreNotTheSame = prevLapItem != currentLapItem
+            if (lapItemsAreNotTheSame)
             LapItem(lapItem, index)
         }
     }
@@ -182,23 +195,25 @@ private fun Buttons(
     onStart: () -> Unit,
     onLap: () -> Unit,
     onClear: () -> Unit,
-    onLapHeadLine: (Boolean) -> Unit,
     scrollState: LazyListState,
     scope: CoroutineScope,
-    lapsItems: List<Lap>
+    lapsItems: List<Lap>,
+    onChangeLapHeaderLine: (Boolean) -> Unit
 
-) {
+    ) {
+    var isStartButtonVisible by rememberSaveable { mutableStateOf(true) }
+    Log.e(TAG, "Buttons: $isStartButtonVisible" )
+    val transition = updateTransition(isStartButtonVisible)
         Box {
-            var startVisible by remember { mutableStateOf(true) }
-            val transition = updateTransition(startVisible)
 
             transition.AnimatedVisibility(
                 visible = { targetSelected -> targetSelected }
             ) {
-                StopWatchButton(
+                ClockButton(
                     onClick = {
                         onStart()
-                        startVisible = false
+                        isStartButtonVisible = false
+                        onChangeLapHeaderLine(true)
                     },
                     textButton = "Start",
                     color = MaterialTheme.colorScheme.primary
@@ -211,15 +226,14 @@ private fun Buttons(
                     horizontalArrangement = Arrangement.spacedBy(32.dp)
                         ){
                     if (isPlaying) {
-                        StopWatchButton(
+                        ClockButton(
                             textButton = "Stop",
                             onClick = onPause,
                             color = Red100
                         )
-                        StopWatchButton(
+                        ClockButton(
                             textButton = "Lap",
                             onClick = {
-                                onLapHeadLine(true)
                                 onLap()
                                 scope.launch {
                                     scrollState.animateScrollToItem(index = lapsItems.lastIndex)
@@ -228,18 +242,18 @@ private fun Buttons(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     } else {
-                        StopWatchButton(
+                        ClockButton(
                             textButton = "Resume",
                             onClick = onStart,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        StopWatchButton(
+                        ClockButton(
                             textButton = "Reset",
                             onClick = {
                                 onStop()
-                                onLapHeadLine(false)
-                                startVisible = true
                                 onClear()
+                                isStartButtonVisible = true
+                                onChangeLapHeaderLine(false)
                             },
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -259,25 +273,4 @@ private fun TextTime(timeUnit: String) {
     )
 }
 
-@Composable
-fun StopWatchButton(
-    textButton: String,
-    onClick: () -> Unit,
-    color: Color,
-) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = color
-        ),
-        contentPadding = PaddingValues(
-            start = 40.dp,
-            top = 12.dp,
-            end = 40.dp,
-            bottom = 12.dp
-        )
-    ) {
-        Text(text = textButton,
-            style = MaterialTheme.typography.titleMedium)
-    }
-}
+

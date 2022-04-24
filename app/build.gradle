@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -59,15 +61,23 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 
-    implementation "androidx.navigation:navigation-compose:2.5.0-alpha03"
-
-    implementation "androidx.compose.material3:material3:1.0.0-alpha07"
-
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
+    //compose-navigation
+    implementation "androidx.navigation:navigation-compose:2.5.0-alpha04"
+    //materiel3
+    implementation "androidx.compose.material3:material3:1.0.0-alpha09"
+    //materiel
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
-
+    //insets
     implementation "com.google.accompanist:accompanist-insets:0.24.2-alpha"
-
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha04"
+    //compose-viewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha06"
+    //Hilt
+    implementation "com.google.dagger:hilt-android:2.40"
+    kapt "com.google.dagger:hilt-compiler:2.40"
+    // Zhuinden flow-combinetuple
+    implementation 'com.github.Zhuinden:flow-combinetuple-kt:1.1.1'
 
 
 

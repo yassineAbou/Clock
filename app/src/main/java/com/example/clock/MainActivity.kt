@@ -7,8 +7,11 @@ import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,19 +19,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.clock.alarm.AlarmScreen
 import com.example.clock.components.BottomNavigationBar
 import com.example.clock.components.bottomBarItems
+import com.example.clock.stopwatch.Lap
 import com.example.clock.stopwatch.StopwatchScreen
+import com.example.clock.stopwatch.StopwatchScreenActions
 import com.example.clock.stopwatch.StopwatchViewModel
 import com.example.clock.timer.TimerScreen
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.world.CurrentTimeScreen
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val stopwatchViewModel: StopwatchViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +42,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-           ProvideWindowInsets {
+            ProvideWindowInsets {
                 ClockTheme {
                     val navController = rememberNavController()
                     Scaffold(
@@ -46,13 +51,10 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.navigationBarsPadding(),
                                 items = bottomBarItems,
                                 navController = navController,
-                                onItemClick = {
-                                    navController.navigate(it.route)
-                                },
                             )
                         }
                     ) {
-                        Navigation(navController = navController, stopwatchViewModel)
+                        Navigation(navController = navController)
                     }
                 }
             }
@@ -63,10 +65,12 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalTime::class)
 @Composable
-fun Navigation(navController: NavHostController, stopwatchViewModel: StopwatchViewModel) {
+fun Navigation(navController: NavHostController) {
 
+    val stopwatchViewModel: StopwatchViewModel = viewModel()
+    val stopwatchState by stopwatchViewModel.stopwatchState.observeAsState()
 
-         NavHost(navController = navController, startDestination = Screen.Alarm.route) {
+    NavHost(navController = navController, startDestination = Screen.Alarm.route) {
         composable(Screen.Alarm.route) {
             AlarmScreen()
         }
@@ -74,13 +78,20 @@ fun Navigation(navController: NavHostController, stopwatchViewModel: StopwatchVi
             CurrentTimeScreen()
         }
         composable(Screen.Stopwatch.route) {
-            StopwatchScreen()
+            stopwatchState?.let { it1 ->
+                StopwatchScreen(
+                    stopwatchState = it1,
+                    stopwatchActions = stopwatchViewModel,
+                    lapItems = stopwatchViewModel.lapItems,
+                )
+            }
         }
         composable(Screen.Timer.route) {
             TimerScreen()
         }
     }
 }
+
 
 
 
