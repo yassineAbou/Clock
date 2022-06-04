@@ -24,6 +24,7 @@ import com.example.clock.stopwatch.StopwatchScreen
 import com.example.clock.stopwatch.StopwatchScreenActions
 import com.example.clock.stopwatch.StopwatchViewModel
 import com.example.clock.timer.TimerScreen
+import com.example.clock.timer.TimerViewModel
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.world.CurrentTimeScreen
 import com.google.accompanist.insets.ProvideWindowInsets
@@ -68,7 +69,9 @@ class MainActivity : ComponentActivity() {
 fun Navigation(navController: NavHostController) {
 
     val stopwatchViewModel: StopwatchViewModel = viewModel()
+    val timerViewModel: TimerViewModel = viewModel()
     val stopwatchState by stopwatchViewModel.stopwatchState.observeAsState()
+    val timerState by timerViewModel.timerState.observeAsState()
 
     NavHost(navController = navController, startDestination = Screen.Alarm.route) {
         composable(Screen.Alarm.route) {
@@ -78,16 +81,22 @@ fun Navigation(navController: NavHostController) {
             CurrentTimeScreen()
         }
         composable(Screen.Stopwatch.route) {
-            stopwatchState?.let { it1 ->
+            stopwatchState?.let {
                 StopwatchScreen(
-                    stopwatchState = it1,
+                    stopwatchState = it,
                     stopwatchActions = stopwatchViewModel,
                     lapItems = stopwatchViewModel.lapItems,
                 )
+
             }
         }
         composable(Screen.Timer.route) {
-            TimerScreen()
+            timerState?.let {
+                TimerScreen(
+                   timerState = it,
+                   timerScreenActions = timerViewModel
+                )
+            }
         }
     }
 }

@@ -2,203 +2,266 @@ package com.example.clock.timer
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.text.isDigitsOnly
+import com.example.clock.components.ClockAppBar
 import com.example.clock.components.ClockButton
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.theme.Red100
+import com.example.clock.util.parseInt
 import com.example.clock.util.parseLong
+import com.google.accompanist.insets.statusBarsPadding
 
 private const val TAG = "TimerScreen"
+
 @Preview(name = "TimerScreen")
 @Composable
 private fun TimerScreenPreview() {
     ClockTheme {
-        TimerScreen()
+           TimerScreen(
+            timerState = TimerState(
+                timeInLong = 0L,
+                time = "00:00:00",
+                hours = 0L,
+                minutes = 0L,
+                seconds = 0L,
+                progress = 1.00F,
+                isPlaying = false,
+                isDone = false
+            ),
+            timerScreenActions = object: TimerScreenActions {
+                override fun setHours(hours: Long) {}
+                override fun setMinutes(minutes: Long) {}
+                override fun setSeconds(seconds: Long) {}
+                override fun setTime() {}
+                override fun handleCountDownTimer() {}
+                override fun resetTimer() {}
+
+            }
+        )
+
     }
 }
-@OptIn(ExperimentalAnimationApi::class)
+
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalTransitionApi::class
+)
 @Composable
 fun TimerScreen(
     modifier: Modifier = Modifier,
-    timerViewModel: TimerViewModel = viewModel()
+    timerState: TimerState,
+    timerScreenActions: TimerScreenActions
 ) {
-    var timerPickerVisible by remember { mutableStateOf(true) }
-    val transition = updateTransition(timerPickerVisible)
+    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
+    var isTimerPickerVisible by rememberSaveable { mutableStateOf(true) }
+    val isTimerPickerVisibleTransition = updateTransition(isTimerPickerVisible)
+    var isStartVisible by rememberSaveable { mutableStateOf(true) }
 
-    Surface {
+    LaunchedEffect(timerState.isDone) {
+         if (timerState.isDone) {
+             isTimerPickerVisible = true
+             timerScreenActions.resetTimer()
+             isStartVisible = true
+         }
+
+    }
+
+    Surface(modifier = modifier) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                horizontalAlignment = CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(150.dp))
-                transition.AnimatedVisibility(
+                TimerTopAppBar(
+                    modifier = Modifier.statusBarsPadding(),
+                    scrollBehavior = scrollBehavior
+                )
+
+                Spacer(modifier = Modifier.height(95.dp))
+
+                isTimerPickerVisibleTransition.AnimatedVisibility(
                     visible = { targetSelected -> targetSelected }
                 ) {
                     UnitsOfTime(modifier = Modifier.fillMaxWidth())
                 }
-                transition.AnimatedVisibility(
+
+                isTimerPickerVisibleTransition.AnimatedVisibility(
                     visible = { targetSelected -> targetSelected }
                 ) {
                     TimerPicker(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 30.dp, bottom = 140.dp),
+                            .padding(top = 30.dp, bottom = 132.dp),
                         setHours = {
-                            timerViewModel.setTHours(it)
+                            timerScreenActions.setHours(it)
                         },
                         setMinutes = {
-                            timerViewModel.setMinutes(it)
+                            timerScreenActions.setMinutes(it)
                         },
                         setSeconds = {
-                            timerViewModel.setSeconds(it)
+                            timerScreenActions.setSeconds(it)
                         },
-                        setTime = { timerViewModel.setTime() },
+                        setTime = { timerScreenActions.setTime() },
+                        time = timerState.time
                     )
                 }
-                transition.AnimatedVisibility(
+
+                isTimerPickerVisibleTransition.AnimatedVisibility(
                     visible = { targetSelected -> !targetSelected }
                 ) {
                     Timer(
                         modifier = Modifier
                             .size(300.dp),
-                        time = timerViewModel.time.value,
-                        progress =timerViewModel.progress.value
+                        time = timerState.time,
+                        progress = timerState.progress
                     )
                 }
-                     Spacer(modifier = Modifier.height(80.dp))
-                     TimerButtons(
-                            modifier = Modifier.align(CenterHorizontally),
-                            isPlaying = timerViewModel.isPlaying.value,
-                            optionSelected = {
-                                timerViewModel.handleCountDownTimer()
-                            },
-                            setTimerPickerVisibility = {
-                                timerPickerVisible = it
-                            },
-                            cancelTimer =  { timerViewModel.pauseTimer() }
-                        )
-                    }
+                Spacer(modifier = Modifier.height(72.dp))
+
+                TimerButtons(
+                    modifier = modifier,
+                    isStartVisible = isStartVisible,
+                    isPlaying = timerState.isPlaying,
+                    optionSelected = { timerScreenActions.handleCountDownTimer() },
+                    setTimerPickerVisibility = { isTimerPickerVisible = it } ,
+                    resetTimer = { timerScreenActions.resetTimer() },
+                    setStartVisible = {isStartVisible = it},
+                    time = timerState.time
+                )
+
             }
         }
 
     }
-
-
+}
 
 
 @Composable
-private fun UnitsOfTime( modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        Text(text = "Hours")
-        Text(text = "Minutes")
-        Text(text = "Seconds")
+private fun TimerTopAppBar(
+ modifier: Modifier = Modifier,
+  scrollBehavior: TopAppBarScrollBehavior? = null,
+ ) {
+     ClockAppBar(
+      modifier = modifier,
+       scrollBehavior = scrollBehavior,
+        title = {
+          Text(
+             text = "Timer",
+             style = MaterialTheme.typography.titleLarge,
+            )
+        }
+      )
+ }
 
-    }
-}
+
+@Composable
+private fun UnitsOfTime(modifier: Modifier = Modifier) {
+ Row(
+    modifier = modifier,
+     horizontalArrangement = Arrangement.SpaceAround
+  ) {
+     Text(text = "Hours")
+       Text(text = "Minutes")
+      Text(text = "Seconds")
+      }
+  }
 
 @Composable
 private fun TimerPicker(
-    modifier: Modifier = Modifier,
-    setHours: (Long) -> Unit,
-    setMinutes: (Long) -> Unit,
-    setSeconds: (Long) -> Unit,
-    setTime: () -> Unit,
+   modifier: Modifier = Modifier,
+   setHours: (Long) -> Unit,
+   setMinutes: (Long) -> Unit,
+   setSeconds: (Long) -> Unit,
+   setTime: () -> Unit,
+   time: String,
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly
+
     ) {
+
         val textStyle = MaterialTheme.typography.displayLarge
-        val background = MaterialTheme.colorScheme.surface
-        var hours by remember { mutableStateOf("00") }
-        var minutes by remember { mutableStateOf("00") }
-        var seconds by remember { mutableStateOf("00") }
-        val colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = background,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        )
-        val number = KeyboardOptions(keyboardType = KeyboardType.Number)
+        var hours by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(TextFieldValue(time.substringBefore(":")))
+        }
+        var minutes by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(
+                TextFieldValue(time.substringAfter(":").substringBefore(':'))
+            )
+        }
+        var seconds by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(TextFieldValue(time.substringAfterLast(":")))
+        }
 
-        Surface(modifier = Modifier.weight(1f)) {
-            TextField(
-                value = hours,
-                onValueChange = { value ->
-                    if (value.length <= 2) {
-                        hours = value.filter { it.isDigit() }
-                        setHours(parseLong(hours))
-                    }
-                },
-                textStyle = textStyle,
-                keyboardOptions = number,
-                colors = colors
-            )
-        }
-        Text(
-            text = ":",
-            style = textStyle,
-            modifier = Modifier.padding(top = 10.dp)
+        NumberPicker(
+            modifier = Modifier.weight(1f),
+            number = hours,
+            onNumberChange = { value ->
+                if (value.text.checkTimerInput(99)) {
+                    hours = value
+                    setHours(hours.text.parseLong())
+                    setTime()
+                }
+            }
         )
-        Surface(modifier = Modifier.weight(1f)) {
-            TextField(
-                value = minutes,
-                onValueChange = { value ->
-                    if (value.length <= 2) {
-                        minutes = value.filter { it.isDigit() }
-                        setMinutes(parseLong(minutes))
-                        setTime()
-                    }
-                },
-                textStyle = textStyle,
-                keyboardOptions = number,
-                colors = colors
-            )
-        }
 
         Text(
             text = ":",
             style = textStyle,
             modifier = Modifier.padding(top = 10.dp)
         )
-        Surface(modifier = Modifier.weight(1f)) {
-            TextField(
-                value = seconds,
-                onValueChange = { value ->
-                    if (value.length <= 2) {
-                        seconds = value.filter { it.isDigit() }
-                        setSeconds(parseLong(seconds))
-                    }
-                },
-                textStyle = textStyle,
-                keyboardOptions = number,
-                colors = colors
-            )
+
+        NumberPicker(
+            modifier = Modifier.weight(1f),
+            number = minutes,
+            onNumberChange = { value ->
+                if (value.text.checkTimerInput(60)) {
+                    minutes = value
+                    setMinutes(minutes.text.parseLong())
+                    setTime()
+                }
+            }
+        )
+
+        Text(
+            text = ":",
+            style = textStyle,
+            modifier = Modifier.padding(top = 10.dp)
+        )
+
+        NumberPicker(
+            modifier = Modifier.weight(1f),
+            number = seconds,
+            onNumberChange = { value ->
+                if (value.text.checkTimerInput(60)) {
+                    seconds = value
+                    setSeconds(seconds.text.parseLong())
+                    setTime()
+                }
+            }
+        )
+
         }
     }
-}
+
 
 
 
@@ -234,38 +297,43 @@ private fun Timer(
 private fun TimerButtons(
     modifier: Modifier = Modifier,
     isPlaying: Boolean,
+    isStartVisible: Boolean,
     optionSelected: () -> Unit,
     setTimerPickerVisibility: (Boolean) -> Unit,
-    cancelTimer: () -> Unit
+    resetTimer: () -> Unit,
+    time: String,
+    setStartVisible: (Boolean) -> Unit,
 ) {
-    var startVisible by remember { mutableStateOf(true) }
-    val transition = updateTransition(startVisible)
+
+    val isStartVisibleTransition = updateTransition(isStartVisible)
 
     Box(modifier = modifier) {
 
-        transition.AnimatedVisibility(
+        isStartVisibleTransition.AnimatedVisibility(
             visible = { targetSelected -> targetSelected }
         ) {
+
             ClockButton(
                 textButton = "Start",
                 onClick = {
                     setTimerPickerVisibility(false)
                     optionSelected()
-                    startVisible = false
-                }
+                    setStartVisible(false)
+                },
+                enabled = true
             )
         }
 
-        transition.AnimatedVisibility(
+        isStartVisibleTransition.AnimatedVisibility(
             visible = { targetSelected -> !targetSelected }
         ) {
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.spacedBy(32.dp)
-            ){
+            ) {
                 if (isPlaying) {
                     ClockButton(
                         textButton = "Pause",
-                        onClick =  optionSelected,
+                        onClick = optionSelected,
                         color = Red100
                     )
                 } else {
@@ -276,10 +344,10 @@ private fun TimerButtons(
                 }
                 ClockButton(
                     textButton = "Cancel",
-                    onClick =  {
-                        startVisible = true
-                        cancelTimer()
+                    onClick = {
                         setTimerPickerVisibility(true)
+                        resetTimer()
+                        setStartVisible(true)
                     },
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -287,6 +355,10 @@ private fun TimerButtons(
         }
 
     }
+}
 
+
+private fun String.checkTimerInput(number: Int): Boolean {
+    return this.length <= 2 && this.isDigitsOnly() &&   this.parseInt() <= number
 }
 

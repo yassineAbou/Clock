@@ -1,5 +1,10 @@
 package com.example.clock.util
 
-fun parseLong(`val`: String?): Long {
-    return if (`val` == null || `val`.isEmpty()) 0L else `val`.toLong()
+fun String?.parseLong(): Long {
+    return if (this == null || this.isEmpty()) 0L else this.toLong()
 }
+
+fun String?.parseInt(): Int {
+    return if (this == null || this.isEmpty()) 0 else this.toInt()
+}
+

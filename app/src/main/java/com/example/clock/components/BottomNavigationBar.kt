@@ -29,8 +29,7 @@ data class BottomNavItem(
 fun BottomNavigationBar(
     items: List<BottomNavItem>,
     navController: NavController,
-    modifier: Modifier = Modifier,
-    //onItemClick: (BottomNavItem) -> Unit
+    modifier: Modifier = Modifier
 ) {
     val backStackEntry = navController.currentBackStackEntryAsState()
     NavigationBar(modifier = modifier) {

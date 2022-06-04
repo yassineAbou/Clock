@@ -14,6 +14,7 @@ fun ClockButton(
     textButton: String,
     onClick: () -> Unit,
     color: Color = MaterialTheme.colorScheme.primary,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
@@ -25,7 +26,8 @@ fun ClockButton(
             top = 12.dp,
             end = 40.dp,
             bottom = 12.dp
-        )
+        ),
+        enabled = enabled
     ) {
         Text(text = textButton,
             style = MaterialTheme.typography.titleMedium)

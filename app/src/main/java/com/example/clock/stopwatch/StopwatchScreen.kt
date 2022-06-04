@@ -30,16 +30,33 @@ import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 import androidx.compose.ui.Alignment.Companion as Alignment1
 
-/*
+
 @Preview(name = "StopwatchScreen")
 @OptIn(kotlin.time.ExperimentalTime::class)
 @Composable
 fun DefaultPreview() {
     ClockTheme {
-        StopwatchScreen()
+        StopwatchScreen(
+            stopwatchState = StopwatchState(
+                seconds = "00",
+                minutes = "00",
+                hours = "00",
+                isPlaying = false,
+                isZero = true,
+            ),
+            stopwatchActions = object : StopwatchScreenActions {
+                override fun onStart() {}
+                override fun onLap() {}
+                override fun onClear() {}
+                override fun onPause() {}
+                override fun onStop() {}
+
+            },
+            lapItems = initialLapItems
+        )
     }
 }
- */
+
 
 
 
@@ -202,7 +219,6 @@ private fun Buttons(
 
     ) {
     var isStartButtonVisible by rememberSaveable { mutableStateOf(true) }
-    Log.e(TAG, "Buttons: $isStartButtonVisible" )
     val transition = updateTransition(isStartButtonVisible)
         Box {
 
@@ -272,5 +288,12 @@ private fun TextTime(timeUnit: String) {
         fontWeight = FontWeight.Light
     )
 }
+
+val initialLapItems = listOf(
+    Lap("00:00:00"),
+    Lap("00:00:01"),
+    Lap("00:00:02"),
+    Lap("00:00:03"),
+)
 
 
