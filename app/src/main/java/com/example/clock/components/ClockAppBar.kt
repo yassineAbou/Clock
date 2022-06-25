@@ -2,6 +2,7 @@ package com.example.clock.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import com.example.clock.ui.theme.ClockTheme
 fun ClockAppBar(
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
@@ -30,7 +32,8 @@ fun ClockAppBar(
             modifier = modifier,
             title = title,
             scrollBehavior = scrollBehavior,
-            colors = foregroundColors
+            colors = foregroundColors,
+            actions = actions
         )
     }
 }

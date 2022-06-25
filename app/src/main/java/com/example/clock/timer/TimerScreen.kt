@@ -17,12 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import com.example.clock.components.ClockAppBar
 import com.example.clock.components.ClockButton
+import com.example.clock.components.NumberPicker
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.theme.Red100
-import com.example.clock.util.parseInt
+import com.example.clock.util.checkTimerInput
 import com.example.clock.util.parseLong
 import com.google.accompanist.insets.statusBarsPadding
 
@@ -67,7 +67,7 @@ fun TimerScreen(
     timerState: TimerState,
     timerScreenActions: TimerScreenActions
 ) {
-    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
     var isTimerPickerVisible by rememberSaveable { mutableStateOf(true) }
     val isTimerPickerVisibleTransition = updateTransition(isTimerPickerVisible)
     var isStartVisible by rememberSaveable { mutableStateOf(true) }
@@ -233,7 +233,7 @@ private fun TimerPicker(
             modifier = Modifier.weight(1f),
             number = minutes,
             onNumberChange = { value ->
-                if (value.text.checkTimerInput(60)) {
+                if (value.text.checkTimerInput(59)) {
                     minutes = value
                     setMinutes(minutes.text.parseLong())
                     setTime()
@@ -251,7 +251,7 @@ private fun TimerPicker(
             modifier = Modifier.weight(1f),
             number = seconds,
             onNumberChange = { value ->
-                if (value.text.checkTimerInput(60)) {
+                if (value.text.checkTimerInput(59)) {
                     seconds = value
                     setSeconds(seconds.text.parseLong())
                     setTime()
@@ -358,7 +358,5 @@ private fun TimerButtons(
 }
 
 
-private fun String.checkTimerInput(number: Int): Boolean {
-    return this.length <= 2 && this.isDigitsOnly() &&   this.parseInt() <= number
-}
+
 

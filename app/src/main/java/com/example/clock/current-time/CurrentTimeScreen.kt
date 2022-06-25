@@ -33,7 +33,7 @@ fun CurrentTimeScreenPreview() {
 fun CurrentTimeScreen(
     modifier: Modifier = Modifier
 ) {
-    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
 
     Surface(modifier = modifier) {
         Box(modifier = Modifier.fillMaxSize()) {

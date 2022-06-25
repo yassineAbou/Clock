@@ -1,10 +1,6 @@
-package com.example.clock.timer
+package com.example.clock.components
 
-import android.text.TextUtils.isEmpty
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
@@ -13,21 +9,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.core.text.isDigitsOnly
 import com.example.clock.util.clearFocusOnKeyboardDismiss
-import com.example.clock.util.parseLong
+import java.time.format.TextStyle
 
 @Composable
  fun NumberPicker(
     modifier: Modifier = Modifier,
     number: TextFieldValue,
-    onNumberChange: (TextFieldValue) -> Unit
+    onNumberChange: (TextFieldValue) -> Unit,
+    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.displayLarge
 ) {
 
-    val textStyle = MaterialTheme.typography.displayLarge
     val background = MaterialTheme.colorScheme.surface
     val colors = TextFieldDefaults.textFieldColors(
         backgroundColor = background,
