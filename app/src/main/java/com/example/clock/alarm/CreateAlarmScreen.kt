@@ -22,7 +22,6 @@ import com.example.clock.util.Global.defaultValue
 import com.example.clock.util.Global.formatter
 import com.example.clock.util.checkTimerInput
 import com.example.clock.util.clearFocusOnKeyboardDismiss
-import com.example.clock.util.countOccurrences
 
 import com.example.clock.util.parseInt
 import com.vanpra.composematerialdialogs.MaterialDialog

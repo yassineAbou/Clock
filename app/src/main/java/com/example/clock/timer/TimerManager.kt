@@ -22,7 +22,10 @@ data class TimerState(
 )
 
 @Singleton
-class TimerManager @Inject constructor() {
+class TimerManager @Inject constructor(
+    private val timerServiceManager: TimerServiceManager,
+    private val notificationHelper: NotificationHelper
+) {
 
     private val timeInLongFlow = MutableStateFlow(0L)
     private val timeFlow = MutableStateFlow("00:00:00")
@@ -72,6 +75,8 @@ class TimerManager @Inject constructor() {
             }
 
             override fun onTimerFinish() {
+                notificationHelper.removeTimerNotificationService()
+                notificationHelper.showTimerCompletedNotification(timeFlow.value)
                 handleTimerValues(false, timeInLongFlow.value.formatTime(), 1.0F)
                 isDoneFlow.value = true
             }
@@ -79,10 +84,12 @@ class TimerManager @Inject constructor() {
     }
 
      fun handleCountDownTimer() {
+         notificationHelper.removeTimerCompletedNotification()
         if (isPlayingFlow.value) {
             pauseTimer()
         } else {
             startTimer()
+            timerServiceManager.startTimerService()
         }
     }
 
@@ -96,6 +103,7 @@ class TimerManager @Inject constructor() {
         isPlayingFlow.value = false
         isDoneFlow.value = false
         timeFlow.value = timeInLongFlow.value.formatTime()
+        timerServiceManager.stopTimerService()
     }
 
     private fun startTimer() {

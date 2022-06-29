@@ -2,5 +2,6 @@
     <string name="app_name">Clock</string>
     <string name="add">Add</string>
     <string name="more">More options</string>
+    <string name="timer_service_channel_name">Timer service channel</string>
 
 </resources>
