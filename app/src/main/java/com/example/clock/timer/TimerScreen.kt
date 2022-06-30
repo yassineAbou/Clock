@@ -67,10 +67,11 @@ fun TimerScreen(
     timerState: TimerState,
     timerScreenActions: TimerScreenActions
 ) {
+    val isNotPlaying= !timerState.isPlaying
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
-    var isTimerPickerVisible by rememberSaveable { mutableStateOf(true) }
+    var isTimerPickerVisible by rememberSaveable { mutableStateOf(isNotPlaying) }
     val isTimerPickerVisibleTransition = updateTransition(isTimerPickerVisible)
-    var isStartVisible by rememberSaveable { mutableStateOf(true) }
+    var isStartVisible by rememberSaveable { mutableStateOf(isNotPlaying) }
 
     LaunchedEffect(timerState.isDone) {
          if (timerState.isDone) {

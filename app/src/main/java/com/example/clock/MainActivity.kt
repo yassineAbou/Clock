@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.example.clock.alarm.AlarmsListScreen
 import com.example.clock.alarm.AlarmsListViewModel
 import com.example.clock.alarm.CreateAlarmScreen
@@ -168,7 +169,10 @@ fun Navigation(navController: NavHostController) {
 
             }
         }
-        composable(Screen.Timer.route) {
+        composable(
+           route = Screen.Timer.route,
+            deepLinks = Screen.timerDeepLink
+        ) {
             timerState?.let {
                 TimerScreen(
                    timerState = it,
