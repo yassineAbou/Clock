@@ -1,15 +1,8 @@
 package com.example.clock.timer
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.example.clock.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -29,12 +22,21 @@ class TimerService : Service() {
     @Inject
     lateinit var notificationHelper: NotificationHelper
 
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(TIMER_SERVICE_NOTIFICATION_ID, notificationHelper.getBaseNotification().build())
 
         serviceScope.launch {
             timerManager.timerState.collectLatest {
-                notificationHelper.updateNotificationChannel(it)
+                if (!it.isDone && it.progress != 1.0F) {
+                    notificationHelper.updateTimerServiceNotification(
+                        timerRunning = it.isPlaying,
+                        time = it.time,
+                        isDone = it.isDone
+                    )
+                }
+
+
             }
         }
 
@@ -47,6 +49,10 @@ class TimerService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        notificationHelper.removeTimerNotificationService()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        timerManager.onChangeDone()
+        //notificationHelper.removeTimerServiceNotification()
     }
 }
+
+private const val TAG = "TimerService"

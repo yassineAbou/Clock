@@ -39,5 +39,13 @@ class TimerViewModel @Inject constructor(
         timerManager.resetTimer()
     }
 
+    override fun onChangeDone() {
+        timerManager.onChangeDone()
+    }
+
+    override fun stopService() {
+        timerManager.stopService()
+    }
+
 
 }

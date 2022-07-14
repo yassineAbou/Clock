@@ -1,19 +1,18 @@
 package com.example.clock.timer
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.system.Os.remove
+import android.util.Log
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.example.clock.MainActivity
 import com.example.clock.R
-import com.example.clock.Screen
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,24 +40,72 @@ class NotificationHelper @Inject constructor(
         applicationContext, 0, openTimerIntent, pendingIntentFlags
     )
 
-
-
     init {
         createNotificationChannels()
     }
 
     fun getBaseNotification() = NotificationCompat.Builder(applicationContext, TIMER_SERVICE_CHANNEL_ID)
         .setContentTitle("Timer")
-        .setSmallIcon(R.drawable.ic_baseline_hourglass_empty_24)
+        .setSmallIcon(R.drawable.ic_hourglass_empty)
         .setContentIntent(openTimerPendingIntent)
+        .setAutoCancel(true)
+        .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
+        .setColorized(true)
         .setSilent(true)
         .setOnlyAlertOnce(true)
 
-     fun updateNotificationChannel(timerState: TimerState) {
-        val notificationUpdate = getBaseNotification()
-            .setContentText(timerState.time)
-            .build()
-        notificationManager.notify(TIMER_SERVICE_NOTIFICATION_ID, notificationUpdate)
+     fun updateTimerServiceNotification(
+         time: String,
+         timerRunning: Boolean,
+         isDone: Boolean
+     ) {
+         val actionIntent = getTimerNotificationActionIntent(time, timerRunning, isDone)
+         val remove =  remove()
+         val startStopIcon = if (timerRunning) R.drawable.ic_stop else R.drawable.ic_play
+         val startStopLabel = if (timerRunning) "Pause" else "Resume"
+
+         val notificationUpdate = getBaseNotification()
+             .setContentText(time)
+             .addAction(R.drawable.ic_close, "Cancel", remove)
+             .addAction(
+                 startStopIcon,
+                 startStopLabel,
+                 actionIntent
+             )
+             .build()
+             notificationManager.notify(TIMER_SERVICE_NOTIFICATION_ID, notificationUpdate)
+    }
+
+    private fun remove() : PendingIntent {
+        val broadcastIntent =
+            Intent(applicationContext, TimerNotificationBroadcastReceiver::class.java).apply {
+                action = ACTION_DELETE
+            }
+        return PendingIntent.getBroadcast(
+            applicationContext,
+            2,
+            broadcastIntent,
+            pendingIntentFlags
+        )
+    }
+
+    private fun getTimerNotificationActionIntent(
+        time: String,
+        timerRunning: Boolean,
+        isDone: Boolean
+    ): PendingIntent {
+        val broadcastIntent =
+            Intent(applicationContext, TimerNotificationBroadcastReceiver::class.java).apply {
+                putExtra(EXTRA_TIME, time)
+                putExtra(EXTRA_TIMER_RUNNING, timerRunning)
+                putExtra(EXTRA_IS_DONE, isDone)
+            }
+        return PendingIntent.getBroadcast(
+            applicationContext,
+            1,
+            broadcastIntent,
+            pendingIntentFlags
+        )
     }
 
      fun showTimerCompletedNotification(time: String) {
@@ -66,17 +113,17 @@ class NotificationHelper @Inject constructor(
                 .setContentTitle("Time's up")
                 .setContentText(time)
                 .setContentIntent(openTimerPendingIntent)
-                .setSmallIcon(R.drawable.ic_baseline_hourglass_empty_24)
+                .setSmallIcon(R.drawable.ic_hourglass_empty)
                 .build()
             notificationManager.notify(TIMER_COMPLETED_NOTIFICATION_ID, timerCompletedNotification)
     }
 
-    fun removeTimerNotificationService() {
-        notificationManager.cancel(TIMER_SERVICE_NOTIFICATION_ID)
-    }
-
     fun removeTimerCompletedNotification() {
         notificationManager.cancel(TIMER_COMPLETED_NOTIFICATION_ID)
+    }
+
+    fun removeTimerServiceNotification() {
+        notificationManager.cancel(TIMER_SERVICE_NOTIFICATION_ID)
     }
 
     private fun createNotificationChannels() {
@@ -108,5 +155,6 @@ class NotificationHelper @Inject constructor(
 
 private const val TIMER_SERVICE_CHANNEL_ID = "timer_service_channel"
 private const val TIMER_COMPLETED_CHANNEL_ID = "timer_completed_notification_channel"
-private const val TIMER_COMPLETED_NOTIFICATION_ID = 124
-const val TIMER_SERVICE_NOTIFICATION_ID = 123
+const val TIMER_SERVICE_NOTIFICATION_ID = -1
+private const val TIMER_COMPLETED_NOTIFICATION_ID = -2
+private const val TAG = "NotificationHelper"

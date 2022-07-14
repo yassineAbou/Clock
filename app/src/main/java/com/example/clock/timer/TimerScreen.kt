@@ -1,5 +1,6 @@
 package com.example.clock.timer
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.ExperimentalTransitionApi
@@ -25,6 +26,8 @@ import com.example.clock.ui.theme.Red100
 import com.example.clock.util.checkTimerInput
 import com.example.clock.util.parseLong
 import com.google.accompanist.insets.statusBarsPadding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 private const val TAG = "TimerScreen"
 
@@ -50,6 +53,8 @@ private fun TimerScreenPreview() {
                 override fun setTime() {}
                 override fun handleCountDownTimer() {}
                 override fun resetTimer() {}
+                override fun onChangeDone() {}
+                override fun stopService() {}
 
             }
         )
@@ -67,18 +72,20 @@ fun TimerScreen(
     timerState: TimerState,
     timerScreenActions: TimerScreenActions
 ) {
-    val isNotPlaying= !timerState.isPlaying
+
+    val isNotPlaying = timerState.time == "00:00:00" && !timerState.isPlaying
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
     var isTimerPickerVisible by rememberSaveable { mutableStateOf(isNotPlaying) }
     val isTimerPickerVisibleTransition = updateTransition(isTimerPickerVisible)
     var isStartVisible by rememberSaveable { mutableStateOf(isNotPlaying) }
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(timerState.isDone) {
+    LaunchedEffect(timerState.isDone, timerState.isPlaying) {
          if (timerState.isDone) {
-             isTimerPickerVisible = true
              timerScreenActions.resetTimer()
+             isTimerPickerVisible = true
              isStartVisible = true
-         }
+        }
 
     }
 
@@ -142,7 +149,10 @@ fun TimerScreen(
                     isPlaying = timerState.isPlaying,
                     optionSelected = { timerScreenActions.handleCountDownTimer() },
                     setTimerPickerVisibility = { isTimerPickerVisible = it } ,
-                    resetTimer = { timerScreenActions.resetTimer() },
+                    resetTimer = {
+                        timerScreenActions.onChangeDone()
+                     scope.launch {  timerScreenActions.stopService() }
+                    },
                     setStartVisible = {isStartVisible = it},
                     time = timerState.time
                 )
@@ -345,11 +355,7 @@ private fun TimerButtons(
                 }
                 ClockButton(
                     textButton = "Cancel",
-                    onClick = {
-                        setTimerPickerVisibility(true)
-                        resetTimer()
-                        setStartVisible(true)
-                    },
+                    onClick = resetTimer ,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

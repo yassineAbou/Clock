@@ -26,7 +26,8 @@
             </intent-filter>
 
         </activity>
-        <service android:name=".timer.TimerService" />
+        <service android:name=".timer.TimerService" android:stopWithTask="true"/>
+        <receiver android:name=".timer.TimerNotificationBroadcastReceiver" />
     </application>
 
 </manifest>

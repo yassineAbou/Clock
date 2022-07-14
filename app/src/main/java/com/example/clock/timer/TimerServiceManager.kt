@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TimerServiceManager @Inject constructor(
@@ -17,5 +20,6 @@ class TimerServiceManager @Inject constructor(
     fun stopTimerService() {
         val serviceIntent = Intent(applicationContext, TimerService::class.java)
         applicationContext.stopService(serviceIntent)
+
     }
 }

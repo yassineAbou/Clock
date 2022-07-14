@@ -1,9 +1,15 @@
 package com.example.clock.timer
 
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.runtime.internal.isLiveLiteralsEnabled
 import com.example.clock.stopwatch.StopwatchState
 import com.zhuinden.flowcombinetuplekt.combineTuple
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -75,21 +81,20 @@ class TimerManager @Inject constructor(
             }
 
             override fun onTimerFinish() {
-                notificationHelper.removeTimerNotificationService()
+                onChangeDone()
+                stopService()
                 notificationHelper.showTimerCompletedNotification(timeFlow.value)
                 handleTimerValues(false, timeInLongFlow.value.formatTime(), 1.0F)
-                isDoneFlow.value = true
             }
         }
     }
 
      fun handleCountDownTimer() {
-         notificationHelper.removeTimerCompletedNotification()
+        notificationHelper.removeTimerCompletedNotification()
         if (isPlayingFlow.value) {
             pauseTimer()
         } else {
             startTimer()
-            timerServiceManager.startTimerService()
         }
     }
 
@@ -98,17 +103,25 @@ class TimerManager @Inject constructor(
         isPlayingFlow.value = false
     }
 
+    fun onChangeDone() {
+        isDoneFlow.value = true
+    }
+
     fun resetTimer() {
         countDownTimer?.restart()
+        timeFlow.value = timeInLongFlow.value.formatTime()
         isPlayingFlow.value = false
         isDoneFlow.value = false
-        timeFlow.value = timeInLongFlow.value.formatTime()
-        timerServiceManager.stopTimerService()
+    }
+
+    fun stopService() {
+     timerServiceManager.stopTimerService()
     }
 
     private fun startTimer() {
         countDownTimer?.start()
         isPlayingFlow.value = true
+        timerServiceManager.startTimerService()
     }
 
      private fun handleTimerValues(
@@ -129,3 +142,5 @@ class TimerManager @Inject constructor(
     )
 
 }
+
+private const val TAG = "TimerManager"

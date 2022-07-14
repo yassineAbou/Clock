@@ -7,5 +7,7 @@ package com.example.clock.timer
     fun setTime()
     fun handleCountDownTimer()
     fun resetTimer()
+    fun onChangeDone()
+    fun stopService()
 
 }
