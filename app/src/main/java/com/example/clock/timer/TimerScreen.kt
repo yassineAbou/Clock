@@ -73,19 +73,20 @@ fun TimerScreen(
     timerScreenActions: TimerScreenActions
 ) {
 
-    val isNotPlaying = timerState.time == "00:00:00" && !timerState.isPlaying
+    val isNotPlaying = timerState.progress == 1.0F && !timerState.isPlaying
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
     var isTimerPickerVisible by rememberSaveable { mutableStateOf(isNotPlaying) }
     val isTimerPickerVisibleTransition = updateTransition(isTimerPickerVisible)
     var isStartVisible by rememberSaveable { mutableStateOf(isNotPlaying) }
-    val scope = rememberCoroutineScope()
+    var isStartEnabled by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(timerState.isDone, timerState.isPlaying) {
+    LaunchedEffect(timerState.isDone, timerState.timeInLong) {
          if (timerState.isDone) {
              timerScreenActions.resetTimer()
              isTimerPickerVisible = true
              isStartVisible = true
         }
+        isStartEnabled = timerState.timeInLong != 0L
 
     }
 
@@ -151,10 +152,10 @@ fun TimerScreen(
                     setTimerPickerVisibility = { isTimerPickerVisible = it } ,
                     resetTimer = {
                         timerScreenActions.onChangeDone()
-                     scope.launch {  timerScreenActions.stopService() }
+                        timerScreenActions.stopService()
                     },
-                    setStartVisible = {isStartVisible = it},
-                    time = timerState.time
+                    setStartVisible = { isStartVisible = it},
+                    isStartEnabled = isStartEnabled
                 )
 
             }
@@ -312,7 +313,7 @@ private fun TimerButtons(
     optionSelected: () -> Unit,
     setTimerPickerVisibility: (Boolean) -> Unit,
     resetTimer: () -> Unit,
-    time: String,
+    isStartEnabled: Boolean,
     setStartVisible: (Boolean) -> Unit,
 ) {
 
@@ -331,7 +332,7 @@ private fun TimerButtons(
                     optionSelected()
                     setStartVisible(false)
                 },
-                enabled = true
+                enabled = isStartEnabled
             )
         }
 

@@ -6,5 +6,7 @@
     <string name="timer_service_channel_description">Shows a persistent notification when the timer is running</string>
     <string name="timer_completed_channel_name">Timer completed notifications</string>
     <string name="timer_completed_channel_description">Shows a notification when a countdown timer finishes</string>
+    <string name="alarm_service_channel_name">Alarm service channel</string>
+    <string name="alarm_service_channel_description">Shows an alert notification at a particular time</string>
 
 </resources>

@@ -1,19 +1,25 @@
 package com.example.clock.data
 
 import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.clock.util.Global.current
-import com.example.clock.util.Global.formatter
 
-@Entity(tableName = "alarm_Item_table")
+@Entity(
+    tableName = "alarm_Item_table",
+    indices = [Index(value = ["hour", "minute", "title", "targetDay",
+          "sunday", "monday", "tuesday", "wednesday",  "thursday", "saturday"                                                     ],
+    unique = true)]
+)
 data class Alarm(
-    @PrimaryKey(autoGenerate = true)
-    val alarmId: Long = 0L,
-    var hour: String = "",
-    var minute: String = "",
+    @PrimaryKey()
+    var alarmId: Int = 0,
+    var hour: String = "00",
+    var minute: String = "00",
     var title: String = "",
     var targetDay: String = "",
     var started: Boolean = true,
+    var recurring: Boolean = false,
     var created: Boolean = false,
     var sunday: Boolean = false,
     var monday: Boolean = false,

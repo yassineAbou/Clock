@@ -1,6 +1,5 @@
 package com.example.clock.alarm
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
@@ -18,7 +17,6 @@ import com.example.clock.components.NumberPicker
 import com.example.clock.data.Alarm
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.Global.current
-import com.example.clock.util.Global.defaultValue
 import com.example.clock.util.Global.formatter
 import com.example.clock.util.checkTimerInput
 import com.example.clock.util.clearFocusOnKeyboardDismiss
@@ -51,6 +49,8 @@ private fun CreateAlarmScreenPreview() {
                 override fun onChangeTitle(title: String) {}
                 override fun onChangeTargetDay(targetDay: String) {}
                 override fun onChangeDays(days: List<Boolean>) {}
+                override fun cancel(alarm: Alarm) {}
+                override fun schedule(alarm: Alarm) {}
             },
         )
     }
@@ -148,7 +148,7 @@ fun CreateAlarmScreen(
                         alarmsListScreenActions.insert()
                     },
                     navigateToAlarmsList = navigateToAlarmsList,
-                    onSave = { alarmsListScreenActions.save(it) }
+                    onSave = { alarmsListScreenActions.save(it) },
                 )
             }
         }
@@ -238,11 +238,11 @@ private fun TimePicker(
             timeToMatch[Calendar.MINUTE] = minutes.text.parseInt()
 
             when {
-                currentTime <= timeToMatch && targetDay.any { it.contains("-") }   -> {
+                currentTime < timeToMatch && targetDay.any { it.contains("-") }   -> {
                     onClearTargetDat()
                     onChangeTargetDat("Today-${current.format(formatter)}")
                 }
-                currentTime > timeToMatch && targetDay.any { it.contains("-") }  -> {
+                currentTime >= timeToMatch && targetDay.any { it.contains("-") }  -> {
                     onClearTargetDat()
                     onChangeTargetDat("Tomorrow-${nextDay.format(formatter)}")
                 }
@@ -311,6 +311,7 @@ private fun DatePicker(
                 style = MaterialTheme.typography.titleMedium
             )
         }
+        /*
         IconButton(
             modifier = Modifier.padding(end = 5.dp),
             onClick = {
@@ -319,7 +320,10 @@ private fun DatePicker(
         ) {
             Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = null)
         }
+
+         */
     }
+    /*
     MaterialDialog(
         dialogState = dialogState,
         buttons = {
@@ -332,6 +336,8 @@ private fun DatePicker(
             onChangeTargetDat(date.format(formatter))
         }
     }
+
+     */
 }
 
 private const val TAG = "CreateAlarmScreen"
@@ -391,7 +397,7 @@ private fun CreateAlarmActions(
     modifier: Modifier = Modifier,
     navigateToAlarmsList: () -> Unit,
     onInsert: () -> Unit,
-    onSave: (Alarm) -> Unit
+    onSave: (Alarm) -> Unit,
 ) {
     Row(
         modifier = modifier,
@@ -402,7 +408,6 @@ private fun CreateAlarmActions(
                   .weight(1f)
                   .padding(5.dp),
               onClick = {
-                  onSave(defaultValue)
                  navigateToAlarmsList()
               }
           ) {
@@ -414,7 +419,6 @@ private fun CreateAlarmActions(
                   .padding(5.dp),
               onClick = {
                   onInsert()
-                  onSave(defaultValue)
                   navigateToAlarmsList()
               }
           ) {

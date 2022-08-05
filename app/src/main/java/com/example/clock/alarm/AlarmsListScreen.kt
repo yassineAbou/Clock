@@ -1,41 +1,41 @@
 package com.example.clock.alarm
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.AlarmOn
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.AlarmOff
 import androidx.compose.material3.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment.Companion.CenterEnd
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.clock.Screen
 import com.example.clock.components.ClockAppBar
 import com.example.clock.data.Alarm
 import com.example.clock.ui.theme.ClockTheme
-import com.google.accompanist.insets.statusBarsPadding
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.saveable.rememberSaveable
+import com.example.clock.util.Global
+import com.example.clock.util.parseInt
 import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
+import me.saket.swipe.SwipeAction
+import me.saket.swipe.SwipeableActionsBox
+import java.lang.Integer.parseInt
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.*
 
 @Preview
 @Composable
@@ -55,6 +55,8 @@ fun AlarmScreenPreview() {
                 override fun onChangeTitle(title: String) {}
                 override fun onChangeTargetDay(targetDay: String) {}
                 override fun onChangeDays(days: List<Boolean>) {}
+                override fun cancel(alarm: Alarm) {}
+                override fun schedule(alarm: Alarm) {}
 
             }
         )
@@ -84,16 +86,20 @@ fun AlarmsListScreen(
                     scrollBehavior = scrollBehavior,
                     onClear = { alarmsListScreenActions.clear() }
                 )
-               AlarmsList(
-                    modifier = Modifier.weight(1f).navigationBarsPadding(),
+                AlarmsList(
+                    modifier = Modifier
+                        .weight(1f)
+                        .navigationBarsPadding(),
                     alarmsList = alarmsListState,
                     onDelete = { alarmsListScreenActions.delete(it) },
                     onUpdate = { alarmsListScreenActions.update(it) },
                     navigateToCreateAlarm = navigateToCreateAlarm,
                     onSave = { alarmsListScreenActions.save(it) },
-                    onChangeCreated = { alarmsListScreenActions.onChangeCreated(it) }
-               )
-            }
+                    onChangeCreated = { alarmsListScreenActions.onChangeCreated(it) },
+                    cancel = { alarmsListScreenActions.cancel(it) },
+                    schedule = {alarmsListScreenActions.schedule(it) },
+                )
+             }
         }
     }
 
@@ -148,10 +154,13 @@ private fun AlarmsList(
     onUpdate: (Alarm) -> Unit,
     navigateToCreateAlarm: () -> Unit,
     onSave: (Alarm) -> Unit,
-    onChangeCreated: (Boolean) -> Unit
+    onChangeCreated: (Boolean) -> Unit,
+    schedule: (alarm: Alarm) -> Unit,
+    cancel: (alarm: Alarm) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
+    val context = LocalContext.current
     Box(modifier = modifier) {
         LazyColumn(
             state = scrollState,
@@ -160,44 +169,59 @@ private fun AlarmsList(
                 .fillMaxSize()
         ) {
             items(alarmsList) { item ->
-                var height by rememberSaveable { mutableStateOf(0) }
                 var checked by rememberSaveable { mutableStateOf(item.started) }
-                AnimatedSwipeDismiss(
-                    item = item,
-                    background = { isDismissed ->
-                        Box(
-                            modifier = Modifier
-                                .height(height.dp)
-                                .fillMaxWidth()
-                                .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                                .background(Color.Red),
-                        ) {
-                            val alpha: Float by animateFloatAsState(if (isDismissed) 0f else 1f)
-                            Icon(
-                                modifier = Modifier.align(CenterEnd),
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = null,
-                                tint = Color.White.copy(alpha = alpha)
-                            )
+                val delete = SwipeAction(
+                    icon = {
+                        Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                    },
+                    isUndo = true,
+                    background = MaterialTheme.colorScheme.error,
+                    onSwipe = {
+                        onDelete(item)
+                        if (item.started) {
+                            cancel(item)
+                        }
+                    }
+                )
+                SwipeableActionsBox(
+                    endActions = listOf(delete),
+                    backgroundUntilSwipeThreshold = MaterialTheme.colorScheme.background,
+                    swipeThreshold = 150.dp
+
+                ) {
+                    Alarm(
+                        alarm = item,
+                        onCheckedChange = {
+                            val currentTime = Calendar.getInstance()
+                            val timeToMatch = Calendar.getInstance()
+                            val nextDay = LocalDateTime.now().plus(1, ChronoUnit.DAYS)
+                            checked = it
+                            timeToMatch[Calendar.HOUR_OF_DAY] = item.hour.parseInt()
+                            timeToMatch[Calendar.MINUTE] = item.minute.parseInt()
+                             var targetDay = item.targetDay
+
+                            if (timeToMatch <= currentTime && item.targetDay.any { it in "0123456789" }) {
+                            targetDay = "Tomorrow-${nextDay.format(Global.formatter)}"
                         }
 
-                    },
-                    content = {
-                        Alarm(
-                            alarm = item,
-                            onCheckedChange = {
-                                 checked = it
-                                onUpdate(item.copy(started = checked))
-                            },
-                            checked = checked,
-                            setHeight = { height = it},
-                            navigateToCreateAlarm = navigateToCreateAlarm,
-                            onSave = { onSave(it) },
-                            onChangeCreated = onChangeCreated
-                        )
-                    },
-                    onDismiss = { onDelete(item) }
-                )
+                            when(it) {
+                                true -> schedule(item)
+                                false-> cancel(item)
+                            }
+
+                           onUpdate(item.copy(started = checked, targetDay = targetDay))
+                        },
+                        checked = checked,
+                        navigateToCreateAlarm = navigateToCreateAlarm,
+                        onSave = { onSave(it) },
+                        onChangeCreated = onChangeCreated
+                    )
+                }
+
             }
         }
 
@@ -208,10 +232,10 @@ private fun AlarmsList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Alarm(
+    modifier: Modifier =  Modifier,
     alarm: Alarm,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    setHeight: (Int) -> Unit,
     navigateToCreateAlarm: () -> Unit,
     onSave: (Alarm) -> Unit,
     onChangeCreated: (Boolean) -> Unit
@@ -219,10 +243,7 @@ private fun Alarm(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 20.dp)
-            .onGloballyPositioned { layoutCoordinates ->
-                setHeight(layoutCoordinates.size.height)
-            },
+            .padding(bottom = 20.dp),
         onClick = {
             onSave(alarm)
             navigateToCreateAlarm()

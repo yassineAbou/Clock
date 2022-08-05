@@ -14,4 +14,6 @@ interface AlarmsListScreenActions {
     fun onChangeTitle(title: String)
     fun onChangeTargetDay(targetDay: String)
     fun onChangeDays(days: List<Boolean>)
+    fun cancel(alarm: Alarm)
+    fun schedule(alarm: Alarm)
 }

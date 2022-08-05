@@ -29,11 +29,13 @@ import com.example.clock.alarm.AlarmsListViewModel
 import com.example.clock.alarm.CreateAlarmScreen
 import com.example.clock.components.BottomNavigationBar
 import com.example.clock.components.bottomBarItems
+import com.example.clock.data.Alarm
 import com.example.clock.stopwatch.StopwatchScreen
 import com.example.clock.stopwatch.StopwatchViewModel
 import com.example.clock.timer.TimerScreen
 import com.example.clock.timer.TimerViewModel
 import com.example.clock.ui.theme.ClockTheme
+import com.example.clock.util.Global
 import com.example.clock.world.CurrentTimeScreen
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
@@ -70,6 +72,7 @@ private fun ClockApp() {
     var isFabVisible by rememberSaveable { (mutableStateOf(true)) }
     var isCreateAlarmVisible by rememberSaveable { (mutableStateOf(true)) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val alarmListViewModel: AlarmsListViewModel = viewModel()
 
     LaunchedEffect(navBackStackEntry?.destination?.route) {
         isFabVisible = when (navBackStackEntry?.destination?.route) {
@@ -121,6 +124,7 @@ private fun ClockApp() {
                     },
                     onClick = {
                         navController.navigate(Screen.CreateAlarm.route)
+                        alarmListViewModel.test(Alarm())
                         },
                     elevation = FloatingActionButtonDefaults.elevation(8.dp)
                 ) }
@@ -145,7 +149,10 @@ fun Navigation(navController: NavHostController) {
     val alarmListState by alarmListViewModel.alarmsListState.observeAsState()
 
     NavHost(navController = navController, startDestination = Screen.AlarmsList.route) {
-        composable(Screen.AlarmsList.route) {
+        composable(
+           route = Screen.AlarmsList.route,
+            deepLinks = Screen.alarmListDeepLink
+        ) {
             alarmListState?.let {
                 AlarmsListScreen(
                     alarmsListState = it,
@@ -185,7 +192,9 @@ fun Navigation(navController: NavHostController) {
                 CreateAlarmScreen(
                     alarmsListScreenActions = alarmListViewModel,
                     alarmState = it,
-                    navigateToAlarmsList = { navController.navigate(Screen.AlarmsList.route) },
+                    navigateToAlarmsList = {
+                        navController.navigate(Screen.AlarmsList.route)
+                    },
                     //targetDay = alarmListViewModel.targetDay
                 )
             }

@@ -3,6 +3,9 @@
     package="com.example.clock">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +31,15 @@
         </activity>
         <service android:name=".timer.TimerService" android:stopWithTask="true"/>
         <receiver android:name=".timer.TimerNotificationBroadcastReceiver" />
+        <receiver android:name=".alarm.AlarmBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".alarm.AlarmService"/>
+        <service android:name=".alarm.RescheduleAlarmsService"/>
+        <receiver android:name=".alarm.AlarmActionsBroadcastReceiver"/>
     </application>
 
 </manifest>
