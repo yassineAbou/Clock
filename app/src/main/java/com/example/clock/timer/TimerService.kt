@@ -51,7 +51,6 @@ class TimerService : Service() {
         serviceScope.cancel()
         stopForeground(STOP_FOREGROUND_REMOVE)
         timerManager.onChangeDone()
-        //notificationHelper.removeTimerServiceNotification()
     }
 }
 

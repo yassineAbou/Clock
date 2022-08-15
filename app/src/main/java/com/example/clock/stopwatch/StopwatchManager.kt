@@ -1,9 +1,7 @@
 package com.example.clock.stopwatch
 
-import androidx.compose.runtime.getValue
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -26,7 +24,9 @@ data class StopwatchState(
 
 @OptIn(ExperimentalTime::class)
 @Singleton
-class StopwatchManager @Inject constructor() {
+class StopwatchManager @Inject constructor(
+    private val stopwatchServiceManager: StopwatchServiceManager
+) {
     var lapItems = mutableStateListOf<Lap>()
         private set
 
@@ -34,7 +34,7 @@ class StopwatchManager @Inject constructor() {
     private val minutesFlow = MutableStateFlow("00")
     private val hoursFlow = MutableStateFlow("00")
     private val isPlayingFlow =  MutableStateFlow(false)
-    private val isZeroFlow = MutableStateFlow(false)
+    private val isZeroFlow = MutableStateFlow(true)
 
     val stopwatchState = combineTuple(
         secondsFlow,
@@ -42,9 +42,9 @@ class StopwatchManager @Inject constructor() {
         hoursFlow,
         isPlayingFlow,
         isZeroFlow
-    ).map { (seconds, minutes, hours, isPlaying, isZero) ->
+    ).map { ( seconds, minutes, hours, isPlaying, isZero) ->
         StopwatchState(
-            seconds = seconds, minutes = minutes, hours = hours, isPlaying = isPlaying, isZero = isZero
+           seconds = seconds, minutes = minutes, hours = hours, isPlaying = isPlaying, isZero = isZero
         )
     }
 
@@ -53,6 +53,9 @@ class StopwatchManager @Inject constructor() {
     private lateinit var timer: Timer
 
     fun start() {
+        if (isZeroFlow.value) {
+            stopwatchServiceManager.startStopwatchService()
+        }
         timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
             time = time.plus(Duration.seconds(1))
             updateTimeStates()
@@ -66,6 +69,7 @@ class StopwatchManager @Inject constructor() {
             secondsFlow.value = seconds.pad()
             minutesFlow.value = minutes.pad()
             hoursFlow.value = hours.toInt().pad()
+
         }
     }
 
@@ -75,12 +79,13 @@ class StopwatchManager @Inject constructor() {
         }
         val lap = Lap(timeString)
         lapItems.add(lap)
-        println(lapItems)
+
     }
 
     fun onClear() {
         lapItems.clear()
     }
+
 
     private fun Int.pad(): String {
         return this.toString().padStart(2, '0')
@@ -92,9 +97,12 @@ class StopwatchManager @Inject constructor() {
     }
 
     fun stop() {
+        isZeroFlow.value = true
         pause()
         time = Duration.ZERO
         updateTimeStates()
-        isZeroFlow.value = true
+        stopwatchServiceManager.stopStopwatchService()
     }
 }
+
+private const val TAG = "StopwatchManager"

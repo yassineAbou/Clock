@@ -21,5 +21,10 @@ sealed class Screen(val route: String) {
                 uriPattern = "https://www.clock.com/AlarmsList"
             }
         )
+        val stopwatchDeepLink: List<NavDeepLink> = listOf(
+            navDeepLink {
+                uriPattern = "https://www.clock.com/Stopwatch"
+            }
+        )
     }
 }

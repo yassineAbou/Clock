@@ -3,9 +3,7 @@ package com.example.clock.alarm
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
-import com.example.clock.timer.TimerManager
 import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*

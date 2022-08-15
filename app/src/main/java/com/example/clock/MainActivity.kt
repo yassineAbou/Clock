@@ -166,7 +166,10 @@ fun Navigation(navController: NavHostController) {
         composable(Screen.WorldClock.route) {
             CurrentTimeScreen()
         }
-        composable(Screen.Stopwatch.route) {
+        composable(
+           route = Screen.Stopwatch.route,
+           deepLinks = Screen.stopwatchDeepLink
+        ) {
             stopwatchState?.let {
                 StopwatchScreen(
                     stopwatchState = it,

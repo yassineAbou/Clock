@@ -4,6 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Pc666/AndroidStudioProjects/Clock/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
+        <entry key="..\:/Users/Pc666/AndroidStudioProjects/PP/Clock/app/src/main/res/drawable/ic_baseline_timer_24.xml" value="0.1005" />
+        <entry key="..\:/Users/Pc666/AndroidStudioProjects/PP/Clock/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1005" />
+        <entry key="..\:/Users/Pc666/AndroidStudioProjects/PP/Clock/app/src/main/res/drawable/ic_play.xml" value="0.1005" />
+        <entry key="..\:/Users/Pc666/AndroidStudioProjects/PP/Clock/app/src/main/res/drawable/ic_stopwatch.xml" value="0.1005" />
       </map>
     </option>
   </component>

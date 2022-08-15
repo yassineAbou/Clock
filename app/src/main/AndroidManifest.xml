@@ -40,6 +40,8 @@
         <service android:name=".alarm.AlarmService"/>
         <service android:name=".alarm.RescheduleAlarmsService"/>
         <receiver android:name=".alarm.AlarmActionsBroadcastReceiver"/>
+        <service android:name=".stopwatch.StopwatchService" android:stopWithTask="true"/>
+        <receiver android:name=".stopwatch.StopwatchNotificationBroadcastReceiver"/>
     </application>
 
 </manifest>

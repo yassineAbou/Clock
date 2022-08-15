@@ -1,10 +1,7 @@
 package com.example.clock.stopwatch
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.ExperimentalTransitionApi
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +14,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,7 +24,6 @@ import com.example.clock.ui.theme.Red100
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
-import androidx.compose.ui.Alignment.Companion as Alignment1
 
 
 @Preview(name = "StopwatchScreen")
@@ -42,7 +37,7 @@ fun DefaultPreview() {
                 minutes = "00",
                 hours = "00",
                 isPlaying = false,
-                isZero = true,
+                isZero = true
             ),
             stopwatchActions = object : StopwatchScreenActions {
                 override fun onStart() {}
@@ -79,9 +74,18 @@ fun StopwatchScreen(
     lapItems: List<Lap>,
 
 ) {
-    var lapHeaderLine by rememberSaveable { mutableStateOf(false) }
+    var lapHeaderLine by rememberSaveable { mutableStateOf(lapItems.isNotEmpty()) }
     val scrollState = rememberLazyListState()
+    var isStartButtonVisible by rememberSaveable { mutableStateOf(stopwatchState.isZero) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(stopwatchState.isZero, lapItems.isEmpty()) {
+        if (stopwatchState.isZero) {
+            isStartButtonVisible = true
+        }
+            lapHeaderLine = lapItems.isNotEmpty()
+
+    }
 
 
     Surface(modifier = modifier) {
@@ -94,7 +98,7 @@ fun StopwatchScreen(
                         StopWatchTime(
                             hours = stopwatchState.hours,
                             minutes = stopwatchState.minutes,
-                            seconds = stopwatchState.seconds,
+                            seconds = stopwatchState.seconds
                         )
                         Spacer(modifier = Modifier.height(55.dp))
                         AnimatedVisibility(visible = lapHeaderLine) {
@@ -103,7 +107,7 @@ fun StopwatchScreen(
 
                         LapsItems(
                             lapsItems = lapItems,
-                            scrollState = scrollState
+                            scrollState = scrollState,
                         )
                         Buttons(
                             isPlaying = stopwatchState.isPlaying,
@@ -117,6 +121,10 @@ fun StopwatchScreen(
                             lapsItems = lapItems,
                             onChangeLapHeaderLine = {
                                 lapHeaderLine = it
+                            },
+                            isDone = isStartButtonVisible,
+                            onChangeIsDone = {
+                                isStartButtonVisible = it
                             }
                         )
 
@@ -160,7 +168,7 @@ private fun DividerItem() {
 @Composable
 private fun LapsItems(
     lapsItems: List<Lap>,
-    scrollState: LazyListState
+    scrollState: LazyListState,
 ) {
 
     LazyColumn (
@@ -172,13 +180,10 @@ private fun LapsItems(
         reverseLayout = true,
         state = scrollState
         ) {
-        itemsIndexed(lapsItems) {  index, lapItem ->
-            val prevLapItem = lapsItems.getOrNull(index - 1)?.currentTime
-            val currentLapItem = lapsItems.getOrNull(index)?.currentTime
-            val lapItemsAreNotTheSame = prevLapItem != currentLapItem
-            if (lapItemsAreNotTheSame)
-            LapItem(lapItem, index)
+        itemsIndexed(lapsItems) { index, item ->
+            LapItem(lapItem = item, index = index)
         }
+
     }
 
 }
@@ -215,11 +220,12 @@ private fun Buttons(
     scrollState: LazyListState,
     scope: CoroutineScope,
     lapsItems: List<Lap>,
-    onChangeLapHeaderLine: (Boolean) -> Unit
-
+    onChangeLapHeaderLine: (Boolean) -> Unit,
+    isDone: Boolean,
+    onChangeIsDone: (Boolean) -> Unit
     ) {
-    var isStartButtonVisible by rememberSaveable { mutableStateOf(true) }
-    val transition = updateTransition(isStartButtonVisible)
+
+    val transition = updateTransition(isDone)
         Box {
 
             transition.AnimatedVisibility(
@@ -228,8 +234,8 @@ private fun Buttons(
                 ClockButton(
                     onClick = {
                         onStart()
-                        isStartButtonVisible = false
-                        onChangeLapHeaderLine(true)
+                        onChangeIsDone(false)
+                        //onChangeLapHeaderLine(true)
                     },
                     textButton = "Start",
                     color = MaterialTheme.colorScheme.primary
@@ -268,8 +274,8 @@ private fun Buttons(
                             onClick = {
                                 onStop()
                                 onClear()
-                                isStartButtonVisible = true
-                                onChangeLapHeaderLine(false)
+                                onChangeIsDone(true)
+                               // onChangeLapHeaderLine(false)
                             },
                             color = MaterialTheme.colorScheme.onSurface
                         )

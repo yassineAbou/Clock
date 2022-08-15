@@ -8,5 +8,7 @@
     <string name="timer_completed_channel_description">Shows a notification when a countdown timer finishes</string>
     <string name="alarm_service_channel_name">Alarm service channel</string>
     <string name="alarm_service_channel_description">Shows an alert notification at a particular time</string>
+    <string name="stopwatch_channel">Stopwatch service channel</string>
+    <string name="stopwatch_service_channel_description">Shows a persistent notification when the stopwatch is running</string>
 
 </resources>
