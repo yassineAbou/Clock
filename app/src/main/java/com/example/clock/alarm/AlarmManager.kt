@@ -41,7 +41,8 @@ class AlarmManager @Inject constructor(
                 putExtra(TUESDAY, alarmState.tuesday) ; putExtra(WEDNESDAY, alarmState.wednesday)
                 putExtra(THURSDAY, alarmState.thursday) ; putExtra(FRIDAY, alarmState.friday)
                 putExtra(SATURDAY, alarmState.saturday) ; putExtra(SUNDAY, alarmState.sunday)
-                putExtra(TITLE, alarmState.title)
+                putExtra(TITLE, alarmState.title) ; putExtra(HOUR, alarmState.hour)
+                putExtra(MINUTE, alarmState.minute)
             }
 
             val alarmPendingIntent = PendingIntent.getBroadcast(

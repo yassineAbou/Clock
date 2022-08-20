@@ -170,6 +170,9 @@ private fun AlarmsList(
         ) {
             items(alarmsList) { item ->
                 var checked by rememberSaveable { mutableStateOf(item.started) }
+                LaunchedEffect(item.started) {
+                    checked = item.started
+                }
                 val delete = SwipeAction(
                     icon = {
                         Icon(

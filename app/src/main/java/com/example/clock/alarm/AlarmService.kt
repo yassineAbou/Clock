@@ -6,12 +6,15 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.*
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ServiceCompat.stopForeground
 import com.example.clock.R
+import com.example.clock.repository.AlarmRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.lang.String
 import javax.inject.Inject
@@ -25,6 +28,8 @@ class AlarmService : Service()  {
     private lateinit var vibrator: Vibrator
     @Inject
     lateinit var alarmNotificationHelper: AlarmNotificationHelper
+    @Inject
+    lateinit var alarmAlarmRepository: AlarmRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -47,10 +52,23 @@ class AlarmService : Service()  {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val alarmTitle = intent?.getStringExtra(TITLE).toString()
-        startForeground(ALARM_SERVICE_NOTIFICATION_ID, alarmNotificationHelper.getAlarmBaseNotification(alarmTitle).build())
+        val alarmTime = "${intent?.getStringExtra(HOUR)}:${intent?.getStringExtra(MINUTE)}"
+        startForeground(ALARM_SERVICE_NOTIFICATION_ID, alarmNotificationHelper.getAlarmBaseNotification(alarmTitle, alarmTime).build())
         serviceScope.launch {
 
             mediaPlayer.start()
+
+            alarmAlarmRepository.getAlarmByTime(
+                alarmTime.substringBefore(':'),
+                alarmTime.substringAfter(':'),
+                false
+            ).collectLatest {
+                it?.let {
+                    it.started = false
+                    alarmAlarmRepository.update(it)
+                    Log.e(TAG, "onStartCommand: started = ${it.started}")
+                }
+            }
 
             val pattern = longArrayOf(0, 100, 1000)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

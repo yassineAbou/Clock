@@ -23,4 +23,7 @@ interface AlarmDao {
 
     @Query("SELECT * FROM ALARM_ITEM_TABLE WHERE alarmId=:alarmId ")
     suspend fun getAlarmItem(alarmId: Long): Alarm?
+
+    @Query("SELECT * FROM ALARM_ITEM_TABLE WHERE hour=:hour AND minute=:minute AND recurring=:recurring")
+    fun getAlarmByTime(hour: String, minute: String, recurring: Boolean): Flow<Alarm?>
 }

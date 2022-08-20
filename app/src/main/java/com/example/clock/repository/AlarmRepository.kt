@@ -19,4 +19,6 @@ class AlarmRepository @Inject constructor(
 
     suspend fun getAlarmItem(alarmId: Long) = alarmDao.getAlarmItem(alarmId)
 
+    fun getAlarmByTime(hour: String, minute: String, recurring: Boolean) = alarmDao.getAlarmByTime(hour, minute, recurring)
+
 }

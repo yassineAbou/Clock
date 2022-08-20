@@ -14,8 +14,11 @@ class AlarmServiceManager @Inject constructor(
 ) {
 
      fun startAlarmService(intent: Intent) {
-        val intentService = Intent(applicationContext, AlarmService::class.java)
-        intentService.putExtra(TITLE, intent.getStringExtra(TITLE))
+        val intentService = Intent(applicationContext, AlarmService::class.java).apply {
+            putExtra(TITLE, intent.getStringExtra(TITLE))
+            putExtra(HOUR, intent.getStringExtra(HOUR))
+            putExtra(MINUTE, intent.getStringExtra(MINUTE))
+        }
         ContextCompat.startForegroundService(applicationContext, intentService)
 
     }

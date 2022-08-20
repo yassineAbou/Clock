@@ -44,10 +44,11 @@ class AlarmNotificationHelper @Inject constructor(
         createAlarmNotificationChannels()
     }
 
-    fun getAlarmBaseNotification(alarmTitle:String) = NotificationCompat.Builder(applicationContext, ALARM_SERVICE_CHANNEL_ID)
-            .setContentTitle("Alarm")
+    fun getAlarmBaseNotification(alarmTitle:String, alarmTime: String) = NotificationCompat.Builder(applicationContext, ALARM_SERVICE_CHANNEL_ID)
+            .setContentTitle(alarmTime)
             .setContentText(alarmTitle)
             .setSmallIcon(R.drawable.ic_baseline_alarm_24)
+            .setShowWhen(false)
             .setContentIntent(openAlarmPendingIntent)
             .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
             .addAction(R.drawable.ic_close, "Dismiss", dismiss())
@@ -59,7 +60,7 @@ class AlarmNotificationHelper @Inject constructor(
     private fun createAlarmNotificationChannels() {
         val alarmServiceChannel = NotificationChannelCompat.Builder(
             ALARM_SERVICE_CHANNEL_ID,
-            NotificationManagerCompat.IMPORTANCE_HIGH
+            NotificationManagerCompat.IMPORTANCE_DEFAULT
         )
             .setName(applicationContext.getString(R.string.alarm_service_channel_name))
             .setDescription(applicationContext.getString(R.string.alarm_service_channel_description))
