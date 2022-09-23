@@ -74,6 +74,8 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     //insets
     implementation "com.google.accompanist:accompanist-insets:0.24.2-alpha"
+    //systemUiController
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.23.1"
     //compose-viewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc01"
     //Hilt
@@ -89,6 +91,10 @@ dependencies {
     kapt "androidx.room:room-compiler:2.4.2"
     //Swipe
     implementation "me.saket.swipe:swipe:1.0.0"
+    //intuit
+    implementation 'com.intuit.sdp:sdp-android:1.1.0'
+    implementation 'com.intuit.ssp:ssp-android:1.1.0'
+
 
 
 

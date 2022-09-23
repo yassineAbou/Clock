@@ -22,8 +22,6 @@ import com.example.clock.util.checkTimerInput
 import com.example.clock.util.clearFocusOnKeyboardDismiss
 
 import com.example.clock.util.parseInt
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit

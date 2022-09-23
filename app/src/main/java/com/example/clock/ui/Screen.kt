@@ -1,4 +1,4 @@
-package com.example.clock
+package com.example.clock.ui
 
 import androidx.navigation.NavDeepLink
 import androidx.navigation.navDeepLink
@@ -6,7 +6,7 @@ import androidx.navigation.navDeepLink
 sealed class Screen(val route: String) {
     object AlarmsList: Screen("AlarmsList")
     object CreateAlarm: Screen("CreateAlarm")
-    object WorldClock: Screen("WorldClock")
+    object Clock: Screen("Clock")
     object Stopwatch: Screen("Stopwatch")
     object Timer: Screen("Timer")
 

@@ -1,10 +1,13 @@
-package com.example.clock.components
+package com.example.clock.util
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.TopAppBar
-import androidx.compose.material3.*
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,11 +21,11 @@ fun ClockAppBar(
     actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+    val backgroundColors = TopAppBarDefaults.smallTopAppBarColors()
     val backgroundColor = backgroundColors.containerColor(
         scrollFraction = scrollBehavior?.scrollFraction ?: 0f
     ).value
-    val foregroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+    val foregroundColors = TopAppBarDefaults.smallTopAppBarColors(
         containerColor = Color.Transparent,
         scrolledContainerColor = Color.Transparent
     )
@@ -41,8 +44,16 @@ fun ClockAppBar(
 
 @Preview
 @Composable
-fun JetchatAppBarPreview() {
+private fun ClockAppBarPreview() {
     ClockTheme {
+        ClockAppBar(title = { Text("Alarm") })
+    }
+}
+
+@Preview
+@Composable
+private fun ClockAppBarPreviewDark() {
+    ClockTheme(darkTheme = true) {
         ClockAppBar(title = { Text("Alarm") })
     }
 }

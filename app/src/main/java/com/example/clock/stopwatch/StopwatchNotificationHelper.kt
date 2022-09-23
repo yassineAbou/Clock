@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import com.example.clock.MainActivity
+import com.example.clock.ui.MainActivity
 import com.example.clock.R
 import com.example.clock.timer.*
 

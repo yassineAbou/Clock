@@ -1,17 +1,48 @@
-package com.example.clock.components
+package com.example.clock.util
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.clock.Screen
+import androidx.navigation.compose.rememberNavController
+import com.example.clock.ui.Screen
+import com.example.clock.ui.theme.ClockTheme
 
-data class BottomNavItem(
+@Preview
+@Composable
+private fun BottomNavigationPreview() {
+    ClockTheme {
+        BottomNavigationBar(
+            listBottomBarItems = listBottomBarItems,
+            navController = rememberNavController()
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BottomNavigationPreviewDark() {
+    ClockTheme(darkTheme = true) {
+        BottomNavigationBar(
+            listBottomBarItems = listBottomBarItems,
+            navController = rememberNavController()
+        )
+    }
+}
+
+data class BottomBarItem(
     val name: String,
     val route: String,
     val icon: ImageVector
@@ -19,16 +50,16 @@ data class BottomNavItem(
 
 @Composable
 fun BottomNavigationBar(
-    items: List<BottomNavItem>,
+    listBottomBarItems: List<BottomBarItem>,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val backStackEntry = navController.currentBackStackEntryAsState()
     NavigationBar(modifier = modifier) {
-        items.forEach { item ->
-            val selected = item.route == backStackEntry.value?.destination?.route
+        listBottomBarItems.forEach { item ->
+            val isItemSelected = item.route == backStackEntry.value?.destination?.route
             NavigationBarItem(
-                selected = selected,
+                selected = isItemSelected,
                 onClick = {
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
@@ -52,23 +83,23 @@ fun BottomNavigationBar(
     }
 }
 
-val bottomBarItems =  listOf(
-    BottomNavItem(
+val listBottomBarItems =  listOf(
+    BottomBarItem(
         name = "Alarm",
         route = Screen.AlarmsList.route,
         icon = Icons.Default.Alarm
     ),
-    BottomNavItem(
-        name = "Current Time",
-        route = Screen.WorldClock.route,
+    BottomBarItem(
+        name = "Clock",
+        route = Screen.Clock.route,
         icon = Icons.Default.Language
     ),
-    BottomNavItem(
+    BottomBarItem(
         name = "Stopwatch",
         route = Screen.Stopwatch.route,
         icon = Icons.Default.Timer
     ),
-    BottomNavItem(
+    BottomBarItem(
         name = "Timer",
         route = Screen.Timer.route,
         icon = Icons.Default.HourglassEmpty

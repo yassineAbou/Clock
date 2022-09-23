@@ -1,13 +1,14 @@
-package com.example.clock
+package com.example.clock.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAlarm
 import androidx.compose.material3.*
@@ -15,6 +16,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,40 +26,46 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navDeepLink
+import com.example.clock.R
 import com.example.clock.alarm.AlarmsListScreen
 import com.example.clock.alarm.AlarmsListViewModel
 import com.example.clock.alarm.CreateAlarmScreen
-import com.example.clock.components.BottomNavigationBar
-import com.example.clock.components.bottomBarItems
+import com.example.clock.util.BottomNavigationBar
+import com.example.clock.util.listBottomBarItems
 import com.example.clock.data.Alarm
 import com.example.clock.stopwatch.StopwatchScreen
 import com.example.clock.stopwatch.StopwatchViewModel
 import com.example.clock.timer.TimerScreen
 import com.example.clock.timer.TimerViewModel
+import com.example.clock.ui.clock.ClockScreen
 import com.example.clock.ui.theme.ClockTheme
-import com.example.clock.util.Global
-import com.example.clock.world.CurrentTimeScreen
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.time.ExperimentalTime
 
-private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            ProvideWindowInsets {
-                ClockTheme {
+            ClockTheme {
+                ProvideWindowInsets {
+                    val systemUiController = rememberSystemUiController()
+                    val useDarkIcons = !isSystemInDarkTheme()
+                    SideEffect {
+                        systemUiController.setStatusBarColor(
+                            color = Color.Transparent,
+                            darkIcons = useDarkIcons
+                        )
+                    }
                     ClockApp()
                 }
             }
@@ -68,54 +77,47 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 private fun ClockApp() {
+
     val navController = rememberNavController()
-    var isFabVisible by rememberSaveable { (mutableStateOf(true)) }
-    var isCreateAlarmVisible by rememberSaveable { (mutableStateOf(true)) }
+    var isFloatButtonVisible by rememberSaveable { (mutableStateOf(true)) }
+    var isBottomBarVisible by rememberSaveable { (mutableStateOf(true)) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val alarmListViewModel: AlarmsListViewModel = viewModel()
 
     LaunchedEffect(navBackStackEntry?.destination?.route) {
-        isFabVisible = when (navBackStackEntry?.destination?.route) {
+        isFloatButtonVisible = when (navBackStackEntry?.destination?.route) {
             Screen.AlarmsList.route -> true
             else -> false
         }
-        when (navBackStackEntry?.destination?.route) {
-            Screen.CreateAlarm.route -> {
-                isCreateAlarmVisible = false
-                Log.e(TAG, "isCreateAlarmVisible: $isCreateAlarmVisible")
-            }
-            else -> {
-                isCreateAlarmVisible = true
-                Log.e(TAG, "isCreateAlarmVisible: $isCreateAlarmVisible")
-            }
+        isBottomBarVisible = when (navBackStackEntry?.destination?.route) {
+            Screen.CreateAlarm.route -> false
+            else -> true
         }
     }
-
 
     Scaffold(
         bottomBar = {
             AnimatedVisibility(
-                visible = isCreateAlarmVisible,
+                visible = isBottomBarVisible,
                 enter = scaleIn(),
                 exit = scaleOut(),
             ) {
                 BottomNavigationBar(
                     modifier = Modifier.navigationBarsPadding(),
-                    items = bottomBarItems,
+                    listBottomBarItems = listBottomBarItems,
                     navController = navController,
                 )
             }
         },
+
         floatingActionButton = {
-
-
             AnimatedVisibility(
-                visible = isFabVisible,
+                visible = isFloatButtonVisible,
                 enter = scaleIn(),
                 exit = scaleOut(),
             ) {
                 ExtendedFloatingActionButton(
-                    text = { Text(text = "AddAlarm") },
+                    text = { Text(text = stringResource(id = R.string.add_alarm)) },
                     icon = {
                         Icon(
                             imageVector = Icons.Default.AddAlarm,
@@ -131,7 +133,7 @@ private fun ClockApp() {
 
         },
         content = {
-          Navigation(navController = navController)
+            Navigation(navController = navController, modifier = Modifier.padding(it))
         }
     )
 }
@@ -139,7 +141,7 @@ private fun ClockApp() {
 
 @OptIn(ExperimentalTime::class)
 @Composable
-fun Navigation(navController: NavHostController) {
+fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
 
     val stopwatchViewModel: StopwatchViewModel = viewModel()
     val timerViewModel: TimerViewModel = viewModel()
@@ -163,8 +165,8 @@ fun Navigation(navController: NavHostController) {
                 )
             }
         }
-        composable(Screen.WorldClock.route) {
-            CurrentTimeScreen()
+        composable(Screen.Clock.route) {
+            ClockScreen(modifier = modifier)
         }
         composable(
            route = Screen.Stopwatch.route,
