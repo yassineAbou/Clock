@@ -1,7 +1,11 @@
 package com.example.clock.util
 
+import android.app.ActivityManager
+import android.content.Context
 import androidx.core.text.isDigitsOnly
 import com.example.clock.data.Alarm
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.reduce
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -36,8 +40,4 @@ inline fun <T1: Any, T2: Any, T3: Any, T4: Any, R: Any> safeLet(p1: T1?, p2: T2?
     return if (p1 != null && p2 != null && p3 != null && p4 != null) block(p1, p2, p3, p4) else null
 }
 
-class SkipProperty<T>(val property: T) {
-    override fun equals(other: Any?) = true
-    override fun hashCode() = 0
-}
 

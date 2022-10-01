@@ -1,14 +1,13 @@
-package com.example.clock.stopwatch
+package com.example.clock.data.service
 
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.example.clock.timer.TimerService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class StopwatchServiceManager @Inject constructor(
-    @ApplicationContext private val applicationContext: Context,
+    @ApplicationContext val applicationContext: Context,
 ) {
     fun startStopwatchService() {
         val serviceIntent = Intent(applicationContext, StopwatchService::class.java)

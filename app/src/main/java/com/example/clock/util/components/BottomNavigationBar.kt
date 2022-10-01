@@ -1,4 +1,4 @@
-package com.example.clock.util
+package com.example.clock.util.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm

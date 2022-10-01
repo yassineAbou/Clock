@@ -1,8 +1,9 @@
-package com.example.clock.stopwatch
+package com.example.clock.data.service
 
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.example.clock.data.manager.StopwatchManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -30,12 +31,12 @@ class StopwatchService : Service() {
         )
         serviceScope.launch {
             stopwatchManager.stopwatchState.collectLatest {
-                 if (!it.isZero) {
+                 if (!it.isReset) {
                      stopwatchNotificationHelper.updateStopwatchServiceNotification(
-                         time = "${it.hours}:${it.minutes}:${it.seconds}",
-                         timerRunning = it.isPlaying,
-                         isDone = it.isZero,
-                         lastIndex = stopwatchManager.lapItems.lastIndex
+                         time = "${it.hour}:${it.minute}:${it.second}",
+                         isPlaying = it.isPlaying,
+                         isReset = it.isReset,
+                         lastIndex = stopwatchManager.listTimes.lastIndex
                      )
                  }
             }
@@ -48,6 +49,7 @@ class StopwatchService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopwatchNotificationHelper.removeStopwatchNotification()
+
     }
 }

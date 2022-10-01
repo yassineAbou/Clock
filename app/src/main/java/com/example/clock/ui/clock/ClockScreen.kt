@@ -12,11 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.clock.ui.theme.ClockTheme
-import com.example.clock.util.ClockAppBar
+import com.example.clock.R
+import com.example.clock.util.components.ClockAppBar
 import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
 import java.util.*
@@ -52,7 +52,7 @@ private fun ClockScreenAppBar(
         scrollBehavior = scrollBehavior,
         title = {
             Text(
-                text = "Clock",
+                text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.titleLarge,
             )
         }

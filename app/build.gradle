@@ -81,6 +81,7 @@ dependencies {
     //Hilt
     implementation "com.google.dagger:hilt-android:2.40"
     kapt "com.google.dagger:hilt-compiler:2.40.1"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0-alpha03"
     // Zhuinden flow-combinetuple
     implementation 'com.github.Zhuinden:flow-combinetuple-kt:1.1.1'
     //Compose Material Dialogs
@@ -94,6 +95,7 @@ dependencies {
     //intuit
     implementation 'com.intuit.sdp:sdp-android:1.1.0'
     implementation 'com.intuit.ssp:ssp-android:1.1.0'
+
 
 
 

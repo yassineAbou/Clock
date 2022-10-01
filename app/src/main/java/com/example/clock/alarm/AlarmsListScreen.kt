@@ -22,7 +22,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.clock.util.ClockAppBar
+import com.example.clock.util.components.ClockAppBar
 import com.example.clock.data.Alarm
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.Global

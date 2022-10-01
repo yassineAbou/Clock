@@ -1,4 +1,4 @@
-package com.example.clock.components
+package com.example.clock.util.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Button
@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ClockButton(
-    textButton: String,
+    text: String,
     onClick: () -> Unit,
     color: Color = MaterialTheme.colorScheme.primary,
     enabled: Boolean = true
@@ -29,7 +29,7 @@ fun ClockButton(
         ),
         enabled = enabled
     ) {
-        Text(text = textButton,
+        Text(text = text,
             style = MaterialTheme.typography.titleMedium)
     }
 }

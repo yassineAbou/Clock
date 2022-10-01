@@ -1,4 +1,4 @@
-package com.example.clock.util
+package com.example.clock.util.components
 
 
 import androidx.compose.foundation.background

@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.clock.util.ClockAppBar
-import com.example.clock.components.ClockButton
+import com.example.clock.util.components.ClockAppBar
+import com.example.clock.util.components.ClockButton
 import com.example.clock.components.NumberPicker
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.theme.Red100
@@ -325,7 +325,7 @@ private fun TimerButtons(
         ) {
 
             ClockButton(
-                textButton = "Start",
+                text = "Start",
                 onClick = {
                     setTimerPickerVisibility(false)
                     optionSelected()
@@ -343,18 +343,18 @@ private fun TimerButtons(
             ) {
                 if (isPlaying) {
                     ClockButton(
-                        textButton = "Pause",
+                        text = "Pause",
                         onClick = optionSelected,
                         color = Red100
                     )
                 } else {
                     ClockButton(
-                        textButton = "Resume",
+                        text = "Resume",
                         onClick = optionSelected
                     )
                 }
                 ClockButton(
-                    textButton = "Cancel",
+                    text = "Cancel",
                     onClick = resetTimer ,
                     color = MaterialTheme.colorScheme.onSurface
                 )

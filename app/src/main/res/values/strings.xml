@@ -11,5 +11,12 @@
     <string name="stopwatch_channel">Stopwatch service channel</string>
     <string name="stopwatch_service_channel_description">Shows a persistent notification when the stopwatch is running</string>
     <string name="add_alarm">AddAlarm</string>
+    <string name="stopwatch">Stopwatch</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="resume">Resume</string>
+    <string name="reset">Reset</string>
+    <string name="lap">Lap</string>
+    <string name="is_reset">isReset</string>
 
 </resources>

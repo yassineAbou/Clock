@@ -1,15 +1,8 @@
 package com.example.clock.timer
 
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.runtime.internal.isLiveLiteralsEnabled
-import com.example.clock.stopwatch.StopwatchState
 import com.zhuinden.flowcombinetuplekt.combineTuple
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
