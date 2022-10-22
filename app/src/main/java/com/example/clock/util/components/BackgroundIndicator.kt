@@ -1,4 +1,4 @@
-package com.example.clock.timer
+package com.example.clock.util.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -22,14 +22,14 @@ fun BackgroundIndicator(
     modifier: Modifier = Modifier,
     foregroundColor: Color = MaterialTheme.colorScheme.primary,
     backgroundColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = PrimaryLightAlpha),
-    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
+    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,
 ) {
     Box(modifier) {
         CircularProgressIndicator(
             progress = progress,
             modifier = Modifier.fillMaxSize(),
             color = foregroundColor,
-            strokeWidth = strokeWidth,
+            strokeWidth = strokeWidth
         )
         CircularProgressIndicator(
             progress = 1f,

@@ -19,7 +19,8 @@ fun ClockButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = color
+            containerColor = color,
+            disabledContainerColor = color.copy(alpha = 0.1f)
         ),
         contentPadding = PaddingValues(
             start = 40.dp,

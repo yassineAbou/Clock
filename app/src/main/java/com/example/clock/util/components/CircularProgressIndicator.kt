@@ -1,5 +1,7 @@
-package com.example.clock.timer
+package com.example.clock.util.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.size
@@ -7,6 +9,8 @@ import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -18,6 +22,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CircularProgressIndicator(
     /*@FloatRange(from = 0.0, to = 1.0)*/
@@ -29,18 +34,23 @@ fun CircularProgressIndicator(
     val stroke = with(LocalDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
     }
-    Canvas(
-        modifier
-            .progressSemantics(progress)
-            .size(CircularIndicatorDiameter)
-            .focusable()
-    ) {
-        // Start at 12 O'clock
-        val startAngle = 270f
-        val sweep = progress * 360f
-        drawDeterminateCircularIndicator(startAngle, sweep, color, stroke)
-    }
+    val startAngle = 270f
+    val sweep = progress * 360f
+    val animateSweep by animateFloatAsState(
+        targetValue = sweep ,
+        animationSpec  = tween(easing = LinearEasing)
+    )
+        Canvas(
+            modifier
+                .progressSemantics(progress)
+                .size(CircularIndicatorDiameter)
+                .focusable()
+        ) {
+            drawDeterminateCircularIndicator(startAngle, animateSweep, color, stroke)
+        }
+
 }
+
 
 private fun DrawScope.drawDeterminateCircularIndicator(
     startAngle: Float,

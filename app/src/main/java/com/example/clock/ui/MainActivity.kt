@@ -1,10 +1,7 @@
 package com.example.clock.ui
 
-import android.content.Context
-import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -25,7 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.*
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -33,28 +31,30 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.clock.R
-import com.example.clock.alarm.AlarmServiceManager
 import com.example.clock.alarm.AlarmsListScreen
 import com.example.clock.alarm.AlarmsListViewModel
 import com.example.clock.alarm.CreateAlarmScreen
 import com.example.clock.data.Alarm
-import com.example.clock.data.manager.StopwatchManager
+import com.example.clock.data.manager.ServiceManager
+import com.example.clock.data.receiver.TimerNotificationBroadcastReceiver
 import com.example.clock.data.service.StopwatchService
-import com.example.clock.data.service.StopwatchServiceManager
+import com.example.clock.data.service.TimerRunningService
+import com.example.clock.ui.clock.ClockScreen
 import com.example.clock.ui.stopwatch.StopwatchScreen
 import com.example.clock.ui.stopwatch.StopwatchViewModel
-import com.example.clock.timer.TimerScreen
-import com.example.clock.timer.TimerViewModel
-import com.example.clock.ui.clock.ClockScreen
 import com.example.clock.ui.theme.ClockTheme
+import com.example.clock.ui.timer.TimerScreen
+import com.example.clock.ui.timer.TimerViewModel
 import com.example.clock.util.components.BottomNavigationBar
 import com.example.clock.util.components.listBottomBarItems
-
+import com.example.clock.util.isServiceRunning
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
@@ -65,11 +65,9 @@ class MainActivity : ComponentActivity() {
 
 
     private val stopwatchViewModel: StopwatchViewModel by viewModels()
-
+    private val timerViewModel: TimerViewModel by viewModels()
     @Inject
-    lateinit var stopwatchServiceManager: StopwatchServiceManager
-
-
+    lateinit var serviceManager: ServiceManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,9 +95,15 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            val isReset  = stopwatchViewModel.stopwatchState.asFlow().stateIn(this).value.isReset
-            if (!isReset) {
-                stopwatchServiceManager.stopStopwatchService()
+            if (this@MainActivity.isServiceRunning(StopwatchService::class.java)) {
+                async {
+                    serviceManager.stopService(StopwatchService::class.java)
+                }
+            }
+            if (this@MainActivity.isServiceRunning(TimerRunningService::class.java)) {
+                async {
+                    serviceManager.stopService(TimerRunningService::class.java)
+                }
             }
         }
     }
@@ -108,8 +112,17 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         lifecycleScope.launch {
             val isReset  = stopwatchViewModel.stopwatchState.asFlow().stateIn(this).value.isReset
+            val isDone = timerViewModel.timerState.asFlow().stateIn(this).value.isDone
             if (!isReset) {
-                stopwatchServiceManager.startStopwatchService()
+                async {
+                    serviceManager.startService(StopwatchService::class.java)
+                }
+
+            }
+            if (!isDone) {
+                async {
+                    serviceManager.startService(TimerRunningService::class.java)
+                }
             }
         }
     }
@@ -184,9 +197,7 @@ private fun ClockApp() {
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
 
-    val timerViewModel: TimerViewModel = viewModel()
     val alarmListViewModel: AlarmsListViewModel = viewModel()
-    val timerState by timerViewModel.timerState.observeAsState()
     val alarmListState by alarmListViewModel.alarmsListState.observeAsState()
 
     NavHost(navController = navController, startDestination = Screen.AlarmsList.route) {
@@ -217,12 +228,7 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
            route = Screen.Timer.route,
             deepLinks = Screen.timerDeepLink
         ) {
-            timerState?.let {
-                TimerScreen(
-                   timerState = it,
-                   timerScreenActions = timerViewModel
-                )
-            }
+           TimerScreen(modifier = modifier)
         }
         composable(Screen.CreateAlarm.route) {
             alarmListViewModel.alarmState?.let { it ->

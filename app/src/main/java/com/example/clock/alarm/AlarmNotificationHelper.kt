@@ -11,8 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 
 import com.example.clock.R
-import com.example.clock.timer.ACTION_DELETE
-import com.example.clock.timer.TimerNotificationBroadcastReceiver
+
 import com.example.clock.ui.MainActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

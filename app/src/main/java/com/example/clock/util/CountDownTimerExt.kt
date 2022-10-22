@@ -1,10 +1,10 @@
-package com.example.clock.timer
+package com.example.clock.util
 
 import android.os.CountDownTimer
 
 abstract class CountDownTimerExt(var mMillisInFuture: Long, var mInterval: Long) {
 
-    private lateinit var countDownTimer: CountDownTimer
+    private var countDownTimer: CountDownTimer?   = null
     private var remainingTime: Long = 0
     private var isTimerPaused: Boolean = true
 
@@ -35,13 +35,13 @@ abstract class CountDownTimerExt(var mMillisInFuture: Long, var mInterval: Long)
 
     fun pause() {
         if (!isTimerPaused) {
-            countDownTimer.cancel()
+            countDownTimer?.cancel()
         }
         isTimerPaused = true
     }
 
     fun restart() {
-        countDownTimer.cancel()
+        countDownTimer?.cancel()
         remainingTime = mMillisInFuture
         isTimerPaused = true
     }

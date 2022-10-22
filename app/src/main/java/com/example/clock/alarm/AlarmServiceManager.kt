@@ -2,9 +2,7 @@ package com.example.clock.alarm
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.content.ContextCompat
-import com.example.clock.timer.TimerService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

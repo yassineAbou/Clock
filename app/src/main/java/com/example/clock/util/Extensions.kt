@@ -1,24 +1,56 @@
 package com.example.clock.util
 
 import android.app.ActivityManager
+import android.app.ActivityManager.RunningAppProcessInfo
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
+import android.content.Intent
 import androidx.core.text.isDigitsOnly
 import com.example.clock.data.Alarm
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.reduce
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-fun String?.parseLong(): Long {
-    return if (this == null || this.isEmpty()) 0L else this.toLong()
-}
 
 fun String?.parseInt(): Int {
     return if (this == null || this.isEmpty()) 0 else this.toInt()
 }
 
-fun String.checkTimerInput(number: Int): Boolean {
-    return this.length <= 2 && this.isDigitsOnly() &&   this.parseInt() <= number
+fun String.checkNumberPicker(maxNumber: Int): Boolean {
+    return this.length <= 2 && this.isDigitsOnly() &&  this.parseInt() <= maxNumber
+}
+
+fun Class<*>?.setIntentAction(actionName: String, requestCode: Int, context: Context): PendingIntent {
+    val broadcastIntent =
+        Intent(context, this).apply {
+            action = actionName
+        }
+    return PendingIntent.getBroadcast(
+        context,
+        requestCode,
+        broadcastIntent,
+        Constants.pendingIntentFlags
+    )
+}
+
+@Suppress("DEPRECATION") // Deprecated for third party Services.
+fun <T> Context.isServiceRunning(service: Class<T>) =
+    (getSystemService(ACTIVITY_SERVICE) as ActivityManager)
+        .getRunningServices(Integer.MAX_VALUE)
+        .any { it.service.className == service.name }
+
+fun Context.isBackgroundRunning(): Boolean {
+    val am = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+    val runningProcesses = am.runningAppProcesses
+    for (processInfo in runningProcesses) {
+        if (processInfo.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+            for (activeProcess in processInfo.pkgList) {
+                if (activeProcess == this.packageName) {
+                    return false
+                }
+            }
+        }
+    }
+    return true
 }
 
 object Global {

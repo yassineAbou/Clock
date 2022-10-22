@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.example.clock.data.manager.StopwatchManager
-import com.example.clock.data.service.StopwatchNotificationHelper
+import com.example.clock.util.helper.StopwatchNotificationHelper
 import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -20,19 +20,19 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
 
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        val isPlaying = p1?.getBooleanExtra(EXTRA_STOPWATCH_IS_PLAYING, false)
-        val isReset = p1?.getBooleanExtra(EXTRA_STOPWATCH_IS_RESET, false)
-        val time = p1?.getStringExtra(EXTRA_STOPWATCH_TIME)
-        val lastIndex = p1?.getIntExtra(EXTRA_STOPWATCH_LAST_INDEX, 0)
+        val isPlaying = p1?.getBooleanExtra(STOPWATCH_IS_PLAYING_EXTRA, false)
+        val isReset = p1?.getBooleanExtra(STOPWATCH_IS_RESET_EXTRA, false)
+        val time = p1?.getStringExtra(STOPWATCH_TIME_EXTRA)
+        val lastIndex = p1?.getIntExtra(STOPWATCH_LAST_INDEX_EXTRA, 0)
         val action = p1?.action
 
         action?.let {
             when (it) {
-                ACTION_RESET -> {
+                STOPWATCH_RESET_ACTION -> {
                     stopwatchManager.clearListTimes()
                     stopwatchManager.reset()
                 }
-                ACTION_LAP -> stopwatchManager.addTime()
+                STOPWATCH_LAP_ACTION -> stopwatchManager.addTime()
             }
         }
 
@@ -57,9 +57,9 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
 }
 
 
-const val EXTRA_STOPWATCH_TIME = "EXTRA_STOPWATCH_TIME"
-const val EXTRA_STOPWATCH_IS_PLAYING = "EXTRA_STOPWATCH_IS_PLAYING"
-const val EXTRA_STOPWATCH_IS_RESET = "EXTRA_STOPWATCH_IS_RESET"
-const val ACTION_RESET = "ACTION_RESET"
-const val ACTION_LAP = "ACTION_LAP"
-const val EXTRA_STOPWATCH_LAST_INDEX = "EXTRA_STOPWATCH_LAST_INDEX"
+const val STOPWATCH_TIME_EXTRA = "STOPWATCH_TIME_EXTRA"
+const val STOPWATCH_IS_PLAYING_EXTRA = "STOPWATCH_IS_PLAYING_EXTRA"
+const val STOPWATCH_IS_RESET_EXTRA = "STOPWATCH_IS_RESET_EXTRA"
+const val STOPWATCH_RESET_ACTION = "STOPWATCH_RESET_ACTION"
+const val STOPWATCH_LAP_ACTION = "STOPWATCH_LAP_ACTION"
+const val STOPWATCH_LAST_INDEX_EXTRA = "STOPWATCH_LAST_INDEX_EXTRA"

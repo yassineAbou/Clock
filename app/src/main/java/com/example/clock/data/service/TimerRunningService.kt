@@ -1,8 +1,11 @@
-package com.example.clock.timer
+package com.example.clock.data.service
 
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.example.clock.data.manager.TimerManager
+import com.example.clock.util.helper.TIMER_RUNNING_NOTIFICATION_ID
+import com.example.clock.util.helper.TimerNotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -12,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TimerService : Service() {
+class TimerRunningService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob())
 
@@ -20,27 +23,25 @@ class TimerService : Service() {
     lateinit var timerManager: TimerManager
 
     @Inject
-    lateinit var notificationHelper: NotificationHelper
+    lateinit var timerNotificationHelper: TimerNotificationHelper
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(TIMER_SERVICE_NOTIFICATION_ID, notificationHelper.getBaseNotification().build())
+        startForeground(TIMER_RUNNING_NOTIFICATION_ID, timerNotificationHelper.getTimerBaseNotification().build())
 
         serviceScope.launch {
             timerManager.timerState.collectLatest {
-                if (!it.isDone && it.progress != 1.0F) {
-                    notificationHelper.updateTimerServiceNotification(
-                        timerRunning = it.isPlaying,
+                if (!it.isDone) {
+                    timerNotificationHelper.updateTimerServiceNotification(
+                        isPlaying = it.isPlaying,
                         time = it.time,
                         isDone = it.isDone
                     )
                 }
-
-
             }
         }
 
-        return START_STICKY
+            return START_STICKY
     }
 
 
@@ -49,8 +50,7 @@ class TimerService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        timerManager.onChangeDone()
+        timerNotificationHelper.removeTimerRunningNotification()
     }
 }
 

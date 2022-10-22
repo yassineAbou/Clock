@@ -58,8 +58,7 @@ fun StopwatchScreen(
     var isReset by rememberSaveable { mutableStateOf(stopwatchState.isReset) }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(stopwatchState.isReset, stopwatchViewModel.listTimes.isEmpty()
-    ) {
+    LaunchedEffect(stopwatchState.isReset, stopwatchViewModel.listTimes.isEmpty()) {
         isReset = stopwatchState.isReset
         lineSeparator = stopwatchViewModel.listTimes.isNotEmpty()
         if (stopwatchViewModel.listTimes.isNotEmpty()) {
@@ -230,89 +229,89 @@ private fun Buttons(
     modifier: Modifier = Modifier
 ) {
     val transition = updateTransition(isReset, label = stringResource(id = R.string.is_reset))
-        Box(
-            modifier = modifier
+    Box(
+        modifier = modifier
+    ) {
+
+        transition.AnimatedVisibility(
+            visible = { isTargetReset -> isTargetReset },
+            enter = expandHorizontally(
+                animationSpec = tween(
+                    durationMillis = 1,
+                    easing = FastOutLinearInEasing
+                )
+            ),
+            exit = shrinkHorizontally(
+                animationSpec = tween(
+                    durationMillis = 1,
+                    easing = FastOutLinearInEasing
+                )
+            )
         ) {
-
-            transition.AnimatedVisibility(
-                visible = { isTargetReset -> isTargetReset },
-                enter = expandHorizontally(
-                    animationSpec = tween(
-                        durationMillis = 1,
-                        easing = FastOutLinearInEasing
-                    )
-                ),
-                exit = shrinkHorizontally(
-                    animationSpec = tween(
-                        durationMillis = 1,
-                        easing = FastOutLinearInEasing
-                    )
-                )
-            ) {
-                ClockButton(
-                    onClick = {
-                        stopwatchViewModel.start()
-                        onChangeIsReset(false)
-                    },
-                    text = stringResource(id = R.string.start),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            transition.AnimatedVisibility(
-                visible = { isTargetReset -> !isTargetReset },
-                enter = expandHorizontally(
-                    animationSpec = tween(
-                        durationMillis = 500,
-                        easing = LinearOutSlowInEasing
-                    )
-                ),
-                exit = shrinkHorizontally(
-                    animationSpec = tween(
-                        durationMillis = 1,
-                        easing = FastOutLinearInEasing
-                    )
-                )
-            ) {
-                Row (
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                        ){
-                    if (isPlaying) {
-                        ClockButton(
-                            text = stringResource(id = R.string.stop),
-                            onClick = {stopwatchViewModel.stop() },
-                            color = Red100
-                        )
-                        ClockButton(
-                            text = stringResource(id = R.string.lap),
-                            onClick = {
-                                stopwatchViewModel.addTime()
-                                scope.launch {
-                                    scrollState.animateScrollToItem(index = stopwatchViewModel.listTimes.lastIndex)
-                                }
-                            },
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    } else {
-                        ClockButton(
-                            text = stringResource(id = R.string.resume),
-                            onClick = { stopwatchViewModel.start() },
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        ClockButton(
-                            text = stringResource(id = R.string.reset),
-                            onClick = {
-                                stopwatchViewModel.reset()
-                                stopwatchViewModel.clearListTimes()
-                                onChangeIsReset(true)
-                            },
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-
-            }
+            ClockButton(
+                onClick = {
+                    stopwatchViewModel.start()
+                    onChangeIsReset(false)
+                },
+                text = stringResource(id = R.string.start),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
+        transition.AnimatedVisibility(
+            visible = { isTargetReset -> !isTargetReset },
+            enter = expandHorizontally(
+                animationSpec = tween(
+                    durationMillis = 500,
+                    easing = LinearOutSlowInEasing
+                )
+            ),
+            exit = shrinkHorizontally(
+                animationSpec = tween(
+                    durationMillis = 1,
+                    easing = FastOutLinearInEasing
+                )
+            )
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                if (isPlaying) {
+                    ClockButton(
+                        text = stringResource(id = R.string.stop),
+                        onClick = { stopwatchViewModel.stop() },
+                        color = Red100
+                    )
+                    ClockButton(
+                        text = stringResource(id = R.string.lap),
+                        onClick = {
+                            stopwatchViewModel.addTime()
+                            scope.launch {
+                                scrollState.animateScrollToItem(index = stopwatchViewModel.listTimes.lastIndex)
+                            }
+                        },
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                } else {
+                    ClockButton(
+                        text = stringResource(id = R.string.resume),
+                        onClick = { stopwatchViewModel.start() },
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    ClockButton(
+                        text = stringResource(id = R.string.reset),
+                        onClick = {
+                            stopwatchViewModel.reset()
+                            stopwatchViewModel.clearListTimes()
+                            onChangeIsReset(true)
+                        },
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
+        }
+    }
 }
 
 

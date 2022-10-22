@@ -3,8 +3,6 @@ package com.example.clock.alarm
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -13,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.clock.components.NumberPicker
+import com.example.clock.util.components.NumberPicker
 import com.example.clock.data.Alarm
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.Global.current
 import com.example.clock.util.Global.formatter
-import com.example.clock.util.checkTimerInput
-import com.example.clock.util.clearFocusOnKeyboardDismiss
+import com.example.clock.util.checkNumberPicker
+import com.example.clock.util.components.clearFocusOnKeyboardDismiss
 
 import com.example.clock.util.parseInt
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -253,8 +251,9 @@ private fun TimePicker(
                 .weight(1f)
                 .padding(start = 85.dp),
             number = hours,
+            labelTimeUnit = "Hours",
             onNumberChange = { value ->
-                if (value.text.checkTimerInput(23)) {
+                if (value.text.checkNumberPicker(23)) {
                     hours = value
                     setHour(hours.text)
                 }
@@ -271,9 +270,10 @@ private fun TimePicker(
         NumberPicker(
             modifier = Modifier.weight(1f),
             number = minutes,
+            labelTimeUnit = "Minutes",
             textStyle = textStyle,
             onNumberChange = { value ->
-                if (value.text.checkTimerInput(59)) {
+                if (value.text.checkNumberPicker(59)) {
                     minutes = value
                     setMinute(minutes.text)
                 }

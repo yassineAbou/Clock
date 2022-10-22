@@ -1,7 +1,8 @@
 package com.example.clock.data.manager
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.clock.data.service.StopwatchServiceManager
+import com.example.clock.data.service.StopwatchService
+import com.example.clock.util.Constants.TIME_FORMAT
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -23,7 +24,7 @@ data class StopwatchState(
 @OptIn(ExperimentalTime::class)
 @Singleton
 class StopwatchManager @Inject constructor(
-    private val stopwatchServiceManager: StopwatchServiceManager
+    private val serviceManager: ServiceManager
 ) {
 
     var listTimes = mutableStateListOf<String>()
@@ -49,7 +50,7 @@ class StopwatchManager @Inject constructor(
 
 
     private var duration: Duration = Duration.ZERO
-    private lateinit var timer: Timer
+    private var timer: Timer? = null
 
     fun start() {
         timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
@@ -71,7 +72,7 @@ class StopwatchManager @Inject constructor(
 
     fun addTime() {
         val time =  duration.toComponents { hours, minutes, seconds, _ ->
-            String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            String.format(TIME_FORMAT, hours, minutes, seconds)
         }
         listTimes.add(time)
     }
@@ -86,7 +87,7 @@ class StopwatchManager @Inject constructor(
     }
 
     fun stop() {
-        timer.cancel()
+        timer?.cancel()
         isPlayingFlow.value = false
     }
 
@@ -95,7 +96,7 @@ class StopwatchManager @Inject constructor(
         stop()
         duration = Duration.ZERO
         updateStopwatchState()
-        stopwatchServiceManager.stopStopwatchService()
+        serviceManager.stopService(StopwatchService::class.java)
     }
 }
 

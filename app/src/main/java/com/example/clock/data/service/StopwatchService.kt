@@ -4,6 +4,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.example.clock.data.manager.StopwatchManager
+import com.example.clock.util.helper.STOPWATCH_SERVICE_NOTIFICATION_ID
+import com.example.clock.util.helper.StopwatchNotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -23,6 +25,9 @@ class StopwatchService : Service() {
     @Inject
     lateinit var stopwatchNotificationHelper: StopwatchNotificationHelper
 
+    override fun onCreate() {
+        super.onCreate()
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(

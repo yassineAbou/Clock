@@ -1,41 +1,44 @@
-package com.example.clock.components
+package com.example.clock.util.components
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import com.example.clock.util.clearFocusOnKeyboardDismiss
-import java.time.format.TextStyle
+import com.intuit.sdp.R
 
 @Composable
  fun NumberPicker(
     modifier: Modifier = Modifier,
     number: TextFieldValue,
+    labelTimeUnit: String,
     onNumberChange: (TextFieldValue) -> Unit,
     textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.displayLarge
 ) {
 
-    val background = MaterialTheme.colorScheme.surface
-    val colors = TextFieldDefaults.textFieldColors(
-        backgroundColor = background,
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        disabledIndicatorColor = Color.Transparent
-    )
+    val backgroundColor = MaterialTheme.colorScheme.surface
     val numberType = KeyboardOptions(keyboardType = KeyboardType.Number)
+    val colors = TextFieldDefaults.textFieldColors(
+        containerColor = backgroundColor,
+        focusedIndicatorColor = backgroundColor,
+        unfocusedIndicatorColor = backgroundColor
+        )
 
     Surface(modifier = modifier) {
 
         TextField(
+            label = {
+                Text(text = labelTimeUnit,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = dimensionResource(id = R.dimen._5sdp))
+                )
+            },
             modifier = Modifier
-                .clearFocusOnKeyboardDismiss()
+                //.clearFocusOnKeyboardDismiss()
                 .onFocusChanged { focusState ->
                     if (!focusState.isFocused && number.text.isEmpty()) {
                         onNumberChange(TextFieldValue("00"))
@@ -48,7 +51,7 @@ import java.time.format.TextStyle
             onValueChange = onNumberChange,
             textStyle = textStyle,
             keyboardOptions = numberType,
-            colors = colors,
+            colors = colors
         )
     }
 

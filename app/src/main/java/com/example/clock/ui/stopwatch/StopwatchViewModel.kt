@@ -17,9 +17,12 @@ class StopwatchViewModel @Inject constructor(
 
     val listTimes = stopwatchManager.listTimes
 
-
     fun start() {
         stopwatchManager.start()
+    }
+
+    fun stop() {
+        stopwatchManager.stop()
     }
 
     fun addTime() {
@@ -28,10 +31,6 @@ class StopwatchViewModel @Inject constructor(
 
     fun clearListTimes() {
         stopwatchManager.clearListTimes()
-    }
-
-    fun stop() {
-        stopwatchManager.stop()
     }
 
     fun reset() {
