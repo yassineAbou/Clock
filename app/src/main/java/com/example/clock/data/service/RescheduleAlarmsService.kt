@@ -1,10 +1,11 @@
-package com.example.clock.alarm
+package com.example.clock.data.service
 
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.example.clock.repository.AlarmRepository
+import com.example.clock.data.manager.ScheduleAlarmManager
+import com.example.clock.data.repository.AlarmRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,7 +14,7 @@ import javax.inject.Inject
 class RescheduleAlarmsService : LifecycleService() {
 
     @Inject
-    lateinit var alarmManager: AlarmManager
+    lateinit var scheduleAlarmManager: ScheduleAlarmManager
 
     @Inject
     lateinit var alarmRepository: AlarmRepository
@@ -22,11 +23,10 @@ class RescheduleAlarmsService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
 
         lifecycleScope.launch {
-            alarmRepository.alarmsItems.collect { alarms ->
+            alarmRepository.alarmsList.collect { alarms ->
                 for (alarm in alarms) {
-                    if (alarm.started) {
-                        alarmManager.scheduleAlarm(alarm)
-                        Log.e(TAG, "onStartCommand: ${alarm.alarmId}", )
+                    if (alarm.isScheduled) {
+                        scheduleAlarmManager.schedule(alarm)
                     }
                 }
             }

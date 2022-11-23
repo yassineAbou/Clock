@@ -1,13 +1,14 @@
-package com.example.clock.repository
+package com.example.clock.data.repository
 
-import com.example.clock.data.Alarm
-import com.example.clock.data.AlarmDao
+import com.example.clock.data.model.Alarm
+import com.example.clock.data.local.AlarmDao
+import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
 
 class AlarmRepository @Inject constructor(
     private val alarmDao: AlarmDao
 ) {
-    val alarmsItems = alarmDao.getAlarmsItems()
+    val alarmsList = alarmDao.getAlarmsList().distinctUntilChanged()
 
     suspend fun insert(alarm: Alarm) = alarmDao.insert(alarm)
 
@@ -15,9 +16,11 @@ class AlarmRepository @Inject constructor(
 
     suspend fun delete(alarm: Alarm) = alarmDao.delete(alarm)
 
+    suspend fun getLastAutoId() = alarmDao.getLastAutoId()
+
     suspend fun clear() = alarmDao.clear()
 
-    suspend fun getAlarmItem(alarmId: Long) = alarmDao.getAlarmItem(alarmId)
+    suspend fun getAlarmById(id: Int) = alarmDao.getAlarmById(id)
 
     fun getAlarmByTime(hour: String, minute: String, recurring: Boolean) = alarmDao.getAlarmByTime(hour, minute, recurring)
 

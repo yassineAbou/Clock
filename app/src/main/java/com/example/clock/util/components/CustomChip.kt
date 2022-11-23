@@ -1,4 +1,4 @@
-package com.example.clock.alarm
+package com.example.clock.util.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,9 +27,8 @@ import androidx.compose.ui.unit.dp
 import com.example.clock.ui.theme.Shapes
 
 @Composable
-fun Chip(
+fun CustomChip(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
     isSelected: Boolean,
     text: String,
     onChecked: (Boolean) -> Unit,
@@ -56,7 +55,6 @@ fun Chip(
             .clip(shape = CircleShape)
             .clickable {
                 onChecked(!isSelected)
-                onClick()
             }
             .padding(4.dp)
     ) {

@@ -1,6 +1,5 @@
 package com.example.clock.ui
 
-import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,20 +30,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.clock.R
-import com.example.clock.alarm.AlarmsListScreen
-import com.example.clock.alarm.AlarmsListViewModel
-import com.example.clock.alarm.CreateAlarmScreen
-import com.example.clock.data.Alarm
 import com.example.clock.data.manager.ServiceManager
-import com.example.clock.data.receiver.TimerNotificationBroadcastReceiver
 import com.example.clock.data.service.StopwatchService
 import com.example.clock.data.service.TimerRunningService
+import com.example.clock.ui.alarm.AlarmViewModel
+import com.example.clock.ui.alarm.AlarmsListScreen
 import com.example.clock.ui.clock.ClockScreen
+import com.example.clock.ui.alarm.CreateAlarmScreen
 import com.example.clock.ui.stopwatch.StopwatchScreen
 import com.example.clock.ui.stopwatch.StopwatchViewModel
 import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.timer.TimerScreen
 import com.example.clock.ui.timer.TimerViewModel
+import com.example.clock.util.Constants.alarmDefaultValue
 import com.example.clock.util.components.BottomNavigationBar
 import com.example.clock.util.components.listBottomBarItems
 import com.example.clock.util.isServiceRunning
@@ -53,7 +51,6 @@ import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -136,7 +133,7 @@ private fun ClockApp() {
     var isFloatButtonVisible by rememberSaveable { (mutableStateOf(true)) }
     var isBottomBarVisible by rememberSaveable { (mutableStateOf(true)) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val alarmListViewModel: AlarmsListViewModel = viewModel()
+    val alarmViewModel: AlarmViewModel = viewModel()
 
     LaunchedEffect(navBackStackEntry?.destination?.route) {
         isFloatButtonVisible = when (navBackStackEntry?.destination?.route) {
@@ -179,9 +176,9 @@ private fun ClockApp() {
                         )
                     },
                     onClick = {
+                        alarmViewModel.changeCreateAlarmState(alarmDefaultValue)
                         navController.navigate(Screen.CreateAlarm.route)
-                        alarmListViewModel.test(Alarm())
-                        },
+                    },
                     elevation = FloatingActionButtonDefaults.elevation(8.dp)
                 ) }
 
@@ -197,23 +194,18 @@ private fun ClockApp() {
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
 
-    val alarmListViewModel: AlarmsListViewModel = viewModel()
-    val alarmListState by alarmListViewModel.alarmsListState.observeAsState()
+    val alarmViewModel: AlarmViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = Screen.AlarmsList.route) {
         composable(
            route = Screen.AlarmsList.route,
             deepLinks = Screen.alarmListDeepLink
         ) {
-            alarmListState?.let {
-                AlarmsListScreen(
-                    alarmsListState = it,
-                    alarmsListScreenActions = alarmListViewModel,
-                    navigateToCreateAlarm = {
-                        navController.navigate(Screen.CreateAlarm.route)
-                    }
-                )
-            }
+            AlarmsListScreen(
+                modifier = modifier,
+                alarmViewModel = alarmViewModel,
+                navigateToCreateAlarm = { navController.navigate(Screen.CreateAlarm.route) }
+            )
         }
         composable(Screen.Clock.route) {
             ClockScreen(modifier = modifier)
@@ -231,21 +223,14 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
            TimerScreen(modifier = modifier)
         }
         composable(Screen.CreateAlarm.route) {
-            alarmListViewModel.alarmState?.let { it ->
-                CreateAlarmScreen(
-                    alarmsListScreenActions = alarmListViewModel,
-                    alarmState = it,
-                    navigateToAlarmsList = {
-                        navController.navigate(Screen.AlarmsList.route)
-                    },
-                    //targetDay = alarmListViewModel.targetDay
-                )
-            }
+           CreateAlarmScreen(
+               modifier = modifier,
+               alarmViewModel = alarmViewModel,
+               navigateToAlarmsList = { navController.navigate(Screen.AlarmsList.route) }
+           )
         }
     }
 }
-
-private const val TAG = "MainActivity"
 
 
 

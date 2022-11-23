@@ -7,7 +7,7 @@
     <string name="timer_completed_channel_name">Timer completed notifications</string>
     <string name="timer_completed_channel_description">Shows a notification when a countdown timer finishes</string>
     <string name="alarm_service_channel_name">Alarm service channel</string>
-    <string name="alarm_service_channel_description">Shows an alert notification at a particular time</string>
+    <string name="alarm_service_channel_description">Shows an alert notification at scheduled time</string>
     <string name="stopwatch_channel">Stopwatch service channel</string>
     <string name="stopwatch_service_channel_description">Shows a persistent notification when the stopwatch is running</string>
     <string name="add_alarm">AddAlarm</string>
@@ -25,5 +25,8 @@
     <string name="cancel">Cancel</string>
     <string name="pause">Pause</string>
     <string name="is_done">is_done</string>
+    <string name="alarm">Alarm</string>
+    <string name="save">Save</string>
+    <string name="clear_alarms">Clear alarms</string>
 
 </resources>

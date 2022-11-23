@@ -57,8 +57,7 @@ fun TimerScreen(
     Surface(modifier = modifier) {
         BoxWithConstraints(
             modifier = Modifier
-                .fillMaxSize()
-                .imePadding(),
+                .fillMaxSize(),
         ) {
             val timerPickerPaddingStart = if (maxWidth > 400.dp) dimensionResource(id = com.intuit.sdp.R.dimen._30sdp) else 0.dp
             TimerAppBar(
@@ -177,7 +176,7 @@ private fun TimerPicker(
         )
 
         Text(
-            modifier = Modifier.padding(top = dimensionResource(id = com.intuit.sdp.R.dimen._12sdp)),
+            modifier = Modifier.padding(top = 17.dp),
             text = ":",
             style = textStyle,
         )
@@ -196,7 +195,7 @@ private fun TimerPicker(
         )
 
         Text(
-            modifier = Modifier.padding(top = dimensionResource(id = com.intuit.sdp.R.dimen._12sdp)),
+            modifier = Modifier.padding(top = 17.dp),
             text = ":",
             style = textStyle
         )

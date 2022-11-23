@@ -1,8 +1,8 @@
-package com.example.clock.util
+package com.example.clock.util.helper
 
 import android.os.CountDownTimer
 
-abstract class CountDownTimerExt(var mMillisInFuture: Long, var mInterval: Long) {
+abstract class CountDownTimerHelper(var mMillisInFuture: Long, var mInterval: Long) {
 
     private var countDownTimer: CountDownTimer?   = null
     private var remainingTime: Long = 0

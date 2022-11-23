@@ -1,7 +1,9 @@
-package com.example.clock.data
+package com.example.clock.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.clock.data.local.AlarmDao
+import com.example.clock.data.local.AlarmDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,14 +22,14 @@ object DatabaseModule {
     ) = Room.databaseBuilder(
         app,
         AlarmDatabase::class.java,
-        "alarms_items_database"
+        "alarms_list_database"
     ).build()
 
     @Singleton
     @Provides
-    fun provideAlarmDoe(alarmDatabase: AlarmDatabase):
+    fun provideAlarmDao(alarmDatabase: AlarmDatabase):
             AlarmDao {
-        return alarmDatabase.getAlarmDoe()
+        return alarmDatabase.getAlarmDao()
     }
 
 

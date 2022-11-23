@@ -6,10 +6,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
+import android.text.format.DateUtils
 import androidx.core.text.isDigitsOnly
-import com.example.clock.data.Alarm
+import com.example.clock.data.model.Alarm
+import com.example.clock.util.Constants.dateTimeFormatter
+import com.example.clock.util.Constants.nextDay
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.util.*
 
 fun String?.parseInt(): Int {
     return if (this == null || this.isEmpty()) 0 else this.toInt()
@@ -18,6 +21,23 @@ fun String?.parseInt(): Int {
 fun String.checkNumberPicker(maxNumber: Int): Boolean {
     return this.length <= 2 && this.isDigitsOnly() &&  this.parseInt() <= maxNumber
 }
+
+fun Alarm.checkDate(): String {
+
+    val currentTime = Calendar.getInstance()
+    val timeToMatch = Calendar.getInstance()
+    val currentDay = LocalDateTime.now()
+    timeToMatch[Calendar.HOUR_OF_DAY] = this.hour.parseInt()
+    timeToMatch[Calendar.MINUTE] = this.minute.parseInt()
+
+   return when {
+       currentTime < timeToMatch -> "Today-${currentDay.format(dateTimeFormatter)}"
+       currentTime >= timeToMatch -> "Tomorrow-${nextDay.format(dateTimeFormatter)}"
+       else -> this.description
+   }
+}
+
+private const val TAG = "Extensions"
 
 fun Class<*>?.setIntentAction(actionName: String, requestCode: Int, context: Context): PendingIntent {
     val broadcastIntent =
@@ -51,12 +71,6 @@ fun Context.isBackgroundRunning(): Boolean {
         }
     }
     return true
-}
-
-object Global {
-    val formatter = DateTimeFormatter.ofPattern("EEE,MMMdd")
-    val current = LocalDateTime.now()
-     val defaultValue = Alarm(targetDay = "Today-${current.format(formatter)}")
 }
 
 

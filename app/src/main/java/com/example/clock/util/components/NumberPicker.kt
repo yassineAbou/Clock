@@ -2,10 +2,12 @@ package com.example.clock.util.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -17,10 +19,11 @@ import com.intuit.sdp.R
     number: TextFieldValue,
     labelTimeUnit: String,
     onNumberChange: (TextFieldValue) -> Unit,
-    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.displayLarge
+    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.displayLarge,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface
 ) {
 
-    val backgroundColor = MaterialTheme.colorScheme.surface
+
     val numberType = KeyboardOptions(keyboardType = KeyboardType.Number)
     val colors = TextFieldDefaults.textFieldColors(
         containerColor = backgroundColor,
@@ -38,7 +41,7 @@ import com.intuit.sdp.R
                 )
             },
             modifier = Modifier
-                //.clearFocusOnKeyboardDismiss()
+                .clearFocusOnKeyboardDismiss()
                 .onFocusChanged { focusState ->
                     if (!focusState.isFocused && number.text.isEmpty()) {
                         onNumberChange(TextFieldValue("00"))

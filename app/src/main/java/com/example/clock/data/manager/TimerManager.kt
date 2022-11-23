@@ -3,7 +3,7 @@ package com.example.clock.data.manager
 import android.content.Context
 import com.example.clock.data.service.TimerCompletedService
 import com.example.clock.data.service.TimerRunningService
-import com.example.clock.util.CountDownTimerExt
+import com.example.clock.util.helper.CountDownTimerHelper
 import com.example.clock.util.Constants.TIME_FORMAT
 import com.example.clock.util.isServiceRunning
 import com.zhuinden.flowcombinetuplekt.combineTuple
@@ -61,7 +61,7 @@ class TimerManager @Inject constructor(
         )
     }
 
-    private var countDownTimer: CountDownTimerExt? = null
+    private var countDownTimerHelper: CountDownTimerHelper? = null
 
 
     fun setTHour(hour: Int) {
@@ -79,7 +79,7 @@ class TimerManager @Inject constructor(
      @OptIn(ExperimentalTime::class)
      fun setCountDownTimer() {
         timeInMillisFlow.value = (hourFlow.value.hours + minuteFlow.value.minutes + secondFlow.value.seconds).inWholeMilliseconds
-        countDownTimer = object : CountDownTimerExt(timeInMillisFlow.value, 1000) {
+        countDownTimerHelper = object : CountDownTimerHelper(timeInMillisFlow.value, 1000) {
             override fun onTimerTick(millisUntilFinished: Long) {
                 val progressValue = millisUntilFinished.toFloat() / timeInMillisFlow.value
                 handleTimerValues(true, millisUntilFinished.formatTime(), progressValue)
@@ -104,18 +104,18 @@ class TimerManager @Inject constructor(
     }
 
     private fun pauseTimer() {
-        countDownTimer?.pause()
+        countDownTimerHelper?.pause()
         isPlayingFlow.value = false
     }
 
     fun resetTimer() {
         handleTimerValues(false, timeInMillisFlow.value.formatTime(), 0f)
         isDoneFlow.value = true
-        countDownTimer?.restart()
+        countDownTimerHelper?.restart()
     }
 
      fun startTimer() {
-        countDownTimer?.start()
+        countDownTimerHelper?.start()
         isPlayingFlow.value = true
         isDoneFlow.value = false
         progressFlow.value = 1f

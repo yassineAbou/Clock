@@ -11,7 +11,7 @@
 
     <application
         android:name=".ClockApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -23,7 +23,8 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Clock"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="adjustResize"
+            android:showOnLockScreen="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,26 +36,26 @@
         <service android:name=".data.service.TimerCompletedService"/>
 
         <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />
+
         <receiver
-            android:name=".alarm.AlarmBroadcastReceiver"
-            android:exported="true" >
+            android:name=".data.receiver.AlarmBroadcastReceiver"
+            android:exported="true">
             <intent-filter>
                 <data
                     android:host="www.clock.com"
                     android:scheme="https" />
-
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".alarm.AlarmService" />
-        <service android:name=".alarm.RescheduleAlarmsService" />
-
-        <receiver android:name=".alarm.AlarmActionsBroadcastReceiver" />
+        <service android:name=".data.service.AlarmService" />
+        <service android:name=".data.service.RescheduleAlarmsService" />
 
         <service android:name=".data.service.StopwatchService" />
 
         <receiver android:name=".data.receiver.StopwatchNotificationBroadcastReceiver" />
+        <receiver android:name=".data.receiver.AlarmActionsBroadcastReceiver" />
+
     </application>
 
 </manifest>
