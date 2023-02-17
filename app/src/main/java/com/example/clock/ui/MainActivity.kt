@@ -9,9 +9,10 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAlarm
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,9 +47,7 @@ import com.example.clock.util.Constants.alarmDefaultValue
 import com.example.clock.util.components.BottomNavigationBar
 import com.example.clock.util.components.listBottomBarItems
 import com.example.clock.util.isServiceRunning
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.stateIn
@@ -171,7 +170,8 @@ private fun ClockApp() {
                     text = { Text(text = stringResource(id = R.string.add_alarm)) },
                     icon = {
                         Icon(
-                            imageVector = Icons.Default.AddAlarm,
+                            imageVector = Icons.Default.AddAlarm
+                            ,
                             contentDescription = null
                         )
                     },

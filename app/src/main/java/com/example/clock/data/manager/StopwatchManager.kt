@@ -11,6 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 data class StopwatchState(
@@ -54,7 +55,7 @@ class StopwatchManager @Inject constructor(
 
     fun start() {
         timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
-            duration = duration.plus(Duration.seconds(1))
+            duration = duration.plus(1.seconds)
             updateStopwatchState()
         }
         isPlayingFlow.value = true

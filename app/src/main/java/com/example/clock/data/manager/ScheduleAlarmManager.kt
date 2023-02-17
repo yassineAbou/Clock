@@ -4,21 +4,27 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
-import com.example.clock.alarm.*
 import com.example.clock.data.model.Alarm
-import com.example.clock.data.receiver.*
+import com.example.clock.data.receiver.AlarmBroadcastReceiver
+import com.example.clock.data.receiver.HOUR
+import com.example.clock.data.receiver.IS_FRIDAY
+import com.example.clock.data.receiver.IS_MONDAY
+import com.example.clock.data.receiver.IS_RECURRING
+import com.example.clock.data.receiver.IS_SATURDAY
+import com.example.clock.data.receiver.IS_SUNDAY
+import com.example.clock.data.receiver.IS_THURSDAY
+import com.example.clock.data.receiver.IS_TUESDAY
+import com.example.clock.data.receiver.IS_WEDNESDAY
+import com.example.clock.data.receiver.MINUTE
+import com.example.clock.data.receiver.TITLE
 import com.example.clock.data.repository.AlarmRepository
 import com.example.clock.util.Constants.pendingIntentFlags
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import java.time.Duration
-import java.util.*
+import java.util.Calendar
+import java.util.Random
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.days
 
 
 @Singleton
