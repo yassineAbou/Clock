@@ -6,10 +6,9 @@ import com.example.clock.data.manager.TimerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    private val timerManager: TimerManager
+    private val timerManager: TimerManager,
 ) : ViewModel() {
 
     val timerState = timerManager.timerState.asLiveData()
@@ -22,7 +21,7 @@ class TimerViewModel @Inject constructor(
         timerManager.setMinute(minute)
     }
 
-    fun setSecond(second:Int) {
+    fun setSecond(second: Int) {
         timerManager.setSeconds(second)
     }
 
@@ -37,5 +36,4 @@ class TimerViewModel @Inject constructor(
     fun resetTimer() {
         timerManager.resetTimer()
     }
-
 }

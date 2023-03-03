@@ -9,7 +9,6 @@ import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -29,7 +28,7 @@ fun CircularProgressIndicator(
     progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary,
-    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
+    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,
 ) {
     val stroke = with(LocalDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
@@ -37,33 +36,31 @@ fun CircularProgressIndicator(
     val startAngle = 270f
     val sweep = progress * 360f
     val animateSweep by animateFloatAsState(
-        targetValue = sweep ,
-        animationSpec  = tween(easing = LinearEasing)
+        targetValue = sweep,
+        animationSpec = tween(easing = LinearEasing),
     )
-        Canvas(
-            modifier
-                .progressSemantics(progress)
-                .size(CircularIndicatorDiameter)
-                .focusable()
-        ) {
-            drawDeterminateCircularIndicator(startAngle, animateSweep, color, stroke)
-        }
-
+    Canvas(
+        modifier
+            .progressSemantics(progress)
+            .size(CircularIndicatorDiameter)
+            .focusable(),
+    ) {
+        drawDeterminateCircularIndicator(startAngle, animateSweep, color, stroke)
+    }
 }
-
 
 private fun DrawScope.drawDeterminateCircularIndicator(
     startAngle: Float,
     sweep: Float,
     color: Color,
-    stroke: Stroke
+    stroke: Stroke,
 ) = drawCircularIndicator(startAngle, sweep, color, stroke)
 
 private fun DrawScope.drawCircularIndicator(
     startAngle: Float,
     sweep: Float,
     color: Color,
-    stroke: Stroke
+    stroke: Stroke,
 ) {
     // To draw this circle we need a rect with edges that line up with the midpoint of the stroke.
     // To do this we need to remove half the stroke width from the total diameter for both sides.
@@ -76,7 +73,7 @@ private fun DrawScope.drawCircularIndicator(
         useCenter = false,
         topLeft = Offset(diameterOffset, diameterOffset),
         size = Size(arcDimen, arcDimen),
-        style = stroke
+        style = stroke,
     )
 }
 

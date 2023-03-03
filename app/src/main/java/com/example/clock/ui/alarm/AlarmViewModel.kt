@@ -2,11 +2,9 @@ package com.example.clock.ui.alarm
 
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.clock.data.manager.ScheduleAlarmManager
@@ -14,35 +12,28 @@ import com.example.clock.data.model.Alarm
 import com.example.clock.data.repository.AlarmRepository
 import com.example.clock.util.Constants.alarmDefaultValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.system.measureTimeMillis
-
 
 private const val TAG = "AlarmsListViewModel"
 
 @HiltViewModel
 class AlarmViewModel @Inject constructor(
     private val alarmRepository: AlarmRepository,
-    private val scheduleAlarmManager: ScheduleAlarmManager
+    private val scheduleAlarmManager: ScheduleAlarmManager,
 ) : ViewModel() {
 
     val alarmsListState = alarmRepository.alarmsList.asLiveData()
     var createAlarmState by mutableStateOf(alarmDefaultValue)
-    private set
+        private set
 
     fun changeCreateAlarmState(alarm: Alarm) {
         createAlarmState = alarm
     }
 
     fun update(alarm: Alarm) = viewModelScope.launch {
-        Log.e(TAG, "description: ${alarm.description}", )
+        Log.e(TAG, "description: ${alarm.description}")
         alarmRepository.update(alarm)
     }
 
@@ -56,7 +47,7 @@ class AlarmViewModel @Inject constructor(
                     } else {
                         scheduleAlarmManager.cancel(alarm)
                     }
-                }
+                },
             )
         }
     }
@@ -69,7 +60,7 @@ class AlarmViewModel @Inject constructor(
                     if (alarm.isScheduled) {
                         scheduleAlarmManager.cancel(alarm)
                     }
-                }
+                },
             )
         }
     }
@@ -92,9 +83,8 @@ class AlarmViewModel @Inject constructor(
                         alarmRepository.insert(createAlarmState)
                     }
                 },
-                async { scheduleAlarmManager.schedule(createAlarmState) }
+                async { scheduleAlarmManager.schedule(createAlarmState) },
             )
-
         }
     }
 
@@ -103,13 +93,9 @@ class AlarmViewModel @Inject constructor(
             alarmsListState.value?.let {
                 listOf(
                     async { alarmRepository.clear() },
-                    async { scheduleAlarmManager.cancelAlarms(alarms = it) }
+                    async { scheduleAlarmManager.cancelAlarms(alarms = it) },
                 )
             }
         }
     }
-
 }
-
-
-

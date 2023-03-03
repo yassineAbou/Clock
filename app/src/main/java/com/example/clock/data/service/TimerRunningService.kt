@@ -25,9 +25,11 @@ class TimerRunningService : Service() {
     @Inject
     lateinit var timerNotificationHelper: TimerNotificationHelper
 
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(TIMER_RUNNING_NOTIFICATION_ID, timerNotificationHelper.getTimerBaseNotification().build())
+        startForeground(
+            TIMER_RUNNING_NOTIFICATION_ID,
+            timerNotificationHelper.getTimerBaseNotification().build(),
+        )
 
         serviceScope.launch {
             timerManager.timerState.collectLatest {
@@ -35,15 +37,14 @@ class TimerRunningService : Service() {
                     timerNotificationHelper.updateTimerServiceNotification(
                         isPlaying = it.isPlaying,
                         time = it.time,
-                        isDone = it.isDone
+                        isDone = it.isDone,
                     )
                 }
             }
         }
 
-            return START_STICKY
+        return START_STICKY
     }
-
 
     override fun onBind(p0: Intent?): IBinder? = null
 

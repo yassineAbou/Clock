@@ -1,7 +1,6 @@
 package com.example.clock.data.service
 
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.example.clock.data.manager.ScheduleAlarmManager
@@ -33,7 +32,6 @@ class RescheduleAlarmsService : LifecycleService() {
         }
         return START_STICKY
     }
-
 }
 
 private const val TAG = "RescheduleAlarmsService"

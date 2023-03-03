@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
-import android.text.format.DateUtils
 import androidx.core.text.isDigitsOnly
 import com.example.clock.data.model.Alarm
 import com.example.clock.util.Constants.dateTimeFormatter
@@ -19,27 +18,30 @@ fun String?.parseInt(): Int {
 }
 
 fun String.checkNumberPicker(maxNumber: Int): Boolean {
-    return this.length <= 2 && this.isDigitsOnly() &&  this.parseInt() <= maxNumber
+    return this.length <= 2 && this.isDigitsOnly() && this.parseInt() <= maxNumber
 }
 
 fun Alarm.checkDate(): String {
-
     val currentTime = Calendar.getInstance()
     val timeToMatch = Calendar.getInstance()
     val currentDay = LocalDateTime.now()
     timeToMatch[Calendar.HOUR_OF_DAY] = this.hour.parseInt()
     timeToMatch[Calendar.MINUTE] = this.minute.parseInt()
 
-   return when {
-       currentTime < timeToMatch -> "Today-${currentDay.format(dateTimeFormatter)}"
-       currentTime >= timeToMatch -> "Tomorrow-${nextDay.format(dateTimeFormatter)}"
-       else -> this.description
-   }
+    return when {
+        currentTime < timeToMatch -> "Today-${currentDay.format(dateTimeFormatter)}"
+        currentTime >= timeToMatch -> "Tomorrow-${nextDay.format(dateTimeFormatter)}"
+        else -> this.description
+    }
 }
 
 private const val TAG = "Extensions"
 
-fun Class<*>?.setIntentAction(actionName: String, requestCode: Int, context: Context): PendingIntent {
+fun Class<*>?.setIntentAction(
+    actionName: String,
+    requestCode: Int,
+    context: Context,
+): PendingIntent {
     val broadcastIntent =
         Intent(context, this).apply {
             action = actionName
@@ -48,7 +50,7 @@ fun Class<*>?.setIntentAction(actionName: String, requestCode: Int, context: Con
         context,
         requestCode,
         broadcastIntent,
-        Constants.pendingIntentFlags
+        Constants.pendingIntentFlags,
     )
 }
 
@@ -73,17 +75,25 @@ fun Context.isBackgroundRunning(): Boolean {
     return true
 }
 
-
-inline fun <T1: Any, T2: Any, T3: Any, R: Any> safeLet(p1: T1?, p2: T2?, p3: T3?, block: (T1, T2, T3)->R?): R? {
+inline fun <T1 : Any, T2 : Any, T3 : Any, R : Any> safeLet(
+    p1: T1?,
+    p2: T2?,
+    p3: T3?,
+    block: (T1, T2, T3) -> R?,
+): R? {
     return if (p1 != null && p2 != null && p3 != null) block(p1, p2, p3) else null
 }
 
-inline fun <T1: Any, T2: Any, R: Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2)->R?): R? {
+inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
     return if (p1 != null && p2 != null) block(p1, p2) else null
 }
 
-inline fun <T1: Any, T2: Any, T3: Any, T4: Any, R: Any> safeLet(p1: T1?, p2: T2?, p3: T3?, p4: T4?, block: (T1, T2, T3, T4)->R?): R? {
+inline fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any, R : Any> safeLet(
+    p1: T1?,
+    p2: T2?,
+    p3: T3?,
+    p4: T4?,
+    block: (T1, T2, T3, T4) -> R?,
+): R? {
     return if (p1 != null && p2 != null && p3 != null && p4 != null) block(p1, p2, p3, p4) else null
 }
-
-

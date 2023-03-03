@@ -10,7 +10,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 @HiltViewModel
 class StopwatchViewModel @Inject constructor(
-    private val stopwatchManager: StopwatchManager
+    private val stopwatchManager: StopwatchManager,
 ) : ViewModel() {
 
     val stopwatchState = stopwatchManager.stopwatchState.asLiveData()
@@ -36,11 +36,6 @@ class StopwatchViewModel @Inject constructor(
     fun reset() {
         stopwatchManager.reset()
     }
-
-
 }
 
 private const val TAG = "StopwatchViewModel"
-
-
-

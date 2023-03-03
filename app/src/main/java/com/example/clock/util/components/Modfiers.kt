@@ -3,17 +3,21 @@ package com.example.clock.util.components
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 
-
-
 fun Modifier.clearFocusOnKeyboardDismiss(): Modifier = composed {
-
     var isFocused by remember { mutableStateOf(false) }
     var keyboardAppearedSinceLastFocused by remember { mutableStateOf(false) }
 
@@ -41,9 +45,9 @@ fun Modifier.clearFocusOnKeyboardDismiss(): Modifier = composed {
 
 private fun View.isKeyboardOpen(): Boolean {
     val rect = Rect()
-    getWindowVisibleDisplayFrame(rect);
+    getWindowVisibleDisplayFrame(rect)
     val screenHeight = rootView.height
-    val keypadHeight = screenHeight - rect.bottom;
+    val keypadHeight = screenHeight - rect.bottom
     return keypadHeight > screenHeight * 0.15
 }
 
@@ -56,7 +60,6 @@ private fun rememberIsKeyboardOpen(): State<Boolean> {
         val listener = ViewTreeObserver.OnGlobalLayoutListener { value = view.isKeyboardOpen() }
         viewTreeObserver.addOnGlobalLayoutListener(listener)
 
-        awaitDispose { viewTreeObserver.removeOnGlobalLayoutListener(listener)  }
+        awaitDispose { viewTreeObserver.removeOnGlobalLayoutListener(listener) }
     }
 }
-

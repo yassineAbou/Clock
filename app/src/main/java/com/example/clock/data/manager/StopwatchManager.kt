@@ -25,7 +25,7 @@ data class StopwatchState(
 @OptIn(ExperimentalTime::class)
 @Singleton
 class StopwatchManager @Inject constructor(
-    private val serviceManager: ServiceManager
+    private val serviceManager: ServiceManager,
 ) {
 
     var listTimes = mutableStateListOf<String>()
@@ -34,7 +34,7 @@ class StopwatchManager @Inject constructor(
     private val secondFlow = MutableStateFlow("00")
     private val minuteFlow = MutableStateFlow("00")
     private val hourFlow = MutableStateFlow("00")
-    private val isPlayingFlow =  MutableStateFlow(false)
+    private val isPlayingFlow = MutableStateFlow(false)
     private val isResetFlow = MutableStateFlow(true)
 
     val stopwatchState = combineTuple(
@@ -42,13 +42,16 @@ class StopwatchManager @Inject constructor(
         minuteFlow,
         hourFlow,
         isPlayingFlow,
-        isResetFlow
-    ).map { ( second, minute, hour, isPlaying, isReset) ->
+        isResetFlow,
+    ).map { (second, minute, hour, isPlaying, isReset) ->
         StopwatchState(
-           second = second, minute = minute, hour = hour, isPlaying = isPlaying, isReset = isReset
+            second = second,
+            minute = minute,
+            hour = hour,
+            isPlaying = isPlaying,
+            isReset = isReset,
         )
     }
-
 
     private var duration: Duration = Duration.ZERO
     private var timer: Timer? = null
@@ -59,7 +62,7 @@ class StopwatchManager @Inject constructor(
             updateStopwatchState()
         }
         isPlayingFlow.value = true
-        isResetFlow.value= false
+        isResetFlow.value = false
     }
 
     private fun updateStopwatchState() {
@@ -70,14 +73,12 @@ class StopwatchManager @Inject constructor(
         }
     }
 
-
     fun addTime() {
-        val time =  duration.toComponents { hours, minutes, seconds, _ ->
+        val time = duration.toComponents { hours, minutes, seconds, _ ->
             String.format(TIME_FORMAT, hours, minutes, seconds)
         }
         listTimes.add(time)
     }
-
 
     fun clearListTimes() {
         listTimes.clear()
@@ -100,4 +101,3 @@ class StopwatchManager @Inject constructor(
         serviceManager.stopService(StopwatchService::class.java)
     }
 }
-

@@ -21,7 +21,6 @@ class ServiceManager @Inject constructor(
     fun stopService(service: Class<*>?) {
         val serviceIntent = Intent(applicationContext, service)
         applicationContext.stopService(serviceIntent)
-
     }
 
     fun startAlarmService(intent: Intent) {

@@ -14,23 +14,25 @@ fun ClockButton(
     text: String,
     onClick: () -> Unit,
     color: Color = MaterialTheme.colorScheme.primary,
-    enabled: Boolean = true
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = color,
-            disabledContainerColor = color.copy(alpha = 0.1f)
+            disabledContainerColor = color.copy(alpha = 0.1f),
         ),
         contentPadding = PaddingValues(
             start = 40.dp,
             top = 12.dp,
             end = 40.dp,
-            bottom = 12.dp
+            bottom = 12.dp,
         ),
-        enabled = enabled
+        enabled = enabled,
     ) {
-        Text(text = text,
-            style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+        )
     }
 }

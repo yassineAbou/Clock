@@ -13,7 +13,6 @@ import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class TimerNotificationBroadcastReceiver : BroadcastReceiver() {
 
@@ -21,7 +20,7 @@ class TimerNotificationBroadcastReceiver : BroadcastReceiver() {
     lateinit var timerManager: TimerManager
 
     @Inject
-   lateinit var timerNotificationHelper: TimerNotificationHelper
+    lateinit var timerNotificationHelper: TimerNotificationHelper
 
     @Inject
     lateinit var serviceManager: ServiceManager
@@ -32,37 +31,33 @@ class TimerNotificationBroadcastReceiver : BroadcastReceiver() {
         val time = intent?.getStringExtra(TIMER_RUNNING_TIME_EXTRA)
         val action = intent?.action
 
-            action?.let {
-                when (it) {
-                    TIMER_RUNNING_CANCEL_ACTION -> {
-                        timerManager.resetTimer()
-                        serviceManager.stopService(TimerRunningService::class.java)
-                    }
-                    TIMER_COMPLETED_DISMISS_ACTION -> serviceManager.stopService(TimerCompletedService::class.java)
-                    TIMER_COMPLETED_RESTART_ACTION -> {
-                        serviceManager.stopService(TimerCompletedService::class.java)
-                        timerManager.startTimer()
-                        if (p0?.isBackgroundRunning() == true) {
-                            serviceManager.startService(TimerRunningService::class.java)
-                        }
+        action?.let {
+            when (it) {
+                TIMER_RUNNING_CANCEL_ACTION -> {
+                    timerManager.resetTimer()
+                    serviceManager.stopService(TimerRunningService::class.java)
+                }
+                TIMER_COMPLETED_DISMISS_ACTION -> serviceManager.stopService(TimerCompletedService::class.java)
+                TIMER_COMPLETED_RESTART_ACTION -> {
+                    serviceManager.stopService(TimerCompletedService::class.java)
+                    timerManager.startTimer()
+                    if (p0?.isBackgroundRunning() == true) {
+                        serviceManager.startService(TimerRunningService::class.java)
                     }
                 }
             }
-
+        }
 
         safeLet(isPlaying, time, isDone) { safeIsPlaying, safeTime, safeIsDone ->
             if (!safeIsDone) {
                 timerNotificationHelper.updateTimerServiceNotification(
                     isPlaying = safeIsPlaying,
                     time = safeTime,
-                    isDone = safeIsDone
+                    isDone = safeIsDone,
                 )
                 timerManager.handleCountDownTimer()
             }
         }
-
-
-
     }
 }
 
@@ -72,4 +67,3 @@ const val TIMER_RUNNING_IS_DONE_EXTRA = "TIMER_RUNNING_IS_DONE_EXTRA"
 const val TIMER_RUNNING_CANCEL_ACTION = "TIMER_RUNNING_CANCEL_ACTION"
 const val TIMER_COMPLETED_DISMISS_ACTION = "TIMER_COMPLETED_DISMISS_ACTION"
 const val TIMER_COMPLETED_RESTART_ACTION = "TIMER_COMPLETED_RESTART_ACTION"
-

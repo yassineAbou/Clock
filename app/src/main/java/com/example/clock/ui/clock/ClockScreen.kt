@@ -21,27 +21,25 @@ import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
 import java.util.*
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClockScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
+    //val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
 
     Surface(modifier = modifier) {
         Box(modifier = Modifier.fillMaxSize()) {
             ClockScreenAppBar(
                 modifier = Modifier.statusBarsPadding(),
-                scrollBehavior = scrollBehavior
+                //scrollBehavior = scrollBehavior,
             )
             DigitalClock()
         }
     }
-
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClockScreenAppBar(
     modifier: Modifier = Modifier,
@@ -55,7 +53,7 @@ private fun ClockScreenAppBar(
                 text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.titleLarge,
             )
-        }
+        },
     )
 }
 
@@ -129,13 +127,13 @@ private fun NumberColumn(
                 durationMillis = 300,
                 easing = LinearOutSlowInEasing,
             )
-        }
+        },
     )
 
     Column(
         modifier
             .offset(y = offset)
-            .clip(RoundedCornerShape(percent = 25))
+            .clip(RoundedCornerShape(percent = 25)),
     ) {
         range.forEach { num ->
             Number(num == current, num, Modifier.size(size))
@@ -161,11 +159,3 @@ private fun Number(active: Boolean, value: Int, modifier: Modifier = Modifier) {
         )
     }
 }
-
-
-
-
-
-
-
-

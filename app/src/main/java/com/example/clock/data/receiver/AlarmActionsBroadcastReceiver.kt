@@ -1,10 +1,8 @@
 package com.example.clock.data.receiver
 
-import android.app.AlarmManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-
 import com.example.clock.data.manager.ScheduleAlarmManager
 import com.example.clock.data.manager.ServiceManager
 import com.example.clock.data.service.AlarmService
@@ -25,7 +23,7 @@ class AlarmActionsBroadcastReceiver : BroadcastReceiver() {
 
         alarmActions?.let {
             when (it) {
-                ACTION_DISMISS ->  serviceManager.stopService(AlarmService::class.java)
+                ACTION_DISMISS -> serviceManager.stopService(AlarmService::class.java)
                 ACTION_SNOOZE -> {
                     scheduleAlarmManager.snooze()
                     serviceManager.stopService(AlarmService::class.java)

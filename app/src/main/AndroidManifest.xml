@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Clock" >
+        android:theme="@style/Theme.Clock">
 
         <activity
             android:name=".ui.MainActivity"
@@ -32,7 +32,7 @@
         </activity>
 
         <service android:name=".data.service.TimerRunningService" />
-        <service android:name=".data.service.TimerCompletedService"/>
+        <service android:name=".data.service.TimerCompletedService" />
 
         <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />
 

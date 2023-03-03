@@ -1,6 +1,5 @@
 package com.example.clock.ui.alarm
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,15 +30,14 @@ import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 import kotlin.time.ExperimentalTime
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun AlarmsListScreen(
     modifier: Modifier = Modifier,
     alarmViewModel: AlarmViewModel,
-    navigateToCreateAlarm: () -> Unit = {}
+    navigateToCreateAlarm: () -> Unit = {},
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
+    //val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
     val alarmListState by alarmViewModel.alarmsListState.observeAsState()
 
     Surface(modifier = modifier) {
@@ -47,12 +45,12 @@ fun AlarmsListScreen(
             Column(
                 Modifier
                     .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    //.nestedScroll(scrollBehavior.nestedScrollConnection),
             ) {
                 AlarmsListAppBar(
                     modifier = Modifier.statusBarsPadding(),
-                    scrollBehavior = scrollBehavior,
-                    clearAlarmsList = { alarmViewModel.clearAlarmsList() }
+                    //scrollBehavior = scrollBehavior,
+                    clearAlarmsList = { alarmViewModel.clearAlarmsList() },
                 )
                 alarmListState?.let {
                     AlarmsList(
@@ -61,17 +59,17 @@ fun AlarmsListScreen(
                         navigateToCreateAlarm = navigateToCreateAlarm,
                     )
                 }
-             }
+            }
         }
     }
-
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AlarmsListAppBar(
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    clearAlarmsList: () -> Unit
+    clearAlarmsList: () -> Unit,
 ) {
     var showMenu by rememberSaveable { mutableStateOf(false) }
     ClockAppBar(
@@ -87,28 +85,24 @@ private fun AlarmsListAppBar(
             IconButton(onClick = { showMenu = !showMenu }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = null
+                    contentDescription = null,
                 )
             }
             DropdownMenu(
                 expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+                onDismissRequest = { showMenu = false },
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(id = R.string.clear_alarms)) },
                     onClick = {
                         clearAlarmsList()
                         showMenu = false
-                    }
+                    },
                 )
-             }
-        }
+            }
+        },
     )
 }
-
-
-
-
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -130,19 +124,19 @@ private fun AlarmsList(
                 val delete = SwipeAction(
                     icon = {
                         Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.inversePrimary
-                    )
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.inversePrimary,
+                        )
                     },
                     isUndo = false,
                     background = MaterialTheme.colorScheme.error,
-                    onSwipe = { alarmViewModel.remove(alarm = item)  }
+                    onSwipe = { alarmViewModel.remove(alarm = item) },
                 )
                 SwipeableActionsBox(
                     endActions = listOf(delete),
                     backgroundUntilSwipeThreshold = MaterialTheme.colorScheme.background,
-                    swipeThreshold = maxWidth / 2
+                    swipeThreshold = maxWidth / 2,
                 ) {
                     Alarm(
                         alarm = item,
@@ -152,18 +146,20 @@ private fun AlarmsList(
                             if (description.any { char -> char in "0123456789" }) {
                                 description = item.checkDate()
                             }
-                            alarmViewModel.onScheduledChange(item.copy(isScheduled = isScheduled, description = description))
+                            alarmViewModel.onScheduledChange(
+                                item.copy(
+                                    isScheduled = isScheduled,
+                                    description = description,
+                                ),
+                            )
                         },
                         changeCreateAlarmState = { alarmViewModel.changeCreateAlarmState(it) },
-                        navigateToCreateAlarm = navigateToCreateAlarm
+                        navigateToCreateAlarm = navigateToCreateAlarm,
                     )
                 }
-
             }
         }
-
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -173,7 +169,7 @@ private fun Alarm(
     isScheduled: Boolean,
     navigateToCreateAlarm: () -> Unit,
     onScheduledChange: (Boolean) -> Unit,
-    changeCreateAlarmState: (Alarm) -> Unit
+    changeCreateAlarmState: (Alarm) -> Unit,
 
 ) {
     Card(
@@ -186,52 +182,47 @@ private fun Alarm(
         },
 
     ) {
-
         Row(
             modifier = Modifier
                 .padding(20.dp),
-            verticalAlignment = CenterVertically
+            verticalAlignment = CenterVertically,
         ) {
+            AlarmTime(
+                modifier = Modifier.weight(2f),
+                time = "${alarm.hour}:${alarm.minute}",
+                title = alarm.title,
+                isScheduled = isScheduled,
+            )
 
-                AlarmTime(
-                    modifier = Modifier.weight(2f),
-                    time = "${alarm.hour}:${alarm.minute}",
-                    title = alarm.title,
-                    isScheduled = isScheduled
-                )
-
-                Text(
-                    modifier = Modifier
-                        .weight(2f)
-                        .padding(start = 5.dp),
-                    text = alarm.description.substringAfter("-")
-                )
-                IconToggleButton(
-                    modifier = Modifier.weight(1f),
-                    checked = isScheduled,
-                    onCheckedChange = {
-                        onScheduledChange(it)
-                    }
-                ) {
-                    if (isScheduled) {
-                        Icon(
-                            modifier = Modifier.size(35.dp),
-                            imageVector = Icons.Filled.AlarmOn,
-                            contentDescription = "AlarmOn"
-                        )
-                    } else {
-                        Icon(
-                            modifier = Modifier.size(35.dp),
-                            imageVector = Icons.Outlined.AlarmOff,
-                            contentDescription = "AlarmOff"
-                        )
-                    }
+            Text(
+                modifier = Modifier
+                    .weight(2f)
+                    .padding(start = 5.dp),
+                text = alarm.description.substringAfter("-"),
+            )
+            IconToggleButton(
+                modifier = Modifier.weight(1f),
+                checked = isScheduled,
+                onCheckedChange = {
+                    onScheduledChange(it)
+                },
+            ) {
+                if (isScheduled) {
+                    Icon(
+                        modifier = Modifier.size(35.dp),
+                        imageVector = Icons.Filled.AlarmOn,
+                        contentDescription = "AlarmOn",
+                    )
+                } else {
+                    Icon(
+                        modifier = Modifier.size(35.dp),
+                        imageVector = Icons.Outlined.AlarmOff,
+                        contentDescription = "AlarmOff",
+                    )
                 }
+            }
         }
-
-
     }
-
 }
 
 @Composable
@@ -239,30 +230,30 @@ private fun AlarmTime(
     modifier: Modifier = Modifier,
     time: String,
     title: String,
-    isScheduled: Boolean
+    isScheduled: Boolean,
 ) {
-
-    val textColor by animateColorAsState(targetValue = if (isScheduled) LocalContentColor.current else LocalContentColor.current.copy(alpha = 0.5f))
+    val textColor by animateColorAsState(
+        targetValue = if (isScheduled) {
+            LocalContentColor.current
+        } else {
+            LocalContentColor.current.copy(
+                alpha = 0.5f,
+            )
+        },
+    )
 
     Column(modifier = modifier) {
         Text(
             text = time,
             style = MaterialTheme.typography.headlineLarge,
-            color = textColor
+            color = textColor,
         )
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            color = textColor
+            color = textColor,
         )
     }
 }
 
-
 private const val TAG = "AlarmsListScreen"
-
-
-
-
-
-

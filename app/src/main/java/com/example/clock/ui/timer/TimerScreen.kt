@@ -26,26 +26,34 @@ import com.example.clock.util.components.ClockAppBar
 import com.example.clock.util.components.ClockButton
 import com.example.clock.util.components.NumberPicker
 import com.example.clock.util.parseInt
-import com.google.accompanist.insets.imePadding
 import com.google.accompanist.insets.statusBarsPadding
 
 private const val TAG = "TimerScreen"
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalTransitionApi::class
+
+@OptIn(
+    ExperimentalAnimationApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalTransitionApi::class,
 )
 @Composable
 fun TimerScreen(
     modifier: Modifier = Modifier,
-    timerViewModel: TimerViewModel = hiltViewModel()
+    timerViewModel: TimerViewModel = hiltViewModel(),
 ) {
     val timerState: TimerState by timerViewModel.timerState.observeAsState(
         TimerState(
-            timeInMillis = 0L, time = "00:00:00", hour = 0, minute = 0, second = 0, progress = 0f,
-            isPlaying = false, isDone = true
-        )
+            timeInMillis = 0L,
+            time = "00:00:00",
+            hour = 0,
+            minute = 0,
+            second = 0,
+            progress = 0f,
+            isPlaying = false,
+            isDone = true,
+        ),
     )
     var isDone by rememberSaveable { mutableStateOf(timerState.isDone) }
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
+    //val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
     val isDoneTransition = updateTransition(isDone, label = stringResource(id = R.string.is_done))
     var isStartButtonEnabled by rememberSaveable { mutableStateOf(timerState.timeInMillis != 0L) }
 
@@ -59,52 +67,52 @@ fun TimerScreen(
             modifier = Modifier
                 .fillMaxSize(),
         ) {
-            val timerPickerPaddingStart = if (maxWidth > 400.dp) dimensionResource(id = com.intuit.sdp.R.dimen._30sdp) else 0.dp
+            val timerPickerPaddingStart =
+                if (maxWidth > 400.dp) dimensionResource(id = com.intuit.sdp.R.dimen._30sdp) else 0.dp
             TimerAppBar(
                 modifier = Modifier.statusBarsPadding(),
-                scrollBehavior = scrollBehavior
+                //scrollBehavior = scrollBehavior,
             )
 
             isDoneTransition.AnimatedVisibility(
-                    visible = { isTargetDone -> isTargetDone },
-                    enter = scaleIn(
-                        animationSpec = tween(
-                            durationMillis = 1,
-                            easing = FastOutLinearInEasing
-                        )
+                visible = { isTargetDone -> isTargetDone },
+                enter = scaleIn(
+                    animationSpec = tween(
+                        durationMillis = 1,
+                        easing = FastOutLinearInEasing,
                     ),
-                    exit = fadeOut()
-                ) {
-                    TimerPicker(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                top = maxHeight / 3,
-                                start = timerPickerPaddingStart
-                            )
-                            ,
-                        timerViewModel = timerViewModel,
-                        time = timerState.time
-                    )
-                }
+                ),
+                exit = fadeOut(),
+            ) {
+                TimerPicker(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = maxHeight / 3,
+                            start = timerPickerPaddingStart,
+                        ),
+                    timerViewModel = timerViewModel,
+                    time = timerState.time,
+                )
+            }
 
-                isDoneTransition.AnimatedVisibility(
-                    visible = { isTargetDone -> !isTargetDone },
-                    modifier = Modifier.align(Center),
-                    enter = fadeIn(),
-                    exit = fadeOut(
-                        animationSpec = tween(
-                            durationMillis = 1,
-                            easing = FastOutLinearInEasing
-                        )
-                    )
-                ) {
-                        Timer(
-                            modifier = Modifier.size(dimensionResource(id = com.intuit.sdp.R.dimen._268sdp)),
-                            time = timerState.time,
-                            progress = timerState.progress
-                        )
-                }
+            isDoneTransition.AnimatedVisibility(
+                visible = { isTargetDone -> !isTargetDone },
+                modifier = Modifier.align(Center),
+                enter = fadeIn(),
+                exit = fadeOut(
+                    animationSpec = tween(
+                        durationMillis = 1,
+                        easing = FastOutLinearInEasing,
+                    ),
+                ),
+            ) {
+                Timer(
+                    modifier = Modifier.size(dimensionResource(id = com.intuit.sdp.R.dimen._268sdp)),
+                    time = timerState.time,
+                    progress = timerState.progress,
+                )
+            }
             Buttons(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -114,37 +122,36 @@ fun TimerScreen(
                 resetTimer = {
                     timerViewModel.resetTimer()
                 },
-                isDoneTransition= isDoneTransition,
-                isStartButtonEnabled = isStartButtonEnabled
+                isDoneTransition = isDoneTransition,
+                isStartButtonEnabled = isStartButtonEnabled,
             )
         }
-
     }
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimerAppBar(
-  modifier: Modifier = Modifier,
-  scrollBehavior: TopAppBarScrollBehavior? = null,
- ) {
-     ClockAppBar(
-      modifier = modifier,
-       scrollBehavior = scrollBehavior,
+    modifier: Modifier = Modifier,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+    ClockAppBar(
+        modifier = modifier,
+        scrollBehavior = scrollBehavior,
         title = {
-          Text(
-             text = stringResource(id = R.string.timer),
-             style = MaterialTheme.typography.titleLarge,
+            Text(
+                text = stringResource(id = R.string.timer),
+                style = MaterialTheme.typography.titleLarge,
             )
-        }
-      )
- }
+        },
+    )
+}
 
 @Composable
 private fun TimerPicker(
-   modifier: Modifier = Modifier,
-   timerViewModel: TimerViewModel,
-   time: String,
+    modifier: Modifier = Modifier,
+    timerViewModel: TimerViewModel,
+    time: String,
 ) {
     Row(
         modifier = modifier,
@@ -155,7 +162,7 @@ private fun TimerPicker(
         }
         var minute by rememberSaveable(stateSaver = TextFieldValue.Saver) {
             mutableStateOf(
-                TextFieldValue(time.substringAfter(":").substringBefore(':'))
+                TextFieldValue(time.substringAfter(":").substringBefore(':')),
             )
         }
         var second by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -172,7 +179,7 @@ private fun TimerPicker(
                     timerViewModel.setHour(hour.text.parseInt())
                     timerViewModel.setCountDownTimer()
                 }
-            }
+            },
         )
 
         Text(
@@ -191,13 +198,13 @@ private fun TimerPicker(
                     timerViewModel.setMinute(minute.text.parseInt())
                     timerViewModel.setCountDownTimer()
                 }
-            }
+            },
         )
 
         Text(
             modifier = Modifier.padding(top = 17.dp),
             text = ":",
-            style = textStyle
+            style = textStyle,
         )
 
         NumberPicker(
@@ -210,37 +217,30 @@ private fun TimerPicker(
                     timerViewModel.setSecond(second.text.parseInt())
                     timerViewModel.setCountDownTimer()
                 }
-            }
+            },
         )
     }
-
 }
-
-
-
-
-
 
 @Composable
 private fun Timer(
     modifier: Modifier = Modifier,
     time: String,
-    progress: Float
+    progress: Float,
 ) {
-
     Box(modifier = modifier) {
         BackgroundIndicator(
             progress = progress,
             modifier = modifier
                 .fillMaxSize()
                 .scale(scaleX = 1f, scaleY = 1f),
-            strokeWidth = 6.dp
+            strokeWidth = 6.dp,
         )
         Text(
             modifier = Modifier.align(Center),
             text = time,
             style = MaterialTheme.typography.displayLarge,
-            fontWeight = FontWeight.Light
+            fontWeight = FontWeight.Light,
         )
     }
 }
@@ -255,32 +255,28 @@ private fun Buttons(
     isStartButtonEnabled: Boolean,
     isDoneTransition: Transition<Boolean>,
 ) {
-
-
     Box(modifier = modifier) {
-
         isDoneTransition.AnimatedVisibility(
             visible = { isTargetDone -> isTargetDone },
             enter = expandHorizontally(
                 animationSpec = tween(
                     durationMillis = 1,
-                    easing = FastOutLinearInEasing
-                )
+                    easing = FastOutLinearInEasing,
+                ),
             ),
             exit = shrinkHorizontally(
                 animationSpec = tween(
                     durationMillis = 1,
-                    easing = FastOutLinearInEasing
-                )
-            )
+                    easing = FastOutLinearInEasing,
+                ),
+            ),
         ) {
-
             ClockButton(
                 text = stringResource(id = R.string.start),
                 onClick = {
                     optionSelected()
                 },
-                enabled = isStartButtonEnabled
+                enabled = isStartButtonEnabled,
 
             )
         }
@@ -291,41 +287,36 @@ private fun Buttons(
                 animationSpec = tween(
                     durationMillis = 500,
                     easing = LinearOutSlowInEasing,
-                )
+                ),
             ),
             exit = shrinkHorizontally(
                 animationSpec = tween(
                     durationMillis = 1,
-                    easing = FastOutLinearInEasing
-                )
-            )
+                    easing = FastOutLinearInEasing,
+                ),
+            ),
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(32.dp)
+                horizontalArrangement = Arrangement.spacedBy(32.dp),
             ) {
                 if (isPlaying) {
                     ClockButton(
                         text = stringResource(id = R.string.pause),
                         onClick = optionSelected,
-                        color = Red100
+                        color = Red100,
                     )
                 } else {
                     ClockButton(
                         text = stringResource(id = R.string.resume),
-                        onClick = optionSelected
+                        onClick = optionSelected,
                     )
                 }
                 ClockButton(
                     text = stringResource(id = R.string.cancel),
-                    onClick = resetTimer ,
-                    color = MaterialTheme.colorScheme.onSurface
+                    onClick = resetTimer,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
-
     }
 }
-
-
-
-

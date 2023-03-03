@@ -26,7 +26,7 @@ private fun BottomNavigationPreview() {
     ClockTheme {
         BottomNavigationBar(
             listBottomBarItems = listBottomBarItems,
-            navController = rememberNavController()
+            navController = rememberNavController(),
         )
     }
 }
@@ -37,7 +37,7 @@ private fun BottomNavigationPreviewDark() {
     ClockTheme(darkTheme = true) {
         BottomNavigationBar(
             listBottomBarItems = listBottomBarItems,
-            navController = rememberNavController()
+            navController = rememberNavController(),
         )
     }
 }
@@ -45,14 +45,14 @@ private fun BottomNavigationPreviewDark() {
 data class BottomBarItem(
     val name: String,
     val route: String,
-    val icon: ImageVector
+    val icon: ImageVector,
 )
 
 @Composable
 fun BottomNavigationBar(
     listBottomBarItems: List<BottomBarItem>,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backStackEntry = navController.currentBackStackEntryAsState()
     NavigationBar(modifier = modifier) {
@@ -68,14 +68,14 @@ fun BottomNavigationBar(
                         launchSingleTop = true
                         restoreState = true
                     }
-                    },
+                },
                 label = {
-                   Text(text = item.name)
-                  },
+                    Text(text = item.name)
+                },
                 icon = {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = item.name
+                        contentDescription = item.name,
                     )
                 },
             )
@@ -83,25 +83,25 @@ fun BottomNavigationBar(
     }
 }
 
-val listBottomBarItems =  listOf(
+val listBottomBarItems = listOf(
     BottomBarItem(
         name = "Alarm",
         route = Screen.AlarmsList.route,
-        icon = Icons.Default.Alarm
+        icon = Icons.Default.Alarm,
     ),
     BottomBarItem(
         name = "Clock",
         route = Screen.Clock.route,
-        icon = Icons.Default.Language
+        icon = Icons.Default.Language,
     ),
     BottomBarItem(
         name = "Stopwatch",
         route = Screen.Stopwatch.route,
-        icon = Icons.Default.Timer
+        icon = Icons.Default.Timer,
     ),
     BottomBarItem(
         name = "Timer",
         route = Screen.Timer.route,
-        icon = Icons.Default.HourglassEmpty
+        icon = Icons.Default.HourglassEmpty,
     ),
 )

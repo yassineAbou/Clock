@@ -8,60 +8,73 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import com.example.clock.ui.MainActivity
 import com.example.clock.R
-import com.example.clock.data.receiver.*
+import com.example.clock.data.receiver.STOPWATCH_IS_PLAYING_EXTRA
+import com.example.clock.data.receiver.STOPWATCH_IS_RESET_EXTRA
+import com.example.clock.data.receiver.STOPWATCH_LAP_ACTION
+import com.example.clock.data.receiver.STOPWATCH_LAST_INDEX_EXTRA
+import com.example.clock.data.receiver.STOPWATCH_RESET_ACTION
+import com.example.clock.data.receiver.STOPWATCH_TIME_EXTRA
+import com.example.clock.data.receiver.StopwatchNotificationBroadcastReceiver
+import com.example.clock.ui.MainActivity
 import com.example.clock.util.Constants.pendingIntentFlags
 import com.example.clock.util.setIntentAction
-
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StopwatchNotificationHelper @Inject constructor(
-    @ApplicationContext private val applicationContext: Context
+    @ApplicationContext private val applicationContext: Context,
 ) {
-    private val  notificationManager = NotificationManagerCompat.from(applicationContext)
+    private val notificationManager = NotificationManagerCompat.from(applicationContext)
 
-    private val stopwatchNotificationBroadcastReceiver = StopwatchNotificationBroadcastReceiver::class.java
+    private val stopwatchNotificationBroadcastReceiver =
+        StopwatchNotificationBroadcastReceiver::class.java
 
     private val openStopwatchIntent = Intent(
         Intent.ACTION_VIEW,
         "https://www.clock.com/Stopwatch".toUri(),
         applicationContext,
-        MainActivity::class.java
+        MainActivity::class.java,
     )
 
     private val openStopwatchPendingIntent = PendingIntent.getActivity(
-        applicationContext, 0, openStopwatchIntent, pendingIntentFlags
+        applicationContext,
+        0,
+        openStopwatchIntent,
+        pendingIntentFlags,
     )
 
     init {
         createStopwatchNotificationChannel()
     }
 
-    fun getStopwatchBaseNotification() = NotificationCompat.Builder(applicationContext, STOPWATCH_SERVICE_CHANNEL)
-        .setContentTitle("Stopwatch")
-        .setSmallIcon(R.drawable.ic_timer)
-        .setContentIntent(openStopwatchPendingIntent)
-        .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
-        .setColorized(true)
-        .setOngoing(true)
-        .setAutoCancel(true)
-    
+    fun getStopwatchBaseNotification() =
+        NotificationCompat.Builder(applicationContext, STOPWATCH_SERVICE_CHANNEL)
+            .setContentTitle("Stopwatch")
+            .setSmallIcon(R.drawable.ic_timer)
+            .setContentIntent(openStopwatchPendingIntent)
+            .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
+            .setColorized(true)
+            .setOngoing(true)
+            .setAutoCancel(true)
 
     fun updateStopwatchServiceNotification(
         time: String,
         isPlaying: Boolean,
         isReset: Boolean,
-        lastIndex: Int
+        lastIndex: Int,
     ) {
         val lapIntentAction = stopwatchNotificationBroadcastReceiver.setIntentAction(
-            actionName = STOPWATCH_LAP_ACTION, requestCode = 3, context = applicationContext
+            actionName = STOPWATCH_LAP_ACTION,
+            requestCode = 3,
+            context = applicationContext,
         )
-        val resetIntentAction  = stopwatchNotificationBroadcastReceiver.setIntentAction(
-            actionName = STOPWATCH_RESET_ACTION, requestCode = 2, context = applicationContext
+        val resetIntentAction = stopwatchNotificationBroadcastReceiver.setIntentAction(
+            actionName = STOPWATCH_RESET_ACTION,
+            requestCode = 2,
+            context = applicationContext,
         )
         val stopResumeIntentAction = stopResumeIntentAction(time, isPlaying, isReset, lastIndex)
         val stopResumeLabel = if (isPlaying) "Stop" else "Resume"
@@ -69,7 +82,7 @@ class StopwatchNotificationHelper @Inject constructor(
         val lapResetIntentAction = if (isPlaying) lapIntentAction else resetIntentAction
         val lapResetLabel = if (isPlaying) "Lap" else "Reset"
         val lapResetIcon = if (isPlaying) R.drawable.ic_close else R.drawable.ic_timer
-        val lastLap = if (isPlaying && lastIndex!= -1) "\nLap  $lastIndex" else ""
+        val lastLap = if (isPlaying && lastIndex != -1) "\nLap  $lastIndex" else ""
         val isPaused = if (isPlaying) "" else "\nPaused"
 
         val notificationUpdate = getStopwatchBaseNotification()
@@ -77,7 +90,7 @@ class StopwatchNotificationHelper @Inject constructor(
             .addAction(stopResumeIcon, stopResumeLabel, stopResumeIntentAction)
             .addAction(lapResetIcon, lapResetLabel, lapResetIntentAction)
             .build()
-        notificationManager.notify(STOPWATCH_SERVICE_NOTIFICATION_ID , notificationUpdate)
+        notificationManager.notify(STOPWATCH_SERVICE_NOTIFICATION_ID, notificationUpdate)
     }
 
     fun removeStopwatchNotification() {
@@ -88,7 +101,7 @@ class StopwatchNotificationHelper @Inject constructor(
         time: String,
         isPlaying: Boolean,
         isReset: Boolean,
-        lastIndex: Int
+        lastIndex: Int,
     ): PendingIntent {
         val broadcastIntent =
             Intent(applicationContext, stopwatchNotificationBroadcastReceiver).apply {
@@ -101,15 +114,14 @@ class StopwatchNotificationHelper @Inject constructor(
             applicationContext,
             1,
             broadcastIntent,
-            pendingIntentFlags
+            pendingIntentFlags,
         )
     }
-
 
     private fun createStopwatchNotificationChannel() {
         val stopwatchServiceChannel = NotificationChannelCompat.Builder(
             STOPWATCH_SERVICE_CHANNEL,
-            NotificationManagerCompat.IMPORTANCE_DEFAULT
+            NotificationManagerCompat.IMPORTANCE_DEFAULT,
         )
             .setName(applicationContext.getString(R.string.stopwatch_channel))
             .setDescription(applicationContext.getString(R.string.stopwatch_service_channel_description))

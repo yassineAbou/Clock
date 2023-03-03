@@ -24,42 +24,51 @@ import com.example.clock.util.components.NumberPicker
 import com.intuit.sdp.R
 import java.util.regex.Pattern
 
-
 @Composable
 fun CreateAlarmScreen(
     modifier: Modifier = Modifier,
     alarmViewModel: AlarmViewModel,
     navigateToAlarmsList: () -> Unit = {},
 ) {
-    val cardContainerColor = CardDefaults.cardColors().containerColor(enabled = true).value
+    val cardContainerColor = MaterialTheme.colorScheme.surface
     val createAlarmState = alarmViewModel.createAlarmState
-    val descriptionListState = remember{ mutableStateListOf("") }
+    val descriptionListState = remember { mutableStateListOf("") }
 
     LaunchedEffect(Unit) {
-        val splitDescriptionToList = Pattern.compile(" ").split(createAlarmState.description).toList()
+        val splitDescriptionToList =
+            Pattern.compile(" ").split(createAlarmState.description).toList()
         splitDescriptionToList.forEach { descriptionListState.add(it) }
     }
 
     SideEffect {
         alarmViewModel.changeCreateAlarmState(
-            createAlarmState.copy(description = descriptionListState.joinToString(" "))
+            createAlarmState.copy(description = descriptionListState.joinToString(" ")),
         )
     }
 
-    Surface(modifier = modifier, color = cardContainerColor) {
+    Surface(
+        modifier = modifier,
+        color = cardContainerColor
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-
-            val alarmPickerPaddingStart = if (maxWidth > 400.dp) dimensionResource(id = R.dimen._60sdp) else dimensionResource(id = R.dimen._35sdp)
+            val alarmPickerPaddingStart =
+                if (maxWidth > 400.dp) {
+                    dimensionResource(id = R.dimen._60sdp)
+                } else {
+                    dimensionResource(
+                        id = R.dimen._35sdp,
+                    )
+                }
 
             AlarmPicker(
                 modifier = Modifier
-                    .padding(top = maxHeight / 6, start = alarmPickerPaddingStart ),
+                    .padding(top = maxHeight / 6, start = alarmPickerPaddingStart),
                 cardContainerColor = cardContainerColor,
                 createAlarmState = createAlarmState,
-                changeCreateAlarmState = { alarmViewModel.changeCreateAlarmState(it)},
+                changeCreateAlarmState = { alarmViewModel.changeCreateAlarmState(it) },
                 descriptionListState = descriptionListState,
                 addToDescriptionList = { descriptionListState.add(it) },
-                clearDescriptionList = { descriptionListState.clear() }
+                clearDescriptionList = { descriptionListState.clear() },
             )
 
             AlarmCustomActions(
@@ -71,23 +80,18 @@ fun CreateAlarmScreen(
                 changeCreateAlarmState = { alarmViewModel.changeCreateAlarmState(it) },
                 addToDescriptionList = { descriptionListState.add(it) },
                 removeFromDescriptionList = { descriptionListState.remove(it) },
-                clearDescriptionList = { descriptionListState.removeAll { it.contains("[0-9]".toRegex()) } }
+                clearDescriptionList = { descriptionListState.removeAll { it.contains("[0-9]".toRegex()) } },
             )
             Buttons(
                 modifier = Modifier
                     .align(BottomCenter)
                     .navigationBarsPadding(),
                 navigateToAlarmsList = navigateToAlarmsList,
-                saveAlarm = { alarmViewModel.saveAlarm() }
+                saveAlarm = { alarmViewModel.saveAlarm() },
             )
         }
     }
- }
-
-
-
-
-
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +104,7 @@ private fun AlarmCustomActions(
     removeFromDescriptionList: (String) -> Unit,
     clearDescriptionList: () -> Unit,
 ) {
-    Box(modifier = modifier,) {
+    Box(modifier = modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -109,7 +113,7 @@ private fun AlarmCustomActions(
                 Text(
                     modifier = Modifier.padding(dimensionResource(id = R.dimen._8sdp)),
                     text = descriptionListState.joinToString(" "),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen._3sdp)))
@@ -120,20 +124,17 @@ private fun AlarmCustomActions(
                 changeCreateAlarmState = changeCreateAlarmState,
                 addToDescriptionList = addToDescriptionList,
                 removeFromDescriptionList = removeFromDescriptionList,
-                clearDescriptionList = clearDescriptionList
+                clearDescriptionList = clearDescriptionList,
             )
             AlarmTitle(
                 modifier = Modifier
                     .align(Start)
                     .padding(dimensionResource(id = R.dimen._8sdp)),
                 createAlarmState = createAlarmState,
-                changeCreateAlarmState = changeCreateAlarmState
+                changeCreateAlarmState = changeCreateAlarmState,
             )
-
         }
     }
-
-
 }
 
 @Composable
@@ -144,7 +145,7 @@ private fun AlarmPicker(
     cardContainerColor: Color,
     descriptionListState: List<String>,
     clearDescriptionList: () -> Unit,
-    addToDescriptionList: (String) -> Unit
+    addToDescriptionList: (String) -> Unit,
 ) {
     val textStyle = MaterialTheme.typography.displaySmall
 
@@ -157,8 +158,8 @@ private fun AlarmPicker(
 
     LaunchedEffect(createAlarmState.hour, createAlarmState.minute) {
         if (descriptionListState.any { it.contains("[0-9]".toRegex()) }) {
-           clearDescriptionList()
-           addToDescriptionList(createAlarmState.checkDate())
+            clearDescriptionList()
+            addToDescriptionList(createAlarmState.checkDate())
         }
     }
 
@@ -166,7 +167,6 @@ private fun AlarmPicker(
         Row(
             modifier = Modifier.fillMaxWidth(),
         ) {
-
             NumberPicker(
                 modifier = Modifier.weight(1f),
                 number = hours,
@@ -178,7 +178,7 @@ private fun AlarmPicker(
                     }
                 },
                 textStyle = textStyle,
-                backgroundColor = cardContainerColor
+                backgroundColor = cardContainerColor,
             )
 
             Text(
@@ -186,7 +186,7 @@ private fun AlarmPicker(
                 style = textStyle,
                 modifier = Modifier
                     .weight(0.5f)
-                    .padding(top = 20.dp)
+                    .padding(top = 20.dp),
             )
 
             NumberPicker(
@@ -200,17 +200,13 @@ private fun AlarmPicker(
                         changeCreateAlarmState(createAlarmState.copy(minute = minutes.text))
                     }
                 },
-                backgroundColor = cardContainerColor
+                backgroundColor = cardContainerColor,
             )
         }
     }
-
 }
 
-
 private const val TAG = "CreateAlarmScreen"
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -221,22 +217,24 @@ private fun Recurring(
     clearDescriptionList: () -> Unit,
     modifier: Modifier = Modifier,
     createAlarmState: Alarm,
-    changeCreateAlarmState: (Alarm) -> Unit
+    changeCreateAlarmState: (Alarm) -> Unit,
 ) {
-
     val isSelectedByDay = remember {
         mutableStateMapOf(
-            "Sun" to createAlarmState.isSunday, "Mon" to createAlarmState.isMonday, "Tue" to createAlarmState.isTuesday,
-            "Whe" to createAlarmState.isWednesday, "Thu" to createAlarmState.isThursday, "Fri" to createAlarmState.isFriday,
-            "Sat" to createAlarmState.isSaturday
+            "Sun" to createAlarmState.isSunday,
+            "Mon" to createAlarmState.isMonday,
+            "Tue" to createAlarmState.isTuesday,
+            "Whe" to createAlarmState.isWednesday,
+            "Thu" to createAlarmState.isThursday,
+            "Fri" to createAlarmState.isFriday,
+            "Sat" to createAlarmState.isSaturday,
         )
     }
 
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        
         isSelectedByDay.forEach { (day, isSelected) ->
             CustomChip(
                 isSelected = isSelected,
@@ -245,7 +243,6 @@ private fun Recurring(
                     isSelectedByDay[day] = isChecked
 
                     isSelectedByDay.apply {
-
                         changeCreateAlarmState(
                             createAlarmState.copy(
                                 isRecurring = isSelectedByDay.any { it.value },
@@ -255,37 +252,41 @@ private fun Recurring(
                                 isWednesday = getOrDefault("Whe", createAlarmState.isWednesday),
                                 isThursday = getOrDefault("Thu", createAlarmState.isThursday),
                                 isFriday = getOrDefault("Fri", createAlarmState.isFriday),
-                                isSaturday = getOrDefault("Sat", createAlarmState.isSaturday)
-                            )
+                                isSaturday = getOrDefault("Sat", createAlarmState.isSaturday),
+                            ),
                         )
 
-                        if (isSelectedByDay.all { !it.value } && descriptionListState.all { !it.contains("[0-9]".toRegex()) }) {
+                        if (isSelectedByDay.all { !it.value } && descriptionListState.all {
+                                !it.contains(
+                                    "[0-9]".toRegex(),
+                                )
+                            }
+                        ) {
                             addToDescriptionList(createAlarmState.checkDate())
                         }
 
                         when {
                             isChecked && descriptionListState.any { it != day } -> {
-                                 clearDescriptionList()
-                                 addToDescriptionList(day)
+                                clearDescriptionList()
+                                addToDescriptionList(day)
                             }
-                            !isChecked  -> {
+                            !isChecked -> {
                                 removeFromDescriptionList(day)
                             }
                         }
-
                     }
-                }
+                },
             )
         }
     }
-
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AlarmTitle(
     modifier: Modifier = Modifier,
     createAlarmState: Alarm,
-    changeCreateAlarmState: (Alarm) -> Unit
+    changeCreateAlarmState: (Alarm) -> Unit,
 ) {
     var title by remember { mutableStateOf(createAlarmState.title) }
 
@@ -297,46 +298,37 @@ private fun AlarmTitle(
                 title = it
                 changeCreateAlarmState(createAlarmState.copy(title = title))
             },
-            label = { Text("Alarm name") }
+            label = { Text("Alarm name") },
         )
     }
 }
-
-
 
 @Composable
 private fun Buttons(
     modifier: Modifier = Modifier,
     navigateToAlarmsList: () -> Unit,
-    saveAlarm: () -> Unit
+    saveAlarm: () -> Unit,
 ) {
     Box(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-             TextButton(
-                onClick =  {
+            TextButton(
+                onClick = {
                     navigateToAlarmsList()
-                }
-             ) {
-                 Text(text = stringResource(id = com.example.clock.R.string.cancel))
-             }
-             TextButton(
+                },
+            ) {
+                Text(text = stringResource(id = com.example.clock.R.string.cancel))
+            }
+            TextButton(
                 onClick = {
                     saveAlarm()
                     navigateToAlarmsList()
-                }
-             ) {
-                 Text(text = stringResource(id = com.example.clock.R.string.save))
-             }
-
+                },
+            ) {
+                Text(text = stringResource(id = com.example.clock.R.string.save))
+            }
         }
     }
 }
-
-
-
-
-
-

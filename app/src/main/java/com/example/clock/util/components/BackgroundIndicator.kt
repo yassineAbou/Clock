@@ -3,7 +3,6 @@ package com.example.clock.util.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +28,7 @@ fun BackgroundIndicator(
             progress = progress,
             modifier = Modifier.fillMaxSize(),
             color = foregroundColor,
-            strokeWidth = strokeWidth
+            strokeWidth = strokeWidth,
         )
         CircularProgressIndicator(
             progress = 1f,
@@ -42,7 +41,7 @@ fun BackgroundIndicator(
 
 @Preview(
     name = "Light mode",
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     name = "Dark mode",

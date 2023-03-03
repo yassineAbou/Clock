@@ -18,19 +18,17 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideAlarmDatabase(
-        @ApplicationContext app: Context
+        @ApplicationContext app: Context,
     ) = Room.databaseBuilder(
         app,
         AlarmDatabase::class.java,
-        "alarms_list_database"
+        "alarms_list_database",
     ).build()
 
     @Singleton
     @Provides
     fun provideAlarmDao(alarmDatabase: AlarmDatabase):
-            AlarmDao {
+        AlarmDao {
         return alarmDatabase.getAlarmDao()
     }
-
-
 }

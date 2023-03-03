@@ -3,8 +3,8 @@ package com.example.clock.data.manager
 import android.content.Context
 import com.example.clock.data.service.TimerCompletedService
 import com.example.clock.data.service.TimerRunningService
-import com.example.clock.util.helper.CountDownTimerHelper
 import com.example.clock.util.Constants.TIME_FORMAT
+import com.example.clock.util.helper.CountDownTimerHelper
 import com.example.clock.util.isServiceRunning
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,7 +18,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-
 data class TimerState(
     val timeInMillis: Long,
     val time: String,
@@ -27,13 +26,13 @@ data class TimerState(
     val second: Int,
     val progress: Float,
     val isPlaying: Boolean,
-    val isDone: Boolean
+    val isDone: Boolean,
 )
 
 @Singleton
 class TimerManager @Inject constructor(
     private val serviceManager: ServiceManager,
-    @ApplicationContext val applicationContext: Context
+    @ApplicationContext val applicationContext: Context,
 ) {
 
     private val timeInMillisFlow = MutableStateFlow(0L)
@@ -53,16 +52,21 @@ class TimerManager @Inject constructor(
         secondFlow,
         progressFlow,
         isPlayingFlow,
-        isDoneFlow
+        isDoneFlow,
     ).map { (timeInMillis, time, hour, minute, second, progress, isPlaying, isDone) ->
         TimerState(
-            timeInMillis = timeInMillis, hour = hour, minute = minute, second = second, time = time,
-            progress = progress, isPlaying = isPlaying, isDone = isDone
+            timeInMillis = timeInMillis,
+            hour = hour,
+            minute = minute,
+            second = second,
+            time = time,
+            progress = progress,
+            isPlaying = isPlaying,
+            isDone = isDone,
         )
     }
 
     private var countDownTimerHelper: CountDownTimerHelper? = null
-
 
     fun setTHour(hour: Int) {
         hourFlow.value = hour
@@ -76,9 +80,10 @@ class TimerManager @Inject constructor(
         secondFlow.value = second
     }
 
-     @OptIn(ExperimentalTime::class)
-     fun setCountDownTimer() {
-        timeInMillisFlow.value = (hourFlow.value.hours + minuteFlow.value.minutes + secondFlow.value.seconds).inWholeMilliseconds
+    @OptIn(ExperimentalTime::class)
+    fun setCountDownTimer() {
+        timeInMillisFlow.value =
+            (hourFlow.value.hours + minuteFlow.value.minutes + secondFlow.value.seconds).inWholeMilliseconds
         countDownTimerHelper = object : CountDownTimerHelper(timeInMillisFlow.value, 1000) {
             override fun onTimerTick(millisUntilFinished: Long) {
                 val progressValue = millisUntilFinished.toFloat() / timeInMillisFlow.value
@@ -86,8 +91,8 @@ class TimerManager @Inject constructor(
             }
 
             override fun onTimerFinish() {
-                 serviceManager.startService(TimerCompletedService::class.java)
-                 resetTimer()
+                serviceManager.startService(TimerCompletedService::class.java)
+                resetTimer()
                 if (applicationContext.isServiceRunning(TimerRunningService::class.java)) {
                     serviceManager.stopService(TimerRunningService::class.java)
                 }
@@ -95,7 +100,7 @@ class TimerManager @Inject constructor(
         }
     }
 
-     fun handleCountDownTimer() {
+    fun handleCountDownTimer() {
         if (isPlayingFlow.value) {
             pauseTimer()
         } else {
@@ -114,29 +119,27 @@ class TimerManager @Inject constructor(
         countDownTimerHelper?.restart()
     }
 
-     fun startTimer() {
+    fun startTimer() {
         countDownTimerHelper?.start()
         isPlayingFlow.value = true
         isDoneFlow.value = false
         progressFlow.value = 1f
     }
 
-     private fun handleTimerValues(
+    private fun handleTimerValues(
         isPlaying: Boolean,
         text: String,
-        progress: Float
+        progress: Float,
     ) {
         isPlayingFlow.value = isPlaying
         timeFlow.value = text
         progressFlow.value = progress
     }
 
-     fun Long.formatTime(): String = String.format(
+    fun Long.formatTime(): String = String.format(
         TIME_FORMAT,
         TimeUnit.MILLISECONDS.toHours(this),
         TimeUnit.MILLISECONDS.toMinutes(this) % 60,
-        TimeUnit.MILLISECONDS.toSeconds(this) % 60
+        TimeUnit.MILLISECONDS.toSeconds(this) % 60,
     )
-
 }
-

@@ -31,19 +31,19 @@ class StopwatchService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(
-            STOPWATCH_SERVICE_NOTIFICATION_ID, stopwatchNotificationHelper.
-            getStopwatchBaseNotification().build()
+            STOPWATCH_SERVICE_NOTIFICATION_ID,
+            stopwatchNotificationHelper.getStopwatchBaseNotification().build(),
         )
         serviceScope.launch {
             stopwatchManager.stopwatchState.collectLatest {
-                 if (!it.isReset) {
-                     stopwatchNotificationHelper.updateStopwatchServiceNotification(
-                         time = "${it.hour}:${it.minute}:${it.second}",
-                         isPlaying = it.isPlaying,
-                         isReset = it.isReset,
-                         lastIndex = stopwatchManager.listTimes.lastIndex
-                     )
-                 }
+                if (!it.isReset) {
+                    stopwatchNotificationHelper.updateStopwatchServiceNotification(
+                        time = "${it.hour}:${it.minute}:${it.second}",
+                        isPlaying = it.isPlaying,
+                        isReset = it.isReset,
+                        lastIndex = stopwatchManager.listTimes.lastIndex,
+                    )
+                }
             }
         }
         return START_STICKY
@@ -55,6 +55,5 @@ class StopwatchService : Service() {
         super.onDestroy()
         serviceScope.cancel()
         stopwatchNotificationHelper.removeStopwatchNotification()
-
     }
 }

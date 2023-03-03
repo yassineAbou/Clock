@@ -9,9 +9,8 @@ import com.example.clock.data.manager.ServiceManager
 import com.example.clock.data.service.RescheduleAlarmsService
 import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class AlarmBroadcastReceiver : BroadcastReceiver() {
@@ -23,23 +22,19 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
     lateinit var scheduleAlarmManager: ScheduleAlarmManager
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-
         safeLet(p0, p1) { context, intent ->
 
             when {
-
                 Intent.ACTION_BOOT_COMPLETED == intent.action -> {
                     Toast.makeText(context, "Alarm Reboot", Toast.LENGTH_SHORT).show()
                     serviceManager.startService(RescheduleAlarmsService::class.java)
                 }
-                !intent.getBooleanExtra(IS_RECURRING, false) -> serviceManager.startAlarmService(intent)
-                alarmIsToday(intent) ->  serviceManager.startAlarmService(intent)
-
-
+                !intent.getBooleanExtra(IS_RECURRING, false) -> serviceManager.startAlarmService(
+                    intent,
+                )
+                alarmIsToday(intent) -> serviceManager.startAlarmService(intent)
             }
-
         }
-
     }
 
     private fun alarmIsToday(intent: Intent): Boolean {

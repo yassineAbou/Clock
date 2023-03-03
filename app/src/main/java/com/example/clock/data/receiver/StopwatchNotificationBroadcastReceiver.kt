@@ -18,7 +18,6 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var stopwatchNotificationHelper: StopwatchNotificationHelper
 
-
     override fun onReceive(p0: Context?, p1: Intent?) {
         val isPlaying = p1?.getBooleanExtra(STOPWATCH_IS_PLAYING_EXTRA, false)
         val isReset = p1?.getBooleanExtra(STOPWATCH_IS_RESET_EXTRA, false)
@@ -36,13 +35,17 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
             }
         }
 
-
-        safeLet(time, isReset, isPlaying, lastIndex) { safeTime, safeIsReset, safeIsPlaying, safeLastIndex ->
+        safeLet(
+            time,
+            isReset,
+            isPlaying,
+            lastIndex,
+        ) { safeTime, safeIsReset, safeIsPlaying, safeLastIndex ->
             stopwatchNotificationHelper.updateStopwatchServiceNotification(
                 isPlaying = safeIsPlaying,
                 time = safeTime,
                 isReset = safeIsReset,
-                lastIndex = safeLastIndex
+                lastIndex = safeLastIndex,
             )
             if (safeIsPlaying) {
                 stopwatchManager.stop()
@@ -51,11 +54,7 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
             }
         }
     }
-
-
-
 }
-
 
 const val STOPWATCH_TIME_EXTRA = "STOPWATCH_TIME_EXTRA"
 const val STOPWATCH_IS_PLAYING_EXTRA = "STOPWATCH_IS_PLAYING_EXTRA"

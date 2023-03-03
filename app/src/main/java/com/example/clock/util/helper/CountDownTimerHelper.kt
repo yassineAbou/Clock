@@ -4,7 +4,7 @@ import android.os.CountDownTimer
 
 abstract class CountDownTimerHelper(var mMillisInFuture: Long, var mInterval: Long) {
 
-    private var countDownTimer: CountDownTimer?   = null
+    private var countDownTimer: CountDownTimer? = null
     private var remainingTime: Long = 0
     private var isTimerPaused: Boolean = true
 
@@ -25,7 +25,6 @@ abstract class CountDownTimerHelper(var mMillisInFuture: Long, var mInterval: Lo
                     remainingTime = millisUntilFinished
                     onTimerTick(millisUntilFinished)
                 }
-
             }.apply {
                 start()
             }
@@ -48,5 +47,4 @@ abstract class CountDownTimerHelper(var mMillisInFuture: Long, var mInterval: Lo
 
     abstract fun onTimerTick(millisUntilFinished: Long)
     abstract fun onTimerFinish()
-
 }

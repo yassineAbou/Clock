@@ -13,31 +13,30 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.intuit.sdp.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
- fun NumberPicker(
+fun NumberPicker(
     modifier: Modifier = Modifier,
     number: TextFieldValue,
     labelTimeUnit: String,
     onNumberChange: (TextFieldValue) -> Unit,
     textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.displayLarge,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
 ) {
-
-
     val numberType = KeyboardOptions(keyboardType = KeyboardType.Number)
     val colors = TextFieldDefaults.textFieldColors(
         containerColor = backgroundColor,
         focusedIndicatorColor = backgroundColor,
-        unfocusedIndicatorColor = backgroundColor
-        )
+        unfocusedIndicatorColor = backgroundColor,
+    )
 
     Surface(modifier = modifier) {
-
         TextField(
             label = {
-                Text(text = labelTimeUnit,
+                Text(
+                    text = labelTimeUnit,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = dimensionResource(id = R.dimen._5sdp))
+                    modifier = Modifier.padding(start = dimensionResource(id = R.dimen._5sdp)),
                 )
             },
             modifier = Modifier
@@ -54,10 +53,7 @@ import com.intuit.sdp.R
             onValueChange = onNumberChange,
             textStyle = textStyle,
             keyboardOptions = numberType,
-            colors = colors
+            colors = colors,
         )
     }
-
-
-
 }

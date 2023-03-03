@@ -1,6 +1,5 @@
 package com.example.clock.data.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.clock.data.model.Alarm
 import kotlinx.coroutines.flow.Flow

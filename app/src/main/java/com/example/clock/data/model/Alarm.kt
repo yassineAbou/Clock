@@ -6,9 +6,15 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "alarms_list_table",
-    indices = [Index(value = ["hour", "minute", "title", "description",
-        "isSunday", "isMonday", "isTuesday", "isWednesday",  "isFriday", "isSaturday"                                                     ],
-        unique = true)]
+    indices = [
+        Index(
+            value = [
+                "hour", "minute", "title", "description",
+                "isSunday", "isMonday", "isTuesday", "isWednesday", "isFriday", "isSaturday",
+            ],
+            unique = true,
+        ),
+    ],
 )
 data class Alarm(
     @PrimaryKey(autoGenerate = true)
@@ -27,9 +33,3 @@ data class Alarm(
     var isFriday: Boolean = false,
     var isSaturday: Boolean = false,
 )
-
-
-
-
-
-

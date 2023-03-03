@@ -1,12 +1,8 @@
 package com.example.clock.data.service
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.MediaPlayer
-import android.os.*
-import android.provider.Settings
+import android.os.IBinder
 import com.example.clock.util.helper.MediaPlayerHelper
 import com.example.clock.util.helper.TIMER_COMPLETED_NOTIFICATION_ID
 import com.example.clock.util.helper.TimerNotificationHelper
@@ -22,19 +18,21 @@ class TimerCompletedService : Service() {
 
     @Inject
     lateinit var timerNotificationHelper: TimerNotificationHelper
+
     @Inject
     lateinit var mediaPlayerHelper: MediaPlayerHelper
     private val serviceScope = CoroutineScope(SupervisorJob())
-
 
     override fun onCreate() {
         super.onCreate()
         mediaPlayerHelper.prepare()
     }
 
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(TIMER_COMPLETED_NOTIFICATION_ID, timerNotificationHelper.showTimerCompletedNotification())
+        startForeground(
+            TIMER_COMPLETED_NOTIFICATION_ID,
+            timerNotificationHelper.showTimerCompletedNotification(),
+        )
 
         serviceScope.launch {
             mediaPlayerHelper.start()
