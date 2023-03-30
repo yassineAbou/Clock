@@ -9,31 +9,35 @@ import javax.inject.Inject
 @HiltViewModel
 class TimerViewModel @Inject constructor(
     private val timerManager: TimerManager,
-) : ViewModel() {
+) : ViewModel(), TimerActions {
 
     val timerState = timerManager.timerState.asLiveData()
 
-    fun setHour(hour: Int) {
+    override fun setHour(hour: Int) {
         timerManager.setTHour(hour)
     }
 
-    fun setMinute(minute: Int) {
+    override fun setMinute(minute: Int) {
         timerManager.setMinute(minute)
     }
 
-    fun setSecond(second: Int) {
-        timerManager.setSeconds(second)
+    override fun setSecond(second: Int) {
+        timerManager.setSecond(second)
     }
 
-    fun setCountDownTimer() {
+    override fun setCountDownTimer() {
         timerManager.setCountDownTimer()
     }
 
-    fun handleCountDownTimer() {
-        timerManager.handleCountDownTimer()
+    override fun start() {
+        timerManager.start()
     }
 
-    fun resetTimer() {
-        timerManager.resetTimer()
+    override fun pause() {
+        timerManager.pause()
+    }
+
+    override fun reset() {
+        timerManager.reset()
     }
 }

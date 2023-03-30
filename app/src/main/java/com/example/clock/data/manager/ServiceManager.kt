@@ -1,5 +1,6 @@
 package com.example.clock.data.manager
 
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
@@ -13,12 +14,12 @@ import javax.inject.Inject
 class ServiceManager @Inject constructor(
     @ApplicationContext val applicationContext: Context,
 ) {
-    fun startService(service: Class<*>?) {
+    fun startService(service: Class<out Service>?) {
         val serviceIntent = Intent(applicationContext, service)
         ContextCompat.startForegroundService(applicationContext, serviceIntent)
     }
 
-    fun stopService(service: Class<*>?) {
+    fun stopService(service: Class<out Service>?) {
         val serviceIntent = Intent(applicationContext, service)
         applicationContext.stopService(serviceIntent)
     }

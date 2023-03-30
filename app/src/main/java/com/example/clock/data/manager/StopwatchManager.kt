@@ -1,34 +1,25 @@
 package com.example.clock.data.manager
 
 import androidx.compose.runtime.mutableStateListOf
+import com.example.clock.data.model.StopwatchState
 import com.example.clock.data.service.StopwatchService
 import com.example.clock.util.Constants.TIME_FORMAT
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import java.util.*
+import java.util.Timer
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
-data class StopwatchState(
-    val second: String,
-    val minute: String,
-    val hour: String,
-    val isPlaying: Boolean,
-    val isReset: Boolean,
-)
-
-@OptIn(ExperimentalTime::class)
 @Singleton
 class StopwatchManager @Inject constructor(
-    private val serviceManager: ServiceManager,
+    val serviceManager: ServiceManager
 ) {
 
-    var listTimes = mutableStateListOf<String>()
+    var lapTimes = mutableStateListOf<String>()
         private set
 
     private val secondFlow = MutableStateFlow("00")
@@ -57,6 +48,7 @@ class StopwatchManager @Inject constructor(
     private var timer: Timer? = null
 
     fun start() {
+        serviceManager.startService(StopwatchService::class.java)
         timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
             duration = duration.plus(1.seconds)
             updateStopwatchState()
@@ -73,15 +65,15 @@ class StopwatchManager @Inject constructor(
         }
     }
 
-    fun addTime() {
+    fun lap() {
         val time = duration.toComponents { hours, minutes, seconds, _ ->
             String.format(TIME_FORMAT, hours, minutes, seconds)
         }
-        listTimes.add(time)
+        lapTimes.add(time)
     }
 
-    fun clearListTimes() {
-        listTimes.clear()
+    fun clear() {
+        lapTimes.clear()
     }
 
     private fun Int.pad(): String {
@@ -94,10 +86,10 @@ class StopwatchManager @Inject constructor(
     }
 
     fun reset() {
+        serviceManager.stopService(StopwatchService::class.java)
         isResetFlow.value = true
         stop()
         duration = Duration.ZERO
         updateStopwatchState()
-        serviceManager.stopService(StopwatchService::class.java)
     }
 }

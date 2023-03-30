@@ -25,10 +25,6 @@ class StopwatchService : Service() {
     @Inject
     lateinit var stopwatchNotificationHelper: StopwatchNotificationHelper
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(
             STOPWATCH_SERVICE_NOTIFICATION_ID,
@@ -40,8 +36,7 @@ class StopwatchService : Service() {
                     stopwatchNotificationHelper.updateStopwatchServiceNotification(
                         time = "${it.hour}:${it.minute}:${it.second}",
                         isPlaying = it.isPlaying,
-                        isReset = it.isReset,
-                        lastIndex = stopwatchManager.listTimes.lastIndex,
+                        lastLapIndex = stopwatchManager.lapTimes.lastIndex,
                     )
                 }
             }

@@ -3,6 +3,7 @@ package com.example.clock.util
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
@@ -35,9 +36,7 @@ fun Alarm.checkDate(): String {
     }
 }
 
-private const val TAG = "Extensions"
-
-fun Class<*>?.setIntentAction(
+fun Class<out BroadcastReceiver>?.setIntentAction(
     actionName: String,
     requestCode: Int,
     context: Context,
@@ -54,7 +53,6 @@ fun Class<*>?.setIntentAction(
     )
 }
 
-@Suppress("DEPRECATION") // Deprecated for third party Services.
 fun <T> Context.isServiceRunning(service: Class<T>) =
     (getSystemService(ACTIVITY_SERVICE) as ActivityManager)
         .getRunningServices(Integer.MAX_VALUE)
@@ -75,25 +73,12 @@ fun Context.isBackgroundRunning(): Boolean {
     return true
 }
 
-inline fun <T1 : Any, T2 : Any, T3 : Any, R : Any> safeLet(
-    p1: T1?,
-    p2: T2?,
-    p3: T3?,
-    block: (T1, T2, T3) -> R?,
-): R? {
-    return if (p1 != null && p2 != null && p3 != null) block(p1, p2, p3) else null
-}
-
 inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
     return if (p1 != null && p2 != null) block(p1, p2) else null
 }
-
-inline fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any, R : Any> safeLet(
-    p1: T1?,
-    p2: T2?,
-    p3: T3?,
-    p4: T4?,
-    block: (T1, T2, T3, T4) -> R?,
-): R? {
+inline fun <T1 : Any, T2 : Any, T3 : Any, R : Any> safeLet(p1: T1?, p2: T2?, p3: T3?, block: (T1, T2, T3) -> R?): R? {
+    return if (p1 != null && p2 != null && p3 != null) block(p1, p2, p3) else null
+}
+inline fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any, R : Any> safeLet(p1: T1?, p2: T2?, p3: T3?, p4: T4?, block: (T1, T2, T3, T4) -> R?): R? {
     return if (p1 != null && p2 != null && p3 != null && p4 != null) block(p1, p2, p3, p4) else null
 }

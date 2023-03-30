@@ -1,83 +1,124 @@
 package com.example.clock.ui.stopwatch
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.clock.R
-import com.example.clock.data.manager.StopwatchState
+import com.example.clock.data.model.StopwatchState
 import com.example.clock.ui.theme.Red100
 import com.example.clock.util.components.ClockAppBar
 import com.example.clock.util.components.ClockButton
-import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 
-private const val TAG = "StopwatchScreen"
+/*
+@Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
+@Composable
+private fun StopwatchScreenPreview() {
+    val lapTimes = mutableListOf<String>().apply {
+        for (i in 0..20) {
+            add("00:00:${String.format("%02d", i)}")
+        }
+    }.toList()
+    ClockTheme {
+        StopwatchScreen(
+            stopwatchState = StopwatchState(second = "09", isPlaying = false, isReset = false),
+            stopwatchActions = object : StopwatchActions {},
+            lapTimes = lapTimes,
+        )
+    }
+}
+
+@Preview(device = Devices.PIXEL_4_XL)
+@Composable
+private fun StopwatchScreenDarkPreview() {
+    ClockTheme(darkTheme = true) {
+        StopwatchScreen(
+            stopwatchState = StopwatchState(),
+            stopwatchActions = object : StopwatchActions {},
+            lapTimes = listOf(""),
+        )
+    }
+}
+
+ */
 
 @OptIn(
-    ExperimentalAnimationApi::class,
-    ExperimentalTime::class,
-    ExperimentalTransitionApi::class,
     ExperimentalMaterial3Api::class,
 )
 @Composable
 fun StopwatchScreen(
     modifier: Modifier = Modifier,
-    stopwatchViewModel: StopwatchViewModel = hiltViewModel(),
+    stopwatchState: StopwatchState,
+    stopwatchActions: StopwatchActions,
+    lapTimes: List<String>,
 ) {
-    val stopwatchState: StopwatchState by stopwatchViewModel.stopwatchState.observeAsState(
-        StopwatchState(second = "00", minute = "00", hour = "00", isReset = true, isPlaying = false),
-    )
-    //val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
-    var lineSeparator by rememberSaveable { mutableStateOf(stopwatchViewModel.listTimes.isNotEmpty()) }
     val scrollState = rememberLazyListState()
-    var isReset by rememberSaveable { mutableStateOf(stopwatchState.isReset) }
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(stopwatchState.isReset, stopwatchViewModel.listTimes.isEmpty()) {
-        isReset = stopwatchState.isReset
-        lineSeparator = stopwatchViewModel.listTimes.isNotEmpty()
-        if (stopwatchViewModel.listTimes.isNotEmpty()) {
-            scrollState.animateScrollToItem(stopwatchViewModel.listTimes.lastIndex)
+    DisposableEffect(Unit) {
+        if (lapTimes.isNotEmpty()) {
+            coroutineScope.launch {
+                scrollState.animateScrollToItem(lapTimes.lastIndex)
+            }
         }
+        onDispose {}
     }
 
     Surface(modifier = modifier) {
         Box(modifier = Modifier.fillMaxSize()) {
             StopwatchScreenAppBar(
                 modifier = Modifier.statusBarsPadding(),
-                //scrollBehavior = scrollBehavior,
             )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f),
-                    //.nestedScroll(scrollBehavior.nestedScrollConnection),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Time(
+                Stopwatch(
                     modifier = Modifier.padding(
                         WindowInsets.statusBars.add(
                             WindowInsets(
-                                top = dimensionResource(
-                                    id = com.intuit.sdp.R.dimen._90sdp,
-                                ),
+                                top = dimensionResource(id = com.intuit.sdp.R.dimen._90sdp),
                             ),
                         ).asPaddingValues(),
                     ),
@@ -85,28 +126,26 @@ fun StopwatchScreen(
                     minutes = stopwatchState.minute,
                     seconds = stopwatchState.second,
                 )
-                AnimatedVisibility(visible = lineSeparator) {
+                AnimatedVisibility(visible = lapTimes.isNotEmpty()) {
                     LineSeparator(modifier = Modifier.padding(dimensionResource(id = com.intuit.sdp.R.dimen._20sdp)))
                 }
-                ListTimes(
+                LapTimes(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    listTimes = stopwatchViewModel.listTimes,
+                    lapTimes = lapTimes,
                     scrollState = scrollState,
                 )
             }
             Buttons(
-                stopwatchViewModel = stopwatchViewModel,
+                stopwatchActions = stopwatchActions,
                 isPlaying = stopwatchState.isPlaying,
                 scrollState = scrollState,
-                scope = scope,
-                isReset = isReset,
-                onChangeIsReset = {
-                    isReset = it
-                },
+                isReset = stopwatchState.isReset,
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(dimensionResource(id = com.intuit.sdp.R.dimen._7sdp)),
+                    .padding(dimensionResource(id = com.intuit.sdp.R.dimen._7sdp))
+                    .align(Alignment.BottomCenter),
+                coroutineScope = coroutineScope,
+                lapTimes = lapTimes,
             )
         }
     }
@@ -116,11 +155,9 @@ fun StopwatchScreen(
 @Composable
 private fun StopwatchScreenAppBar(
     modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     ClockAppBar(
         modifier = modifier,
-        scrollBehavior = scrollBehavior,
         title = {
             Text(
                 text = stringResource(id = R.string.stopwatch),
@@ -131,23 +168,23 @@ private fun StopwatchScreenAppBar(
 }
 
 @Composable
-private fun Time(
+private fun Stopwatch(
     hours: String,
     minutes: String,
     seconds: String,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier) {
-        TimeUnit(unit = hours)
-        TimeUnit(unit = ":")
-        TimeUnit(unit = minutes)
-        TimeUnit(unit = ":")
-        TimeUnit(unit = seconds)
+        TimeUnitDisplay(unit = hours)
+        TimeUnitDisplay(unit = ":")
+        TimeUnitDisplay(unit = minutes)
+        TimeUnitDisplay(unit = ":")
+        TimeUnitDisplay(unit = seconds)
     }
 }
 
 @Composable
-private fun TimeUnit(unit: String) {
+private fun TimeUnitDisplay(unit: String) {
     Text(
         text = unit,
         style = MaterialTheme.typography.displayLarge,
@@ -164,13 +201,13 @@ private fun LineSeparator(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ListTimes(
-    listTimes: List<String>,
+private fun LapTimes(
+    lapTimes: List<String>,
     scrollState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val contentPadding = dimensionResource(id = com.intuit.sdp.R.dimen._5sdp)
-    val verticalPadding = dimensionResource(id = com.intuit.sdp.R.dimen._8sdp)
+    val verticalPadding = dimensionResource(id = com.intuit.sdp.R.dimen._7sdp)
 
     LazyColumn(
         modifier = modifier,
@@ -179,8 +216,8 @@ private fun ListTimes(
         reverseLayout = true,
         state = scrollState,
     ) {
-        itemsIndexed(listTimes) { index, item ->
-            TimeItem(
+        itemsIndexed(lapTimes) { index, item ->
+            LapDuration(
                 item = item,
                 index = index,
                 modifier = Modifier
@@ -192,7 +229,7 @@ private fun ListTimes(
 }
 
 @Composable
-fun TimeItem(item: String, index: Int, modifier: Modifier = Modifier) {
+private fun LapDuration(item: String, index: Int, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -210,23 +247,24 @@ fun TimeItem(item: String, index: Int, modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Buttons(
-    stopwatchViewModel: StopwatchViewModel,
+    stopwatchActions: StopwatchActions,
     isPlaying: Boolean,
     scrollState: LazyListState,
-    scope: CoroutineScope,
     isReset: Boolean,
-    onChangeIsReset: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    coroutineScope: CoroutineScope,
+    lapTimes: List<String>,
 ) {
     val transition = updateTransition(isReset, label = stringResource(id = R.string.is_reset))
+    val startButtonClicked = rememberSaveable { mutableStateOf(false) }
     Box(
         modifier = modifier,
     ) {
         transition.AnimatedVisibility(
-            visible = { isTargetReset -> isTargetReset },
+            visible = { isStopwatchReset -> isStopwatchReset },
             enter = expandHorizontally(
                 animationSpec = tween(
                     durationMillis = 1,
@@ -240,17 +278,19 @@ private fun Buttons(
                 ),
             ),
         ) {
-            ClockButton(
-                onClick = {
-                    stopwatchViewModel.start()
-                    onChangeIsReset(false)
-                },
-                text = stringResource(id = R.string.start),
-                color = MaterialTheme.colorScheme.primary,
-            )
+            if (!startButtonClicked.value) {
+                ClockButton(
+                    onClick = {
+                        startButtonClicked.value = true
+                        stopwatchActions.start()
+                    },
+                    text = stringResource(id = R.string.start),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
         transition.AnimatedVisibility(
-            visible = { isTargetReset -> !isTargetReset },
+            visible = { isStopwatchReset -> !isStopwatchReset },
             enter = expandHorizontally(
                 animationSpec = tween(
                     durationMillis = 500,
@@ -271,15 +311,19 @@ private fun Buttons(
                 if (isPlaying) {
                     ClockButton(
                         text = stringResource(id = R.string.stop),
-                        onClick = { stopwatchViewModel.stop() },
+                        onClick = {
+                            stopwatchActions.stop()
+                            startButtonClicked.value = false
+                        },
                         color = Red100,
                     )
                     ClockButton(
                         text = stringResource(id = R.string.lap),
                         onClick = {
-                            stopwatchViewModel.addTime()
-                            scope.launch {
-                                scrollState.animateScrollToItem(index = stopwatchViewModel.listTimes.lastIndex)
+                            startButtonClicked.value = false
+                            stopwatchActions.lap()
+                            coroutineScope.launch {
+                                scrollState.animateScrollToItem(index = lapTimes.lastIndex)
                             }
                         },
                         color = MaterialTheme.colorScheme.onSurface,
@@ -287,15 +331,18 @@ private fun Buttons(
                 } else {
                     ClockButton(
                         text = stringResource(id = R.string.resume),
-                        onClick = { stopwatchViewModel.start() },
+                        onClick = {
+                            stopwatchActions.start()
+                            startButtonClicked.value = false
+                        },
                         color = MaterialTheme.colorScheme.primary,
                     )
                     ClockButton(
                         text = stringResource(id = R.string.reset),
                         onClick = {
-                            stopwatchViewModel.reset()
-                            stopwatchViewModel.clearListTimes()
-                            onChangeIsReset(true)
+                            startButtonClicked.value = false
+                            stopwatchActions.reset()
+                            stopwatchActions.clear()
                         },
                         color = MaterialTheme.colorScheme.onSurface,
                     )

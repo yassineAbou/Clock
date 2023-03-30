@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.example.clock.R
 import com.example.clock.data.receiver.STOPWATCH_IS_PLAYING_EXTRA
-import com.example.clock.data.receiver.STOPWATCH_IS_RESET_EXTRA
 import com.example.clock.data.receiver.STOPWATCH_LAP_ACTION
 import com.example.clock.data.receiver.STOPWATCH_LAST_INDEX_EXTRA
 import com.example.clock.data.receiver.STOPWATCH_RESET_ACTION
@@ -38,7 +37,6 @@ class StopwatchNotificationHelper @Inject constructor(
         applicationContext,
         MainActivity::class.java,
     )
-
     private val openStopwatchPendingIntent = PendingIntent.getActivity(
         applicationContext,
         0,
@@ -63,30 +61,30 @@ class StopwatchNotificationHelper @Inject constructor(
     fun updateStopwatchServiceNotification(
         time: String,
         isPlaying: Boolean,
-        isReset: Boolean,
-        lastIndex: Int,
+        lastLapIndex: Int,
     ) {
         val lapIntentAction = stopwatchNotificationBroadcastReceiver.setIntentAction(
             actionName = STOPWATCH_LAP_ACTION,
-            requestCode = 3,
+            requestCode = 2,
             context = applicationContext,
         )
         val resetIntentAction = stopwatchNotificationBroadcastReceiver.setIntentAction(
             actionName = STOPWATCH_RESET_ACTION,
-            requestCode = 2,
+            requestCode = 3,
             context = applicationContext,
         )
-        val stopResumeIntentAction = stopResumeIntentAction(time, isPlaying, isReset, lastIndex)
-        val stopResumeLabel = if (isPlaying) "Stop" else "Resume"
-        val stopResumeIcon = if (isPlaying) R.drawable.ic_stop else R.drawable.ic_play
+        val stopResumeIntentAction = stopResumeIntentAction(time, isPlaying, lastLapIndex)
+
         val lapResetIntentAction = if (isPlaying) lapIntentAction else resetIntentAction
         val lapResetLabel = if (isPlaying) "Lap" else "Reset"
         val lapResetIcon = if (isPlaying) R.drawable.ic_close else R.drawable.ic_timer
-        val lastLap = if (isPlaying && lastIndex != -1) "\nLap  $lastIndex" else ""
-        val isPaused = if (isPlaying) "" else "\nPaused"
+        val stopResumeLabel = if (isPlaying) "Stop" else "Resume"
+        val stopResumeIcon = if (isPlaying) R.drawable.ic_stop else R.drawable.ic_play
+        val lastLapIndexText = if (isPlaying && lastLapIndex != -1) "\nLap  $lastLapIndex" else ""
+        val isPlayingText = if (!isPlaying) "\nPaused" else ""
 
         val notificationUpdate = getStopwatchBaseNotification()
-            .setContentText("$time  $lastLap$isPaused")
+            .setContentText("$time  $lastLapIndexText$isPlayingText")
             .addAction(stopResumeIcon, stopResumeLabel, stopResumeIntentAction)
             .addAction(lapResetIcon, lapResetLabel, lapResetIntentAction)
             .build()
@@ -100,19 +98,17 @@ class StopwatchNotificationHelper @Inject constructor(
     private fun stopResumeIntentAction(
         time: String,
         isPlaying: Boolean,
-        isReset: Boolean,
-        lastIndex: Int,
+        lastLapIndex: Int,
     ): PendingIntent {
         val broadcastIntent =
             Intent(applicationContext, stopwatchNotificationBroadcastReceiver).apply {
                 putExtra(STOPWATCH_TIME_EXTRA, time)
                 putExtra(STOPWATCH_IS_PLAYING_EXTRA, isPlaying)
-                putExtra(STOPWATCH_IS_RESET_EXTRA, isReset)
-                putExtra(STOPWATCH_LAST_INDEX_EXTRA, lastIndex)
+                putExtra(STOPWATCH_LAST_INDEX_EXTRA, lastLapIndex)
             }
         return PendingIntent.getBroadcast(
             applicationContext,
-            1,
+            4,
             broadcastIntent,
             pendingIntentFlags,
         )
@@ -133,4 +129,4 @@ class StopwatchNotificationHelper @Inject constructor(
 }
 
 private const val STOPWATCH_SERVICE_CHANNEL = "stopwatch_service_channel"
-const val STOPWATCH_SERVICE_NOTIFICATION_ID = 121412
+const val STOPWATCH_SERVICE_NOTIFICATION_ID = 1

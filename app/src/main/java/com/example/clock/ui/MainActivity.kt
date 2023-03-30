@@ -3,7 +3,6 @@ package com.example.clock.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
@@ -20,9 +19,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -31,8 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -40,9 +38,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.clock.R
-import com.example.clock.data.manager.ServiceManager
-import com.example.clock.data.service.StopwatchService
-import com.example.clock.data.service.TimerRunningService
+import com.example.clock.data.model.StopwatchState
+import com.example.clock.data.model.TimerState
 import com.example.clock.ui.alarm.AlarmViewModel
 import com.example.clock.ui.alarm.AlarmsListScreen
 import com.example.clock.ui.alarm.CreateAlarmScreen
@@ -55,25 +52,13 @@ import com.example.clock.ui.timer.TimerViewModel
 import com.example.clock.util.Constants.alarmDefaultValue
 import com.example.clock.util.components.BottomNavigationBar
 import com.example.clock.util.components.listBottomBarItems
-import com.example.clock.util.isServiceRunning
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val stopwatchViewModel: StopwatchViewModel by viewModels()
-    private val timerViewModel: TimerViewModel by viewModels()
-
-    @Inject
-    lateinit var serviceManager: ServiceManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,51 +67,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ClockTheme {
-                ProvideWindowInsets {
-                    val systemUiController = rememberSystemUiController()
-                    val useDarkIcons = !isSystemInDarkTheme()
-                    SideEffect {
-                        systemUiController.setStatusBarColor(
-                            color = Color.Transparent,
-                            darkIcons = useDarkIcons,
-                        )
-                    }
-                    ClockApp()
+                val systemUiController = rememberSystemUiController()
+                val useDarkIcons = !isSystemInDarkTheme()
+                DisposableEffect(systemUiController, useDarkIcons) {
+                    systemUiController.setStatusBarColor(
+                        color = Color.Transparent,
+                        darkIcons = useDarkIcons,
+                    )
+                    onDispose {}
                 }
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        lifecycleScope.launch {
-            if (this@MainActivity.isServiceRunning(StopwatchService::class.java)) {
-                async {
-                    serviceManager.stopService(StopwatchService::class.java)
-                }
-            }
-            if (this@MainActivity.isServiceRunning(TimerRunningService::class.java)) {
-                async {
-                    serviceManager.stopService(TimerRunningService::class.java)
-                }
-            }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        lifecycleScope.launch {
-            val isReset = stopwatchViewModel.stopwatchState.asFlow().stateIn(this).value.isReset
-            val isDone = timerViewModel.timerState.asFlow().stateIn(this).value.isDone
-            if (!isReset) {
-                async {
-                    serviceManager.startService(StopwatchService::class.java)
-                }
-            }
-            if (!isDone) {
-                async {
-                    serviceManager.startService(TimerRunningService::class.java)
-                }
+                ClockApp()
             }
         }
     }
@@ -199,6 +149,12 @@ private fun ClockApp() {
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
     val alarmViewModel: AlarmViewModel = viewModel()
+    val stopwatchViewModel: StopwatchViewModel = viewModel()
+    val stopwatchState: StopwatchState by stopwatchViewModel.stopwatchState.observeAsState(
+        StopwatchState(),
+    )
+    val timerViewModel: TimerViewModel = viewModel()
+    val timerState: TimerState by timerViewModel.timerState.observeAsState(TimerState())
 
     NavHost(navController = navController, startDestination = Screen.AlarmsList.route) {
         composable(
@@ -218,13 +174,22 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
             route = Screen.Stopwatch.route,
             deepLinks = Screen.stopwatchDeepLink,
         ) {
-            StopwatchScreen(modifier = modifier)
+            StopwatchScreen(
+                modifier = modifier,
+                stopwatchState = stopwatchState,
+                stopwatchActions = stopwatchViewModel,
+                lapTimes = stopwatchViewModel.lapTimes,
+            )
         }
         composable(
             route = Screen.Timer.route,
             deepLinks = Screen.timerDeepLink,
         ) {
-            TimerScreen(modifier = modifier)
+            TimerScreen(
+                modifier = modifier,
+                timerState = timerState,
+                timerActions = timerViewModel,
+            )
         }
         composable(Screen.CreateAlarm.route) {
             CreateAlarmScreen(

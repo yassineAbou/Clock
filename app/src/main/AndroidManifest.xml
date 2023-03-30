@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-
     <application
         android:name=".ClockApplication"
         android:allowBackup="false"
@@ -16,45 +15,41 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Clock">
-
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:showOnLockScreen="true"
             android:theme="@style/Theme.Clock"
-            android:windowSoftInputMode="adjustResize"
-            android:showOnLockScreen="true">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <service android:name=".data.service.TimerRunningService" />
-        <service android:name=".data.service.TimerCompletedService" />
-
-        <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />
-
-        <receiver
-            android:name=".data.receiver.AlarmBroadcastReceiver"
-            android:exported="true">
             <intent-filter>
                 <data
                     android:host="www.clock.com"
                     android:scheme="https" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>
+        </activity>
 
+        <service android:name=".data.service.TimerRunningService" />
+        <service android:name=".data.service.TimerCompletedService" />
         <service android:name=".data.service.AlarmService" />
         <service android:name=".data.service.RescheduleAlarmsService" />
-
         <service android:name=".data.service.StopwatchService" />
 
         <receiver android:name=".data.receiver.StopwatchNotificationBroadcastReceiver" />
         <receiver android:name=".data.receiver.AlarmActionsBroadcastReceiver" />
-
+        <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />
+        <receiver
+            android:name=".data.receiver.AlarmBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

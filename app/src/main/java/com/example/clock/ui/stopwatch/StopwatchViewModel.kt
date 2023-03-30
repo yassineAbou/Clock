@@ -11,31 +11,30 @@ import kotlin.time.ExperimentalTime
 @HiltViewModel
 class StopwatchViewModel @Inject constructor(
     private val stopwatchManager: StopwatchManager,
-) : ViewModel() {
+) : ViewModel(), StopwatchActions {
 
     val stopwatchState = stopwatchManager.stopwatchState.asLiveData()
 
-    val listTimes = stopwatchManager.listTimes
+    val lapTimes = stopwatchManager.lapTimes
 
-    fun start() {
+    override fun start() {
         stopwatchManager.start()
     }
 
-    fun stop() {
+    override fun stop() {
         stopwatchManager.stop()
     }
 
-    fun addTime() {
-        stopwatchManager.addTime()
+    override fun lap() {
+        stopwatchManager.lap()
     }
 
-    fun clearListTimes() {
-        stopwatchManager.clearListTimes()
+    override fun clear() {
+        stopwatchManager.clear()
     }
 
-    fun reset() {
+    override fun reset() {
         stopwatchManager.reset()
     }
 }
 
-private const val TAG = "StopwatchViewModel"

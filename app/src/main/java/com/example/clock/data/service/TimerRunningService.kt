@@ -8,6 +8,7 @@ import com.example.clock.util.helper.TIMER_RUNNING_NOTIFICATION_ID
 import com.example.clock.util.helper.TimerNotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
@@ -31,13 +32,12 @@ class TimerRunningService : Service() {
             timerNotificationHelper.getTimerBaseNotification().build(),
         )
 
-        serviceScope.launch {
+        serviceScope.launch(Dispatchers.Main) {
             timerManager.timerState.collectLatest {
                 if (!it.isDone) {
                     timerNotificationHelper.updateTimerServiceNotification(
                         isPlaying = it.isPlaying,
-                        time = it.time,
-                        isDone = it.isDone,
+                        timeText = it.timeText,
                     )
                 }
             }
@@ -54,5 +54,3 @@ class TimerRunningService : Service() {
         timerNotificationHelper.removeTimerRunningNotification()
     }
 }
-
-private const val TAG = "TimerService"

@@ -1,11 +1,11 @@
 package com.example.clock.data.manager
 
 import android.content.Context
+import com.example.clock.data.model.TimerState
 import com.example.clock.data.service.TimerCompletedService
 import com.example.clock.data.service.TimerRunningService
 import com.example.clock.util.Constants.TIME_FORMAT
 import com.example.clock.util.helper.CountDownTimerHelper
-import com.example.clock.util.isServiceRunning
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,18 +16,6 @@ import javax.inject.Singleton
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
-
-data class TimerState(
-    val timeInMillis: Long,
-    val time: String,
-    val hour: Int,
-    val minute: Int,
-    val second: Int,
-    val progress: Float,
-    val isPlaying: Boolean,
-    val isDone: Boolean,
-)
 
 @Singleton
 class TimerManager @Inject constructor(
@@ -36,7 +24,7 @@ class TimerManager @Inject constructor(
 ) {
 
     private val timeInMillisFlow = MutableStateFlow(0L)
-    private val timeFlow = MutableStateFlow("00:00:00")
+    private val timeTextFlow = MutableStateFlow("00:00:00")
     private val hourFlow = MutableStateFlow(0)
     private val minuteFlow = MutableStateFlow(0)
     private val secondFlow = MutableStateFlow(0)
@@ -46,7 +34,7 @@ class TimerManager @Inject constructor(
 
     val timerState = combineTuple(
         timeInMillisFlow,
-        timeFlow,
+        timeTextFlow,
         hourFlow,
         minuteFlow,
         secondFlow,
@@ -59,7 +47,7 @@ class TimerManager @Inject constructor(
             hour = hour,
             minute = minute,
             second = second,
-            time = time,
+            timeText = time,
             progress = progress,
             isPlaying = isPlaying,
             isDone = isDone,
@@ -76,11 +64,10 @@ class TimerManager @Inject constructor(
         minuteFlow.value = minute
     }
 
-    fun setSeconds(second: Int) {
+    fun setSecond(second: Int) {
         secondFlow.value = second
     }
 
-    @OptIn(ExperimentalTime::class)
     fun setCountDownTimer() {
         timeInMillisFlow.value =
             (hourFlow.value.hours + minuteFlow.value.minutes + secondFlow.value.seconds).inWholeMilliseconds
@@ -89,37 +76,27 @@ class TimerManager @Inject constructor(
                 val progressValue = millisUntilFinished.toFloat() / timeInMillisFlow.value
                 handleTimerValues(true, millisUntilFinished.formatTime(), progressValue)
             }
-
             override fun onTimerFinish() {
                 serviceManager.startService(TimerCompletedService::class.java)
-                resetTimer()
-                if (applicationContext.isServiceRunning(TimerRunningService::class.java)) {
-                    serviceManager.stopService(TimerRunningService::class.java)
-                }
+                reset()
             }
         }
     }
 
-    fun handleCountDownTimer() {
-        if (isPlayingFlow.value) {
-            pauseTimer()
-        } else {
-            startTimer()
-        }
-    }
-
-    private fun pauseTimer() {
+    fun pause() {
         countDownTimerHelper?.pause()
         isPlayingFlow.value = false
     }
 
-    fun resetTimer() {
+    fun reset() {
+        serviceManager.stopService(TimerRunningService::class.java)
         handleTimerValues(false, timeInMillisFlow.value.formatTime(), 0f)
         isDoneFlow.value = true
         countDownTimerHelper?.restart()
     }
 
-    fun startTimer() {
+    fun start() {
+        serviceManager.startService(TimerRunningService::class.java)
         countDownTimerHelper?.start()
         isPlayingFlow.value = true
         isDoneFlow.value = false
@@ -132,7 +109,7 @@ class TimerManager @Inject constructor(
         progress: Float,
     ) {
         isPlayingFlow.value = isPlaying
-        timeFlow.value = text
+        timeTextFlow.value = text
         progressFlow.value = progress
     }
 

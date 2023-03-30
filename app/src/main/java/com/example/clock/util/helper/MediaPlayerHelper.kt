@@ -9,11 +9,10 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.provider.Settings
+import androidx.core.content.ContextCompat.getSystemService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class MediaPlayerHelper @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
 ) {
@@ -57,5 +56,7 @@ class MediaPlayerHelper @Inject constructor(
     fun release() {
         mediaPlayer?.release()
         vibrator?.cancel()
+        mediaPlayer = null
+        vibrator = null
     }
 }

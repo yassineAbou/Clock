@@ -1,40 +1,81 @@
 package com.example.clock.ui.clock
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.clock.R
+import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.components.ClockAppBar
-import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
 import java.util.*
+
+/*
+@Preview(device = Devices.PIXEL_4_XL)
+@Composable
+fun ClockScreenPreview() {
+    ClockTheme {
+        ClockScreen()
+    }
+}
+
+@Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
+@Composable
+fun ClockScreenDarkPreview() {
+    ClockTheme(darkTheme = true) {
+        ClockScreen()
+    }
+}
+
+ */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClockScreen(
     modifier: Modifier = Modifier,
 ) {
-    //val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
-
     Surface(modifier = modifier) {
         Box(modifier = Modifier.fillMaxSize()) {
             ClockScreenAppBar(
                 modifier = Modifier.statusBarsPadding(),
-                //scrollBehavior = scrollBehavior,
             )
-            DigitalClock()
+            SlidingClock()
         }
     }
 }
@@ -60,13 +101,13 @@ private fun ClockScreenAppBar(
 data class Time(val hours: Int, val minutes: Int, val seconds: Int)
 
 @Composable
-private fun DigitalClock() {
+private fun SlidingClock() {
     fun currentTime(): Time {
-        val cal = Calendar.getInstance()
+        val calendar = Calendar.getInstance()
         return Time(
-            hours = cal.get(Calendar.HOUR_OF_DAY),
-            minutes = cal.get(Calendar.MINUTE),
-            seconds = cal.get(Calendar.SECOND),
+            hours = calendar.get(Calendar.HOUR_OF_DAY),
+            minutes = calendar.get(Calendar.MINUTE),
+            seconds = calendar.get(Calendar.SECOND),
         )
     }
 

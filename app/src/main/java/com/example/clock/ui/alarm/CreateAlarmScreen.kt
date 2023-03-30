@@ -170,7 +170,7 @@ private fun AlarmPicker(
             NumberPicker(
                 modifier = Modifier.weight(1f),
                 number = hours,
-                labelTimeUnit = "Hours",
+                timeUnit = "Hours",
                 onNumberChange = { value ->
                     if (value.text.checkNumberPicker(maxNumber = 23)) {
                         hours = value
@@ -192,7 +192,7 @@ private fun AlarmPicker(
             NumberPicker(
                 modifier = Modifier.weight(1f),
                 number = minutes,
-                labelTimeUnit = "Minutes",
+                timeUnit = "Minutes",
                 textStyle = textStyle,
                 onNumberChange = { value ->
                     if (value.text.checkNumberPicker(maxNumber = 59)) {

@@ -12,9 +12,8 @@ import com.example.clock.R
 import com.example.clock.data.receiver.TIMER_COMPLETED_DISMISS_ACTION
 import com.example.clock.data.receiver.TIMER_COMPLETED_RESTART_ACTION
 import com.example.clock.data.receiver.TIMER_RUNNING_CANCEL_ACTION
-import com.example.clock.data.receiver.TIMER_RUNNING_IS_DONE_EXTRA
-import com.example.clock.data.receiver.TIMER_RUNNING_IS_PLAYING_EXTRA
-import com.example.clock.data.receiver.TIMER_RUNNING_TIME_EXTRA
+import com.example.clock.data.receiver.TIMER_RUNNING_IS_PLAYING
+import com.example.clock.data.receiver.TIMER_RUNNING_TIME_TEXT
 import com.example.clock.data.receiver.TimerNotificationBroadcastReceiver
 import com.example.clock.ui.MainActivity
 import com.example.clock.util.Constants.pendingIntentFlags
@@ -40,20 +39,20 @@ class TimerNotificationHelper @Inject constructor(
 
     private val openTimerPendingIntent = PendingIntent.getActivity(
         applicationContext,
-        0,
+        5,
         openTimerIntent,
         pendingIntentFlags,
     )
 
     private val dismissIntentAction = timerNotificationBroadcastReceiver.setIntentAction(
         actionName = TIMER_COMPLETED_DISMISS_ACTION,
-        requestCode = 7,
+        requestCode = 8,
         context = applicationContext,
     )
 
     private val restartIntentAction = timerNotificationBroadcastReceiver.setIntentAction(
         actionName = TIMER_COMPLETED_RESTART_ACTION,
-        requestCode = 8,
+        requestCode = 9,
         context = applicationContext,
     )
 
@@ -72,21 +71,20 @@ class TimerNotificationHelper @Inject constructor(
             .setOngoing(true)
 
     fun updateTimerServiceNotification(
-        time: String,
+        timeText: String,
         isPlaying: Boolean,
-        isDone: Boolean,
     ) {
-        val pauseResumeIntentAction = pauseResumeIntentAction(time, isPlaying, isDone)
+        val pauseResumeIntentAction = pauseResumeIntentAction(timeText, isPlaying)
         val cancelIntentAction = timerNotificationBroadcastReceiver.setIntentAction(
             actionName = TIMER_RUNNING_CANCEL_ACTION,
-            requestCode = 4,
+            requestCode = 10,
             context = applicationContext,
         )
         val pauseResumeIcon = if (isPlaying) R.drawable.ic_stop else R.drawable.ic_play
         val pauseResumeLabel = if (isPlaying) "Pause" else "Resume"
 
         val notificationUpdate = getTimerBaseNotification()
-            .setContentText(time)
+            .setContentText(timeText)
             .addAction(
                 pauseResumeIcon,
                 pauseResumeLabel,
@@ -98,19 +96,17 @@ class TimerNotificationHelper @Inject constructor(
     }
 
     private fun pauseResumeIntentAction(
-        time: String,
+        timeText: String,
         isPlaying: Boolean,
-        isDone: Boolean,
     ): PendingIntent {
         val broadcastIntent =
             Intent(applicationContext, TimerNotificationBroadcastReceiver::class.java).apply {
-                putExtra(TIMER_RUNNING_TIME_EXTRA, time)
-                putExtra(TIMER_RUNNING_IS_PLAYING_EXTRA, isPlaying)
-                putExtra(TIMER_RUNNING_IS_DONE_EXTRA, isDone)
+                putExtra(TIMER_RUNNING_TIME_TEXT, timeText)
+                putExtra(TIMER_RUNNING_IS_PLAYING, isPlaying)
             }
         return PendingIntent.getBroadcast(
             applicationContext,
-            5,
+            11,
             broadcastIntent,
             pendingIntentFlags,
         )
@@ -120,7 +116,7 @@ class TimerNotificationHelper @Inject constructor(
         NotificationCompat.Builder(applicationContext, TIMER_COMPLETED_CHANNEL)
             .setContentTitle("Time's up")
             .setContentText("00:00:00")
-            .setFullScreenIntent(openTimerPendingIntent, true)
+            .setFullScreenIntent(null, true)
             .setSmallIcon(R.drawable.ic_hourglass_empty)
             .setAutoCancel(true)
             .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
@@ -138,7 +134,7 @@ class TimerNotificationHelper @Inject constructor(
     }
 
     private fun createTimerNotificationChannels() {
-        val timerServiceChannel = NotificationChannelCompat.Builder(
+        val timerRunningChannel = NotificationChannelCompat.Builder(
             TIMER_RUNNING_CHANNEL,
             NotificationManagerCompat.IMPORTANCE_DEFAULT,
         )
@@ -158,7 +154,7 @@ class TimerNotificationHelper @Inject constructor(
 
         notificationManager.createNotificationChannelsCompat(
             listOf(
-                timerServiceChannel,
+                timerRunningChannel,
                 timerCompletedChannel,
             ),
         )
@@ -167,5 +163,5 @@ class TimerNotificationHelper @Inject constructor(
 
 private const val TIMER_RUNNING_CHANNEL = "timer_running_channel"
 private const val TIMER_COMPLETED_CHANNEL = "timer_completed_channel"
-const val TIMER_RUNNING_NOTIFICATION_ID = 57766
-const val TIMER_COMPLETED_NOTIFICATION_ID = 3425
+const val TIMER_RUNNING_NOTIFICATION_ID = 6
+const val TIMER_COMPLETED_NOTIFICATION_ID = 7

@@ -1,47 +1,48 @@
 package com.example.clock.util.helper
 
-import android.os.CountDownTimer
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-abstract class CountDownTimerHelper(var mMillisInFuture: Long, var mInterval: Long) {
+abstract class CountDownTimerHelper(
+    private val millisInFuture: Long,
+    private val countDownInterval: Long,
+) {
 
-    private var countDownTimer: CountDownTimer? = null
+    private var job: Job? = null
     private var remainingTime: Long = 0
     private var isTimerPaused: Boolean = true
 
     init {
-        this.remainingTime = mMillisInFuture
+        remainingTime = millisInFuture
     }
 
-    @Synchronized
+    @OptIn(DelicateCoroutinesApi::class)
     fun start() {
         if (isTimerPaused) {
-            countDownTimer = object : CountDownTimer(remainingTime, mInterval) {
-                override fun onFinish() {
-                    onTimerFinish()
-                    restart()
+            job = GlobalScope.launch {
+                while (remainingTime > 0) {
+                    delay(countDownInterval)
+                    remainingTime -= countDownInterval
+                    onTimerTick(remainingTime)
                 }
-
-                override fun onTick(millisUntilFinished: Long) {
-                    remainingTime = millisUntilFinished
-                    onTimerTick(millisUntilFinished)
-                }
-            }.apply {
-                start()
+                onTimerFinish()
+                restart()
             }
             isTimerPaused = false
         }
     }
 
     fun pause() {
-        if (!isTimerPaused) {
-            countDownTimer?.cancel()
-        }
+        job?.cancel()
         isTimerPaused = true
     }
 
     fun restart() {
-        countDownTimer?.cancel()
-        remainingTime = mMillisInFuture
+        job?.cancel()
+        remainingTime = millisInFuture
         isTimerPaused = true
     }
 
