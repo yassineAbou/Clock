@@ -3,7 +3,6 @@
 
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -24,24 +23,20 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <data
-                    android:host="www.clock.com"
-                    android:scheme="https" />
+                <data android:host="www.clock.com" android:scheme="https" />
             </intent-filter>
         </activity>
 
         <service android:name=".data.service.TimerRunningService" />
         <service android:name=".data.service.TimerCompletedService" />
         <service android:name=".data.service.AlarmService" />
-        <service android:name=".data.service.RescheduleAlarmsService" />
         <service android:name=".data.service.StopwatchService" />
+        <service android:name=".data.service.RescheduleAlarmsService"/>
 
         <receiver android:name=".data.receiver.StopwatchNotificationBroadcastReceiver" />
-        <receiver android:name=".data.receiver.AlarmActionsBroadcastReceiver" />
         <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />
         <receiver
             android:name=".data.receiver.AlarmBroadcastReceiver"

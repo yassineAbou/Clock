@@ -26,7 +26,7 @@ interface AlarmDao {
     suspend fun getAlarmById(id: Int): Alarm?
 
     @Query("SELECT id FROM alarms_list_table ORDER BY id DESC LIMIT 1")
-    suspend fun getLastAutoId(): Int?
+    suspend fun getLastId(): Int?
 
     @Query("SELECT * FROM alarms_list_table WHERE hour=:hour AND minute=:minute AND isRecurring=:recurring")
     fun getAlarmByTime(hour: String, minute: String, recurring: Boolean): Flow<Alarm?>

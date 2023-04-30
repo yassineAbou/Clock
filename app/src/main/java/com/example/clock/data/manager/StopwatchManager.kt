@@ -3,7 +3,7 @@ package com.example.clock.data.manager
 import androidx.compose.runtime.mutableStateListOf
 import com.example.clock.data.model.StopwatchState
 import com.example.clock.data.service.StopwatchService
-import com.example.clock.util.Constants.TIME_FORMAT
+import com.example.clock.util.GlobalProperties.TIME_FORMAT
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

@@ -1,6 +1,5 @@
 package com.example.clock.ui.clock
 
-import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -23,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,14 +34,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.clock.R
-import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.components.ClockAppBar
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 /*
@@ -82,13 +78,9 @@ fun ClockScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ClockScreenAppBar(
-    modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
+private fun ClockScreenAppBar(modifier: Modifier = Modifier) {
     ClockAppBar(
         modifier = modifier,
-        scrollBehavior = scrollBehavior,
         title = {
             Text(
                 text = stringResource(id = R.string.app_name),
@@ -113,9 +105,11 @@ private fun SlidingClock() {
 
     var time by remember { mutableStateOf(currentTime()) }
     LaunchedEffect(0) {
-        while (true) {
-            time = currentTime()
-            delay(1000)
+        launch {
+            while (true) {
+                time = currentTime()
+                delay(1000)
+            }
         }
     }
 

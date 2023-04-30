@@ -10,16 +10,17 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.clock.ui.Screen
 import com.example.clock.ui.theme.ClockTheme
 
+/*
 @Preview
 @Composable
 private fun BottomNavigationPreview() {
@@ -42,6 +43,8 @@ private fun BottomNavigationPreviewDark() {
     }
 }
 
+ */
+
 data class BottomBarItem(
     val name: String,
     val route: String,
@@ -54,19 +57,18 @@ fun BottomNavigationBar(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    val backStackEntry = navController.currentBackStackEntryAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
     NavigationBar(modifier = modifier) {
         listBottomBarItems.forEach { item ->
-            val isItemSelected = item.route == backStackEntry.value?.destination?.route
             NavigationBarItem(
-                selected = isItemSelected,
+                selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
+                        popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }
                         launchSingleTop = true
-                        restoreState = true
                     }
                 },
                 label = {

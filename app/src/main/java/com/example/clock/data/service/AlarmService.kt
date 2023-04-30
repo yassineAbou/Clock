@@ -3,7 +3,6 @@ package com.example.clock.data.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import com.example.clock.data.receiver.HOUR
 import com.example.clock.data.receiver.MINUTE
 import com.example.clock.data.receiver.TITLE
@@ -13,8 +12,10 @@ import com.example.clock.util.helper.AlarmNotificationHelper
 import com.example.clock.util.helper.MediaPlayerHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,23 +46,19 @@ class AlarmService : Service() {
             alarmNotificationHelper.getAlarmBaseNotification(title, time).build(),
         )
 
-        serviceScope.launch {
+        serviceScope.launch(Dispatchers.IO) {
             mediaPlayerHelper.start()
 
-            /*
             alarmAlarmRepository.getAlarmByTime(
-                time.substringBefore(':'),
-                time.substringAfter(':'),
-                false
+                hour = time.substringBefore(':'),
+                minute = time.substringAfter(':'),
+                recurring = false,
             ).collectLatest {
                 it?.let {
                     it.isScheduled = false
                     alarmAlarmRepository.update(it)
-                    Log.e(TAG, "onStartCommand: started = ${it.isScheduled}")
                 }
             }
-
-             */
         }
         return START_STICKY
     }
@@ -70,11 +67,8 @@ class AlarmService : Service() {
         super.onDestroy()
         serviceScope.cancel()
         mediaPlayerHelper.release()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        Log.e(TAG, "onDestroy: ALARM SERVICE")
+        alarmNotificationHelper.removeAlarmNotification()
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
 }
-
-private const val TAG = "AlarmService"

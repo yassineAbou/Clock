@@ -16,7 +16,7 @@ import com.example.clock.data.receiver.TIMER_RUNNING_IS_PLAYING
 import com.example.clock.data.receiver.TIMER_RUNNING_TIME_TEXT
 import com.example.clock.data.receiver.TimerNotificationBroadcastReceiver
 import com.example.clock.ui.MainActivity
-import com.example.clock.util.Constants.pendingIntentFlags
+import com.example.clock.util.GlobalProperties.pendingIntentFlags
 import com.example.clock.util.setIntentAction
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

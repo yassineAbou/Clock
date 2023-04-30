@@ -11,9 +11,9 @@ import androidx.core.net.toUri
 import com.example.clock.R
 import com.example.clock.data.receiver.ACTION_DISMISS
 import com.example.clock.data.receiver.ACTION_SNOOZE
-import com.example.clock.data.receiver.AlarmActionsBroadcastReceiver
+import com.example.clock.data.receiver.AlarmBroadcastReceiver
 import com.example.clock.ui.MainActivity
-import com.example.clock.util.Constants.pendingIntentFlags
+import com.example.clock.util.GlobalProperties.pendingIntentFlags
 import com.example.clock.util.setIntentAction
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -25,7 +25,7 @@ class AlarmNotificationHelper @Inject constructor(
 ) {
     private val notificationManager = NotificationManagerCompat.from(applicationContext)
 
-    private val alarmActionsBroadcastReceiver = AlarmActionsBroadcastReceiver::class.java
+    private val alarmBroadcastReceiver = AlarmBroadcastReceiver::class.java
 
     private val openAlarmListIntent = Intent(
         Intent.ACTION_VIEW,
@@ -36,20 +36,20 @@ class AlarmNotificationHelper @Inject constructor(
 
     private val openAlarmPendingIntent = PendingIntent.getActivity(
         applicationContext,
-        0,
+        13,
         openAlarmListIntent,
         pendingIntentFlags,
     )
 
-    private val dismissIntentAction = alarmActionsBroadcastReceiver.setIntentAction(
+    private val dismissIntentAction = alarmBroadcastReceiver.setIntentAction(
         actionName = ACTION_DISMISS,
-        requestCode = 10,
+        requestCode = 14,
         context = applicationContext,
     )
 
-    private val snoozeIntentAction = alarmActionsBroadcastReceiver.setIntentAction(
+    private val snoozeIntentAction = alarmBroadcastReceiver.setIntentAction(
         actionName = ACTION_SNOOZE,
-        requestCode = 11,
+        requestCode = 15,
         context = applicationContext,
     )
 
@@ -68,7 +68,6 @@ class AlarmNotificationHelper @Inject constructor(
             .addAction(R.drawable.ic_close, "Dismiss", dismissIntentAction)
             .addAction(R.drawable.ic_baseline_snooze_24, "Snooze", snoozeIntentAction)
             .setOngoing(true)
-            .setAutoCancel(true)
 
     private fun createAlarmNotificationChannel() {
         val alarmServiceChannel = NotificationChannelCompat.Builder(
@@ -89,4 +88,4 @@ class AlarmNotificationHelper @Inject constructor(
 }
 
 private const val ALARM_SERVICE_CHANNEL_ID = "alarm_service_channel"
-const val ALARM_SERVICE_NOTIFICATION_ID = 2778
+const val ALARM_SERVICE_NOTIFICATION_ID = 12

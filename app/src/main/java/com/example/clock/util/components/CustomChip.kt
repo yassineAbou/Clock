@@ -21,8 +21,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomChip(
-    modifier: Modifier = Modifier,
-    isSelected: Boolean,
+    isChecked: Boolean,
     text: String,
     onChecked: (Boolean) -> Unit,
     selectedColor: Color = MaterialTheme.colorScheme.primary,
@@ -37,22 +36,22 @@ fun CustomChip(
             )
             .border(
                 width = 1.dp,
-                color = if (isSelected) selectedColor else MaterialTheme.colorScheme.onSurface,
+                color = if (isChecked) selectedColor else MaterialTheme.colorScheme.onSurface,
                 shape = CircleShape,
             )
             .background(
-                color = if (isSelected) selectedColor else Transparent,
+                color = if (isChecked) selectedColor else Transparent,
                 shape = CircleShape,
             )
             .clip(shape = CircleShape)
             .clickable {
-                onChecked(!isSelected)
+                onChecked(!isChecked)
             }
             .padding(4.dp),
     ) {
         Text(
             text = text,
-            color = if (isSelected) White else Unspecified,
+            color = if (isChecked) White else Unspecified,
         )
     }
 }

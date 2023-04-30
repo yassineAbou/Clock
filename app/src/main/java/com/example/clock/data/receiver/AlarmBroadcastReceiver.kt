@@ -3,12 +3,17 @@ package com.example.clock.data.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import com.example.clock.data.manager.ScheduleAlarmManager
 import com.example.clock.data.manager.ServiceManager
+import com.example.clock.data.service.AlarmService
 import com.example.clock.data.service.RescheduleAlarmsService
 import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -21,49 +26,64 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var scheduleAlarmManager: ScheduleAlarmManager
 
-    override fun onReceive(p0: Context?, p1: Intent?) {
-        safeLet(p0, p1) { context, intent ->
+    private val broadcastReceiverScope = CoroutineScope(SupervisorJob())
 
-            when {
-                Intent.ACTION_BOOT_COMPLETED == intent.action -> {
-                    Toast.makeText(context, "Alarm Reboot", Toast.LENGTH_SHORT).show()
-                    serviceManager.startService(RescheduleAlarmsService::class.java)
+    override fun onReceive(p0: Context?, p1: Intent?) {
+        val pendingResult: PendingResult = goAsync()
+        broadcastReceiverScope.launch(Dispatchers.Default) {
+            try {
+                safeLet(p0, p1) { context, intent ->
+                    when (intent.action) {
+                        "android.intent.action.BOOT_COMPLETED" -> {
+                            val serviceIntent = Intent(context, RescheduleAlarmsService::class.java)
+                            context.startService(serviceIntent)
+                        }
+                        ACTION_DISMISS -> serviceManager.stopService(AlarmService::class.java)
+                        ACTION_SNOOZE -> {
+                            scheduleAlarmManager.snooze()
+                            serviceManager.stopService(AlarmService::class.java)
+                        }
+                        else -> {
+                            val isRecurring = intent.getBooleanExtra(IS_RECURRING, false)
+                            val shouldStartService = !isRecurring || alarmIsToday(intent)
+                            if (shouldStartService) {
+                                serviceManager.startAlarmService(intent)
+                            } else {
+                            }
+                        }
+                    }
                 }
-                !intent.getBooleanExtra(IS_RECURRING, false) -> serviceManager.startAlarmService(
-                    intent,
-                )
-                alarmIsToday(intent) -> serviceManager.startAlarmService(intent)
+            } finally {
+                pendingResult.finish()
+                broadcastReceiverScope.cancel()
             }
         }
     }
 
     private fun alarmIsToday(intent: Intent): Boolean {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = System.currentTimeMillis()
-        intent.apply {
-            return when (calendar[Calendar.DAY_OF_WEEK]) {
-                Calendar.MONDAY -> getBooleanExtra(IS_MONDAY, false)
-                Calendar.TUESDAY -> getBooleanExtra(IS_TUESDAY, false)
-                Calendar.WEDNESDAY -> getBooleanExtra(IS_WEDNESDAY, false)
-                Calendar.THURSDAY -> getBooleanExtra(IS_THURSDAY, false)
-                Calendar.FRIDAY -> getBooleanExtra(IS_FRIDAY, false)
-                Calendar.SATURDAY -> getBooleanExtra(IS_SATURDAY, false)
-                Calendar.SUNDAY -> getBooleanExtra(IS_SUNDAY, false)
-                else -> false
-            }
+        val daysSelected = intent.extras?.getSerializable(DAYS_SELECTED) as? HashMap<String, Boolean>
+        val today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+        return daysSelected?.get(getDayOfWeek(today)) ?: false
+    }
+
+    private fun getDayOfWeek(day: Int): String {
+        return when (day) {
+            Calendar.MONDAY -> "Mon"
+            Calendar.TUESDAY -> "Tue"
+            Calendar.WEDNESDAY -> "Wed"
+            Calendar.THURSDAY -> "Thu"
+            Calendar.FRIDAY -> "Fri"
+            Calendar.SATURDAY -> "Sat"
+            Calendar.SUNDAY -> "Sun"
+            else -> ""
         }
     }
 }
 
-const val IS_MONDAY = "IS_MONDAY"
-const val IS_TUESDAY = "IS_TUESDAY"
-const val IS_WEDNESDAY = "IS_WEDNESDAY"
-const val IS_THURSDAY = "IS_THURSDAY"
-const val IS_FRIDAY = "IS_FRIDAY"
-const val IS_SATURDAY = "IS_SATURDAY"
-const val IS_SUNDAY = "IS_SUNDAY"
 const val IS_RECURRING = "IS_RECURRING"
+const val DAYS_SELECTED = "DAYS_SELECTED"
 const val TITLE = "TITLE"
-private const val TAG = "AlarmBroadcastReceiver"
 const val HOUR = "HOUR"
 const val MINUTE = "MINUTE"
+const val ACTION_DISMISS = "ACTION_DISMISS"
+const val ACTION_SNOOZE = "ACTION_SNOOZE"

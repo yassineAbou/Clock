@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.clock.data.model.TimerState
 import com.example.clock.data.service.TimerCompletedService
 import com.example.clock.data.service.TimerRunningService
-import com.example.clock.util.Constants.TIME_FORMAT
+import com.example.clock.util.GlobalProperties.TIME_FORMAT
 import com.example.clock.util.helper.CountDownTimerHelper
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import dagger.hilt.android.qualifiers.ApplicationContext

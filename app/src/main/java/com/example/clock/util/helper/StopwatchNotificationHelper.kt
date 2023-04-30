@@ -16,7 +16,7 @@ import com.example.clock.data.receiver.STOPWATCH_RESET_ACTION
 import com.example.clock.data.receiver.STOPWATCH_TIME_EXTRA
 import com.example.clock.data.receiver.StopwatchNotificationBroadcastReceiver
 import com.example.clock.ui.MainActivity
-import com.example.clock.util.Constants.pendingIntentFlags
+import com.example.clock.util.GlobalProperties.pendingIntentFlags
 import com.example.clock.util.setIntentAction
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -37,6 +37,7 @@ class StopwatchNotificationHelper @Inject constructor(
         applicationContext,
         MainActivity::class.java,
     )
+
     private val openStopwatchPendingIntent = PendingIntent.getActivity(
         applicationContext,
         0,

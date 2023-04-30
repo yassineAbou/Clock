@@ -16,7 +16,7 @@ class AlarmRepository @Inject constructor(
 
     suspend fun delete(alarm: Alarm) = alarmDao.delete(alarm)
 
-    suspend fun getLastAutoId() = alarmDao.getLastAutoId()
+    suspend fun getLastId() = alarmDao.getLastId()
 
     suspend fun clear() = alarmDao.clear()
 

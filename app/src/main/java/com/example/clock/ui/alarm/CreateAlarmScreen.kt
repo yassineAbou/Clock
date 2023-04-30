@@ -1,6 +1,8 @@
 package com.example.clock.ui.alarm
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
@@ -11,45 +13,56 @@ import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.clock.data.model.Alarm
+import com.example.clock.ui.theme.Gray300
+import com.example.clock.ui.theme.Purple100
 import com.example.clock.util.checkDate
 import com.example.clock.util.checkNumberPicker
 import com.example.clock.util.components.CustomChip
 import com.example.clock.util.components.NumberPicker
+import com.google.gson.Gson
 import com.intuit.sdp.R
-import java.util.regex.Pattern
+import kotlinx.coroutines.launch
+
+/*
+@Preview(device = Devices.PIXEL_4_XL)
+@Composable
+private fun TimerScreenPreview() {
+    ClockTheme {
+        CreateAlarmScreen(
+            createAlarmState = Alarm(),
+            alarmActions = object : AlarmActions {},
+        )
+    }
+}
+
+@Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
+@Composable
+private fun TimerScreenDarkPreview() {
+    ClockTheme(darkTheme = true) {
+        CreateAlarmScreen(
+            createAlarmState = Alarm(),
+            alarmActions = object : AlarmActions {},
+        )
+    }
+}
+
+ */
 
 @Composable
 fun CreateAlarmScreen(
     modifier: Modifier = Modifier,
-    alarmViewModel: AlarmViewModel,
+    alarmCreationState: Alarm,
+    alarmActions: AlarmActions,
     navigateToAlarmsList: () -> Unit = {},
 ) {
-    val cardContainerColor = MaterialTheme.colorScheme.surface
-    val createAlarmState = alarmViewModel.createAlarmState
-    val descriptionListState = remember { mutableStateListOf("") }
+    val cardContainerColor by animateColorAsState(targetValue = if (isSystemInDarkTheme()) Gray300 else Purple100)
 
-    LaunchedEffect(Unit) {
-        val splitDescriptionToList =
-            Pattern.compile(" ").split(createAlarmState.description).toList()
-        splitDescriptionToList.forEach { descriptionListState.add(it) }
-    }
-
-    SideEffect {
-        alarmViewModel.changeCreateAlarmState(
-            createAlarmState.copy(description = descriptionListState.joinToString(" ")),
-        )
-    }
-
-    Surface(
-        modifier = modifier,
-        color = cardContainerColor
-    ) {
+    Surface(modifier = modifier, color = cardContainerColor) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
             val alarmPickerPaddingStart =
                 if (maxWidth > 400.dp) {
@@ -63,31 +76,23 @@ fun CreateAlarmScreen(
             AlarmPicker(
                 modifier = Modifier
                     .padding(top = maxHeight / 6, start = alarmPickerPaddingStart),
+                alarmCreationState = alarmCreationState,
+                updateAlarmCreationState = { alarmActions.updateAlarmCreationState(it) },
                 cardContainerColor = cardContainerColor,
-                createAlarmState = createAlarmState,
-                changeCreateAlarmState = { alarmViewModel.changeCreateAlarmState(it) },
-                descriptionListState = descriptionListState,
-                addToDescriptionList = { descriptionListState.add(it) },
-                clearDescriptionList = { descriptionListState.clear() },
             )
 
-            AlarmCustomActions(
+            CustomizeAlarmEvent(
                 modifier = Modifier
                     .align(Center)
                     .background(color = MaterialTheme.colorScheme.surface),
-                descriptionListState = descriptionListState,
-                createAlarmState = createAlarmState,
-                changeCreateAlarmState = { alarmViewModel.changeCreateAlarmState(it) },
-                addToDescriptionList = { descriptionListState.add(it) },
-                removeFromDescriptionList = { descriptionListState.remove(it) },
-                clearDescriptionList = { descriptionListState.removeAll { it.contains("[0-9]".toRegex()) } },
+                alarmCreationState = alarmCreationState,
+                updateAlarmCreationState = { alarmActions.updateAlarmCreationState(it) },
             )
             Buttons(
                 modifier = Modifier
-                    .align(BottomCenter)
-                    .navigationBarsPadding(),
+                    .align(BottomCenter),
                 navigateToAlarmsList = navigateToAlarmsList,
-                saveAlarm = { alarmViewModel.saveAlarm() },
+                save = { alarmActions.save() },
             )
         }
     }
@@ -95,14 +100,10 @@ fun CreateAlarmScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AlarmCustomActions(
-    descriptionListState: List<String>,
+private fun CustomizeAlarmEvent(
     modifier: Modifier,
-    createAlarmState: Alarm,
-    changeCreateAlarmState: (Alarm) -> Unit,
-    addToDescriptionList: (String) -> Unit,
-    removeFromDescriptionList: (String) -> Unit,
-    clearDescriptionList: () -> Unit,
+    alarmCreationState: Alarm,
+    updateAlarmCreationState: (Alarm) -> Unit,
 ) {
     Box(modifier = modifier) {
         Column(
@@ -112,26 +113,22 @@ private fun AlarmCustomActions(
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                 Text(
                     modifier = Modifier.padding(dimensionResource(id = R.dimen._8sdp)),
-                    text = descriptionListState.joinToString(" "),
+                    text = alarmCreationState.description,
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen._3sdp)))
-            Recurring(
+            WeekDays(
                 modifier = Modifier.fillMaxWidth(),
-                createAlarmState = createAlarmState,
-                descriptionListState = descriptionListState,
-                changeCreateAlarmState = changeCreateAlarmState,
-                addToDescriptionList = addToDescriptionList,
-                removeFromDescriptionList = removeFromDescriptionList,
-                clearDescriptionList = clearDescriptionList,
+                alarmCreationState = alarmCreationState,
+                updateAlarmCreationState = updateAlarmCreationState,
             )
             AlarmTitle(
                 modifier = Modifier
                     .align(Start)
                     .padding(dimensionResource(id = R.dimen._8sdp)),
-                createAlarmState = createAlarmState,
-                changeCreateAlarmState = changeCreateAlarmState,
+                alarmCreationState = alarmCreationState,
+                updateAlarmCreationState = updateAlarmCreationState,
             )
         }
     }
@@ -139,27 +136,27 @@ private fun AlarmCustomActions(
 
 @Composable
 private fun AlarmPicker(
-    createAlarmState: Alarm,
-    changeCreateAlarmState: (Alarm) -> Unit,
+    alarmCreationState: Alarm,
+    updateAlarmCreationState: (Alarm) -> Unit,
     modifier: Modifier = Modifier,
-    cardContainerColor: Color,
-    descriptionListState: List<String>,
-    clearDescriptionList: () -> Unit,
-    addToDescriptionList: (String) -> Unit,
+    cardContainerColor: androidx.compose.ui.graphics.Color,
 ) {
     val textStyle = MaterialTheme.typography.displaySmall
 
     var hours by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(createAlarmState.hour))
+        mutableStateOf(TextFieldValue(alarmCreationState.hour))
     }
     var minutes by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(createAlarmState.minute))
+        mutableStateOf(TextFieldValue(alarmCreationState.minute))
     }
 
-    LaunchedEffect(createAlarmState.hour, createAlarmState.minute) {
-        if (descriptionListState.any { it.contains("[0-9]".toRegex()) }) {
-            clearDescriptionList()
-            addToDescriptionList(createAlarmState.checkDate())
+    LaunchedEffect(hours, minutes) {
+        launch {
+            if (alarmCreationState.description.any { char -> char.isDigit() }) {
+                updateAlarmCreationState(
+                    alarmCreationState.copy(description = alarmCreationState.checkDate()),
+                )
+            }
         }
     }
 
@@ -174,7 +171,7 @@ private fun AlarmPicker(
                 onNumberChange = { value ->
                     if (value.text.checkNumberPicker(maxNumber = 23)) {
                         hours = value
-                        changeCreateAlarmState(createAlarmState.copy(hour = hours.text))
+                        updateAlarmCreationState(alarmCreationState.copy(hour = hours.text))
                     }
                 },
                 textStyle = textStyle,
@@ -194,13 +191,13 @@ private fun AlarmPicker(
                 number = minutes,
                 timeUnit = "Minutes",
                 textStyle = textStyle,
+                backgroundColor = cardContainerColor,
                 onNumberChange = { value ->
                     if (value.text.checkNumberPicker(maxNumber = 59)) {
                         minutes = value
-                        changeCreateAlarmState(createAlarmState.copy(minute = minutes.text))
+                        updateAlarmCreationState(alarmCreationState.copy(minute = minutes.text))
                     }
                 },
-                backgroundColor = cardContainerColor,
             )
         }
     }
@@ -210,71 +207,40 @@ private const val TAG = "CreateAlarmScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Recurring(
-    descriptionListState: List<String>,
-    addToDescriptionList: (String) -> Unit,
-    removeFromDescriptionList: (String) -> Unit,
-    clearDescriptionList: () -> Unit,
+private fun WeekDays(
     modifier: Modifier = Modifier,
-    createAlarmState: Alarm,
-    changeCreateAlarmState: (Alarm) -> Unit,
+    alarmCreationState: Alarm,
+    updateAlarmCreationState: (Alarm) -> Unit,
 ) {
-    val isSelectedByDay = remember {
-        mutableStateMapOf(
-            "Sun" to createAlarmState.isSunday,
-            "Mon" to createAlarmState.isMonday,
-            "Tue" to createAlarmState.isTuesday,
-            "Whe" to createAlarmState.isWednesday,
-            "Thu" to createAlarmState.isThursday,
-            "Fri" to createAlarmState.isFriday,
-            "Sat" to createAlarmState.isSaturday,
-        )
+    val daysSelected = remember {
+        mutableStateMapOf<String, Boolean>().apply {
+            putAll(alarmCreationState.daysSelected)
+        }
     }
-
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        isSelectedByDay.forEach { (day, isSelected) ->
+        daysSelected.forEach { (day, isSelected) ->
             CustomChip(
-                isSelected = isSelected,
+                isChecked = isSelected,
                 text = day,
                 onChecked = { isChecked ->
-                    isSelectedByDay[day] = isChecked
-
-                    isSelectedByDay.apply {
-                        changeCreateAlarmState(
-                            createAlarmState.copy(
-                                isRecurring = isSelectedByDay.any { it.value },
-                                isSunday = getOrDefault("Sun", createAlarmState.isSunday),
-                                isMonday = getOrDefault("Mon", createAlarmState.isMonday),
-                                isTuesday = getOrDefault("Tue", createAlarmState.isTuesday),
-                                isWednesday = getOrDefault("Whe", createAlarmState.isWednesday),
-                                isThursday = getOrDefault("Thu", createAlarmState.isThursday),
-                                isFriday = getOrDefault("Fri", createAlarmState.isFriday),
-                                isSaturday = getOrDefault("Sat", createAlarmState.isSaturday),
-                            ),
-                        )
-
-                        if (isSelectedByDay.all { !it.value } && descriptionListState.all {
-                                !it.contains(
-                                    "[0-9]".toRegex(),
-                                )
-                            }
-                        ) {
-                            addToDescriptionList(createAlarmState.checkDate())
-                        }
-
-                        when {
-                            isChecked && descriptionListState.any { it != day } -> {
-                                clearDescriptionList()
-                                addToDescriptionList(day)
-                            }
-                            !isChecked -> {
-                                removeFromDescriptionList(day)
-                            }
-                        }
+                    daysSelected[day] = isChecked
+                    val activeDays = daysSelected.filterValues { it }.keys
+                    val description = if (activeDays.isEmpty()) {
+                        alarmCreationState.checkDate()
+                    } else {
+                        activeDays.joinToString(separator = " ")
                     }
+
+                    updateAlarmCreationState(
+                        alarmCreationState.copy(
+                            description = description,
+                            isRecurring = daysSelected.any { it.value },
+                            daysSelectedJson = Gson().toJson(daysSelected),
+                        ),
+                    )
                 },
             )
         }
@@ -285,10 +251,10 @@ private fun Recurring(
 @Composable
 private fun AlarmTitle(
     modifier: Modifier = Modifier,
-    createAlarmState: Alarm,
-    changeCreateAlarmState: (Alarm) -> Unit,
+    alarmCreationState: Alarm,
+    updateAlarmCreationState: (Alarm) -> Unit,
 ) {
-    var title by remember { mutableStateOf(createAlarmState.title) }
+    var title by remember { mutableStateOf(alarmCreationState.title) }
 
     Box(modifier = modifier) {
         OutlinedTextField(
@@ -296,7 +262,7 @@ private fun AlarmTitle(
             value = title,
             onValueChange = {
                 title = it
-                changeCreateAlarmState(createAlarmState.copy(title = title))
+                updateAlarmCreationState(alarmCreationState.copy(title = title))
             },
             label = { Text("Alarm name") },
         )
@@ -307,7 +273,7 @@ private fun AlarmTitle(
 private fun Buttons(
     modifier: Modifier = Modifier,
     navigateToAlarmsList: () -> Unit,
-    saveAlarm: () -> Unit,
+    save: () -> Unit,
 ) {
     Box(modifier = modifier) {
         Row(
@@ -323,7 +289,7 @@ private fun Buttons(
             }
             TextButton(
                 onClick = {
-                    saveAlarm()
+                    save()
                     navigateToAlarmsList()
                 },
             ) {

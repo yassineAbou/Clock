@@ -14,51 +14,67 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AlarmOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.clock.R
 import com.example.clock.data.model.Alarm
 import com.example.clock.util.checkDate
 import com.example.clock.util.components.ClockAppBar
-
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 import kotlin.time.ExperimentalTime
+
+/*
+@Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
+@Composable
+private fun AlarmsListScreenPreview() {
+    ClockTheme {
+        AlarmsListScreen(
+            alarmActions = object : AlarmActions {},
+            alarmsListState = alarmsListPreview,
+        )
+    }
+}
+
+@Preview(device = Devices.PIXEL_4_XL)
+@Composable
+private fun AlarmsListScreenDarkPreview() {
+    ClockTheme(darkTheme = true) {
+        AlarmsListScreen(
+            alarmActions = object : AlarmActions {},
+            alarmsListState = alarmsListPreview,
+        )
+    }
+}
+
+ */
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun AlarmsListScreen(
     modifier: Modifier = Modifier,
-    alarmViewModel: AlarmViewModel,
+    alarmsListState: List<Alarm>,
+    alarmActions: AlarmActions,
     navigateToCreateAlarm: () -> Unit = {},
 ) {
-    //val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
-    val alarmListState by alarmViewModel.alarmsListState.observeAsState()
-
     Surface(modifier = modifier) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 Modifier
-                    .fillMaxSize()
-                    //.nestedScroll(scrollBehavior.nestedScrollConnection),
+                    .fillMaxSize(),
             ) {
                 AlarmsListAppBar(
                     modifier = Modifier.statusBarsPadding(),
-                    //scrollBehavior = scrollBehavior,
-                    clearAlarmsList = { alarmViewModel.clearAlarmsList() },
+                    clear = { alarmActions.clear() },
                 )
-                alarmListState?.let {
-                    AlarmsList(
-                        alarmsListSate = it,
-                        alarmViewModel = alarmViewModel,
-                        navigateToCreateAlarm = navigateToCreateAlarm,
-                    )
-                }
+                AlarmsList(
+                    alarmsListSate = alarmsListState,
+                    alarmActions = alarmActions,
+                    navigateToCreateAlarm = navigateToCreateAlarm,
+                )
             }
         }
     }
@@ -68,13 +84,11 @@ fun AlarmsListScreen(
 @Composable
 private fun AlarmsListAppBar(
     modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    clearAlarmsList: () -> Unit,
+    clear: () -> Unit,
 ) {
     var showMenu by rememberSaveable { mutableStateOf(false) }
     ClockAppBar(
         modifier = modifier,
-        scrollBehavior = scrollBehavior,
         title = {
             Text(
                 text = stringResource(id = R.string.alarm),
@@ -95,7 +109,7 @@ private fun AlarmsListAppBar(
                 DropdownMenuItem(
                     text = { Text(stringResource(id = R.string.clear_alarms)) },
                     onClick = {
-                        clearAlarmsList()
+                        clear()
                         showMenu = false
                     },
                 )
@@ -108,20 +122,19 @@ private fun AlarmsListAppBar(
 @Composable
 private fun AlarmsList(
     modifier: Modifier = Modifier,
-    alarmViewModel: AlarmViewModel,
+    alarmActions: AlarmActions,
     alarmsListSate: List<Alarm>,
     navigateToCreateAlarm: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
+
     BoxWithConstraints(modifier = modifier) {
         LazyColumn(
             state = scrollState,
         ) {
             items(alarmsListSate) { item ->
                 var isScheduled by rememberSaveable { mutableStateOf(item.isScheduled) }
-                var description by rememberSaveable { mutableStateOf(item.description) }
-
-                val delete = SwipeAction(
+                val removeAlarm = SwipeAction(
                     icon = {
                         Icon(
                             imageVector = Icons.Filled.Delete,
@@ -131,29 +144,26 @@ private fun AlarmsList(
                     },
                     isUndo = false,
                     background = MaterialTheme.colorScheme.error,
-                    onSwipe = { alarmViewModel.remove(alarm = item) },
+                    onSwipe = { alarmActions.remove(alarm = item) },
                 )
                 SwipeableActionsBox(
-                    endActions = listOf(delete),
+                    endActions = listOf(removeAlarm),
                     backgroundUntilSwipeThreshold = MaterialTheme.colorScheme.background,
                     swipeThreshold = maxWidth / 2,
                 ) {
                     Alarm(
                         alarm = item,
-                        isScheduled = isScheduled,
                         onScheduledChange = {
                             isScheduled = it
-                            if (description.any { char -> char in "0123456789" }) {
-                                description = item.checkDate()
-                            }
-                            alarmViewModel.onScheduledChange(
+                            val description = if (item.description.any { char -> char.isDigit() }) item.checkDate() else item.description
+                            alarmActions.update(
                                 item.copy(
                                     isScheduled = isScheduled,
                                     description = description,
                                 ),
                             )
                         },
-                        changeCreateAlarmState = { alarmViewModel.changeCreateAlarmState(it) },
+                        updateAlarmCreationState = { alarmActions.updateAlarmCreationState(it) },
                         navigateToCreateAlarm = navigateToCreateAlarm,
                     )
                 }
@@ -166,11 +176,9 @@ private fun AlarmsList(
 @Composable
 private fun Alarm(
     alarm: Alarm,
-    isScheduled: Boolean,
     navigateToCreateAlarm: () -> Unit,
     onScheduledChange: (Boolean) -> Unit,
-    changeCreateAlarmState: (Alarm) -> Unit,
-
+    updateAlarmCreationState: (Alarm) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -178,7 +186,7 @@ private fun Alarm(
             .padding(bottom = 20.dp),
         onClick = {
             navigateToCreateAlarm()
-            changeCreateAlarmState(alarm)
+            updateAlarmCreationState(alarm)
         },
 
     ) {
@@ -187,11 +195,11 @@ private fun Alarm(
                 .padding(20.dp),
             verticalAlignment = CenterVertically,
         ) {
-            AlarmTime(
+            AlarmInfo(
                 modifier = Modifier.weight(2f),
                 time = "${alarm.hour}:${alarm.minute}",
                 title = alarm.title,
-                isScheduled = isScheduled,
+                isScheduled = alarm.isScheduled,
             )
 
             Text(
@@ -202,12 +210,10 @@ private fun Alarm(
             )
             IconToggleButton(
                 modifier = Modifier.weight(1f),
-                checked = isScheduled,
-                onCheckedChange = {
-                    onScheduledChange(it)
-                },
+                checked = alarm.isScheduled,
+                onCheckedChange = { onScheduledChange(it) },
             ) {
-                if (isScheduled) {
+                if (alarm.isScheduled) {
                     Icon(
                         modifier = Modifier.size(35.dp),
                         imageVector = Icons.Filled.AlarmOn,
@@ -226,7 +232,7 @@ private fun Alarm(
 }
 
 @Composable
-private fun AlarmTime(
+private fun AlarmInfo(
     modifier: Modifier = Modifier,
     time: String,
     title: String,
@@ -256,4 +262,11 @@ private fun AlarmTime(
     }
 }
 
-private const val TAG = "AlarmsListScreen"
+val alarmsListPreview = mutableListOf<Alarm>().apply {
+    for (i in 0..20) {
+        val hour = String.format("%02d", i % 24) // format hour with leading zero if needed
+        val minute = "00" // set minute to zero
+        val title = if (i == 0) "zero" else i.toString() // set title to number if not 0
+        add(Alarm(id = i, hour = hour, minute = minute, title = title, isScheduled = true))
+    }
+}.toList()

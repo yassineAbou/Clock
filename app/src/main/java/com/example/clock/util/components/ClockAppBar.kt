@@ -17,14 +17,12 @@ import com.example.clock.ui.theme.ClockTheme
 fun ClockAppBar(
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
-    actions: @Composable RowScope.() -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
         modifier = modifier.height(48.dp),
         title = title,
-        actions = actions,
-        scrollBehavior = scrollBehavior,
+        actions = actions
     )
 }
 
