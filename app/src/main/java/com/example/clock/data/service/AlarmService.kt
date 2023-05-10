@@ -67,7 +67,7 @@ class AlarmService : Service() {
         super.onDestroy()
         serviceScope.cancel()
         mediaPlayerHelper.release()
-        alarmNotificationHelper.removeAlarmNotification()
+        alarmNotificationHelper.removeAlarmServiceNotification()
     }
 
     override fun onBind(p0: Intent?): IBinder? = null

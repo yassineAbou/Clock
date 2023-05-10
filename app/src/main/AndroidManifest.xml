@@ -34,7 +34,9 @@
         <service android:name=".data.service.TimerCompletedService" />
         <service android:name=".data.service.AlarmService" />
         <service android:name=".data.service.StopwatchService" />
-        <service android:name=".data.service.RescheduleAlarmsService"/>
+        <service android:name=".data.service.RescheduleAlarmJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE">
+        </service>
 
         <receiver android:name=".data.receiver.StopwatchNotificationBroadcastReceiver" />
         <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />

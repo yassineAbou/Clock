@@ -1,12 +1,16 @@
 package com.example.clock.data.receiver
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import com.example.clock.data.manager.ScheduleAlarmManager
 import com.example.clock.data.manager.ServiceManager
 import com.example.clock.data.service.AlarmService
-import com.example.clock.data.service.RescheduleAlarmsService
+import com.example.clock.data.service.JOB_ID
+import com.example.clock.data.service.RescheduleAlarmJobService
 import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -35,8 +39,13 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
                 safeLet(p0, p1) { context, intent ->
                     when (intent.action) {
                         "android.intent.action.BOOT_COMPLETED" -> {
-                            val serviceIntent = Intent(context, RescheduleAlarmsService::class.java)
-                            context.startService(serviceIntent)
+                            val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+                            val jobInfo = JobInfo.Builder(JOB_ID, ComponentName(context, RescheduleAlarmJobService::class.java))
+                                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                                .setRequiresCharging(false)
+                                .build()
+
+                            jobScheduler.schedule(jobInfo)
                         }
                         ACTION_DISMISS -> serviceManager.stopService(AlarmService::class.java)
                         ACTION_SNOOZE -> {

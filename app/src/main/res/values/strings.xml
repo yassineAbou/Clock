@@ -28,5 +28,7 @@
     <string name="alarm">Alarm</string>
     <string name="save">Save</string>
     <string name="clear_alarms">Clear alarms</string>
+    <string name="scheduled_alarm_channel_name">Scheduled alarm channel</string>
+    <string name="scheduled_alarm_channel_description">Shows a notification  when any alarm is scheduled</string>
 
 </resources>

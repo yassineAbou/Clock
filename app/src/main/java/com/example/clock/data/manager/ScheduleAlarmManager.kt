@@ -4,8 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
 import com.example.clock.data.model.Alarm
 import com.example.clock.data.receiver.AlarmBroadcastReceiver
@@ -14,10 +12,17 @@ import com.example.clock.data.receiver.HOUR
 import com.example.clock.data.receiver.IS_RECURRING
 import com.example.clock.data.receiver.MINUTE
 import com.example.clock.data.receiver.TITLE
+import com.example.clock.data.repository.AlarmRepository
 import com.example.clock.util.GlobalProperties.pendingIntentFlags
+import com.example.clock.util.helper.AlarmNotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Random
 import javax.inject.Inject
@@ -26,11 +31,13 @@ import javax.inject.Singleton
 @Singleton
 class ScheduleAlarmManager @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
+    private val alarmRepository: AlarmRepository,
+    private val alarmNotificationHelper: AlarmNotificationHelper,
 ) {
 
-    private val handler = Handler(Looper.getMainLooper())
+    private val coroutineScope = CoroutineScope(SupervisorJob())
 
-    fun schedule(alarm: Alarm) {
+    suspend fun schedule(alarm: Alarm) {
         val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(applicationContext, AlarmBroadcastReceiver::class.java).apply {
             putExtra(IS_RECURRING, alarm.isRecurring)
@@ -59,8 +66,16 @@ class ScheduleAlarmManager @Inject constructor(
         } else {
             "One Time Alarm ${alarm.title} scheduled for ${alarm.description.substringAfter('-')} at ${alarm.hour}:${alarm.minute}"
         }
-        handler.post {
+        withContext(Dispatchers.Main) {
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()
+        }
+
+        coroutineScope.launch {
+            alarmRepository.alarmsList.buffer().collect { alarmList ->
+                if (alarmList.any { alarm -> alarm.isScheduled }) {
+                    alarmNotificationHelper.displayScheduledAlarmNotification()
+                }
+            }
         }
 
         if (alarm.isRecurring) {
@@ -79,7 +94,7 @@ class ScheduleAlarmManager @Inject constructor(
         }
     }
 
-    fun cancel(alarm: Alarm) {
+    suspend fun cancel(alarm: Alarm) {
         val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alamIntent = Intent(applicationContext, AlarmBroadcastReceiver::class.java)
         val alarmPendingIntent = PendingIntent.getBroadcast(
@@ -89,14 +104,23 @@ class ScheduleAlarmManager @Inject constructor(
             pendingIntentFlags,
         )
         val toastText = "Alarm canceled for ${alarm.hour}:${alarm.minute}"
-        handler.post {
+
+        withContext(Dispatchers.Main) {
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()
+        }
+
+        coroutineScope.launch {
+            alarmRepository.alarmsList.buffer().collect { alarmList ->
+                if (alarmList.all { alarm -> !alarm.isScheduled }) {
+                    alarmNotificationHelper.removeScheduledAlarmNotification()
+                }
+            }
         }
 
         alarmManager.cancel(alarmPendingIntent)
     }
 
-    fun snooze() {
+    suspend fun snooze() {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
         calendar.add(Calendar.MINUTE, 10)
@@ -118,3 +142,4 @@ class ScheduleAlarmManager @Inject constructor(
         }
     }
 }
+
