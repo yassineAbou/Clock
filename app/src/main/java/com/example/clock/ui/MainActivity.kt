@@ -1,8 +1,10 @@
 package com.example.clock.ui
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
@@ -51,6 +53,8 @@ import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.timer.TimerScreen
 import com.example.clock.ui.timer.TimerViewModel
 import com.example.clock.util.components.BottomNavigationBar
+import com.example.clock.util.components.CheckExactAlarmPermission
+import com.example.clock.util.components.RequestNotificationPermission
 import com.example.clock.util.components.listBottomBarItems
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,6 +64,7 @@ import kotlin.time.ExperimentalTime
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,12 +74,18 @@ class MainActivity : ComponentActivity() {
             ClockTheme {
                 val systemUiController = rememberSystemUiController()
                 val useDarkIcons = !isSystemInDarkTheme()
+                val sdkVersion = Build.VERSION.SDK_INT
                 DisposableEffect(systemUiController, useDarkIcons) {
                     systemUiController.setStatusBarColor(
                         color = Color.Transparent,
                         darkIcons = useDarkIcons,
                     )
                     onDispose {}
+                }
+                if (sdkVersion == Build.VERSION_CODES.S || sdkVersion == Build.VERSION_CODES.S_V2) {
+                    CheckExactAlarmPermission()
+                } else if (sdkVersion >= Build.VERSION_CODES.TIRAMISU) {
+                    RequestNotificationPermission()
                 }
                 ClockApp()
             }

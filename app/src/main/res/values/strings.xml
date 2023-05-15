@@ -30,5 +30,10 @@
     <string name="clear_alarms">Clear alarms</string>
     <string name="scheduled_alarm_channel_name">Scheduled alarm channel</string>
     <string name="scheduled_alarm_channel_description">Shows a notification  when any alarm is scheduled</string>
+    <string name="notification_permission">Notification permission</string>
+    <string name="notification_permission_text">You need to allow this permission in order for the app to run properly</string>
+    <string name="exact_alarm">Alarms and reminders</string>
+    <string name="exact_alarm_text">Allow setting alarms and reminders</string>
+    <string name="confirm">Confirm</string>
 
 </resources>
