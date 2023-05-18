@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Random
@@ -34,8 +33,6 @@ class ScheduleAlarmManager @Inject constructor(
     private val alarmRepository: AlarmRepository,
     private val alarmNotificationHelper: AlarmNotificationHelper,
 ) {
-
-    private val coroutineScope = CoroutineScope(SupervisorJob())
 
     suspend fun schedule(alarm: Alarm) {
         val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -70,14 +67,6 @@ class ScheduleAlarmManager @Inject constructor(
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()
         }
 
-        coroutineScope.launch {
-            alarmRepository.alarmsList.buffer().collect { alarmList ->
-                if (alarmList.any { alarm -> alarm.isScheduled }) {
-                    alarmNotificationHelper.displayScheduledAlarmNotification()
-                }
-            }
-        }
-
         if (alarm.isRecurring) {
             alarmManager.setRepeating(
                 AlarmManager.RTC_WAKEUP,
@@ -109,14 +98,6 @@ class ScheduleAlarmManager @Inject constructor(
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()
         }
 
-        coroutineScope.launch {
-            alarmRepository.alarmsList.buffer().collect { alarmList ->
-                if (alarmList.all { alarm -> !alarm.isScheduled }) {
-                    alarmNotificationHelper.removeScheduledAlarmNotification()
-                }
-            }
-        }
-
         alarmManager.cancel(alarmPendingIntent)
     }
 
@@ -142,4 +123,3 @@ class ScheduleAlarmManager @Inject constructor(
         }
     }
 }
-

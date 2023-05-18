@@ -8,7 +8,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,19 +24,18 @@ class RescheduleAlarmJobService : JobService() {
     @Inject
     lateinit var alarmRepository: AlarmRepository
 
-    private var jobCancelled = false
+    var jobCanceled = false
 
     override fun onStartJob(p0: JobParameters?): Boolean {
         jobServiceScope.launch {
-            alarmRepository.alarmsList.buffer().collect { alarmList ->
-                if (jobCancelled) {
-                    return@collect
+            val scheduledAlarms = alarmRepository.alarmsList
+                .map { alarmList ->
+                    alarmList.filter { alarm -> alarm.isScheduled }
                 }
-                for (alarm in alarmList) {
-                    if (alarm.isScheduled) {
-                        scheduleAlarmManager.schedule(alarm)
-                    }
-                }
+                .firstOrNull { it.isNotEmpty() }
+            scheduledAlarms?.forEach { scheduleAlarmManager.schedule(it) }
+            if (jobCanceled) {
+                return@launch
             }
             jobFinished(p0, false)
             jobServiceScope.cancel()
@@ -45,10 +45,9 @@ class RescheduleAlarmJobService : JobService() {
 
     override fun onStopJob(p0: JobParameters?): Boolean {
         jobServiceScope.cancel()
-        jobCancelled = true
+        jobCanceled = true
         return true
     }
 }
 
 const val JOB_ID = 16
-
