@@ -132,7 +132,7 @@ private fun AlarmsList(
         LazyColumn(
             state = scrollState,
         ) {
-            items(alarmsListSate) { item ->
+            items(items = alarmsListSate, key = { alarmItem -> alarmItem.id }) { item ->
                 var isScheduled by rememberSaveable { mutableStateOf(item.isScheduled) }
                 val removeAlarm = SwipeAction(
                     icon = {

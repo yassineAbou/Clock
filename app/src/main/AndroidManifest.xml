@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
-
-
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <application
         android:name=".ClockApplication"
@@ -19,6 +18,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Clock">
+        <profileable
+            android:shell="true"
+            tools:targetApi="29" />
+
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
@@ -28,10 +31,13 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <data android:host="www.clock.com" android:scheme="https" />
+                <data
+                    android:host="www.clock.com"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 
@@ -39,9 +45,9 @@
         <service android:name=".data.service.TimerCompletedService" />
         <service android:name=".data.service.AlarmService" />
         <service android:name=".data.service.StopwatchService" />
-        <service android:name=".data.service.RescheduleAlarmJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE">
-        </service>
+        <service
+            android:name=".data.service.RescheduleAlarmJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
 
         <receiver android:name=".data.receiver.StopwatchNotificationBroadcastReceiver" />
         <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />

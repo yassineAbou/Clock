@@ -1,7 +1,5 @@
 package com.example.clock.ui.stopwatch
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -82,7 +80,6 @@ private fun StopwatchScreenDarkPreview() {
 }
 
  */
-
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -250,7 +247,6 @@ private fun LapDuration(item: String, index: Int, modifier: Modifier = Modifier)
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Buttons(
@@ -265,7 +261,7 @@ private fun Buttons(
     val transition = updateTransition(isReset, label = stringResource(id = R.string.is_reset))
     val startButtonClicked = rememberSaveable { mutableStateOf(false) }
     Box(
-       modifier = modifier,
+        modifier = modifier,
     ) {
         transition.AnimatedVisibility(
             visible = { isStopwatchReset -> isStopwatchReset },
