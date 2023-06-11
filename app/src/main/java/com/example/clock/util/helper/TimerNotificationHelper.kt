@@ -35,7 +35,9 @@ class TimerNotificationHelper @Inject constructor(
         "https://www.clock.com/Timer".toUri(),
         applicationContext,
         MainActivity::class.java,
-    )
+    ).apply {
+        flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+    }
 
     private val openTimerPendingIntent = PendingIntent.getActivity(
         applicationContext,
@@ -64,10 +66,9 @@ class TimerNotificationHelper @Inject constructor(
         NotificationCompat.Builder(applicationContext, TIMER_RUNNING_CHANNEL)
             .setContentTitle("Timer")
             .setSmallIcon(R.drawable.ic_hourglass_empty)
+            .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
             .setContentIntent(openTimerPendingIntent)
             .setAutoCancel(true)
-            .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
-            .setColorized(true)
             .setOngoing(true)
 
     fun updateTimerServiceNotification(
@@ -119,6 +120,7 @@ class TimerNotificationHelper @Inject constructor(
             .setFullScreenIntent(null, true)
             .setSmallIcon(R.drawable.ic_hourglass_empty)
             .setAutoCancel(true)
+            .setFullScreenIntent(openTimerPendingIntent, true)
             .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
             .addAction(R.drawable.ic_close, "Dismiss", dismissIntentAction)
             .addAction(R.drawable.ic_sync, "Restart", restartIntentAction)

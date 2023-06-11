@@ -3,9 +3,9 @@ package com.example.clock.data.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.clock.data.manager.ServiceManager
+import androidx.work.WorkManager
 import com.example.clock.data.manager.TimerManager
-import com.example.clock.data.service.TimerCompletedService
+import com.example.clock.data.workmanager.worker.TIMER_COMPLETED_TAG
 import com.example.clock.util.helper.TimerNotificationHelper
 import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,9 +25,6 @@ class TimerNotificationBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var timerNotificationHelper: TimerNotificationHelper
 
-    @Inject
-    lateinit var serviceManager: ServiceManager
-
     private val broadcastReceiverScope = CoroutineScope(SupervisorJob())
 
     override fun onReceive(p0: Context?, intent: Intent?) {
@@ -40,10 +37,22 @@ class TimerNotificationBroadcastReceiver : BroadcastReceiver() {
 
                 action?.let {
                     when (it) {
-                        TIMER_RUNNING_CANCEL_ACTION -> timerManager.reset()
-                        TIMER_COMPLETED_DISMISS_ACTION -> serviceManager.stopService(TimerCompletedService::class.java)
+                        TIMER_RUNNING_CANCEL_ACTION -> {
+                            timerManager.reset()
+                        }
+                        TIMER_COMPLETED_DISMISS_ACTION -> {
+                            if (p0 != null) {
+                                WorkManager.getInstance(p0.applicationContext).cancelAllWorkByTag(
+                                    TIMER_COMPLETED_TAG,
+                                )
+                            }
+                        }
                         TIMER_COMPLETED_RESTART_ACTION -> {
-                            serviceManager.stopService(TimerCompletedService::class.java)
+                            if (p0 != null) {
+                                WorkManager.getInstance(p0.applicationContext).cancelAllWorkByTag(
+                                    TIMER_COMPLETED_TAG,
+                                )
+                            }
                             timerManager.start()
                         }
                     }

@@ -61,6 +61,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -219,3 +220,5 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
         }
     }
 }
+
+private const val TAG = "MainActivity"

@@ -47,6 +47,7 @@ import com.example.clock.ui.theme.Red100
 import com.example.clock.util.components.ClockAppBar
 import com.example.clock.util.components.ClockButton
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /*
@@ -278,16 +279,20 @@ private fun Buttons(
                 ),
             ),
         ) {
-            if (!startButtonClicked.value) {
-                ClockButton(
-                    onClick = {
-                        startButtonClicked.value = true
-                        stopwatchActions.start()
-                    },
-                    text = stringResource(id = R.string.start),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
+            ClockButton(
+                onClick = {
+                    if (!startButtonClicked.value) {
+                        coroutineScope.launch {
+                            startButtonClicked.value = true
+                            stopwatchActions.start()
+                            delay(1000L)
+                            startButtonClicked.value = false
+                        }
+                    }
+                },
+                text = stringResource(id = R.string.start),
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
         transition.AnimatedVisibility(
             visible = { isStopwatchReset -> !isStopwatchReset },
@@ -313,14 +318,12 @@ private fun Buttons(
                         text = stringResource(id = R.string.stop),
                         onClick = {
                             stopwatchActions.stop()
-                            startButtonClicked.value = false
                         },
                         color = Red100,
                     )
                     ClockButton(
                         text = stringResource(id = R.string.lap),
                         onClick = {
-                            startButtonClicked.value = false
                             stopwatchActions.lap()
                             coroutineScope.launch {
                                 scrollState.animateScrollToItem(index = lapTimes.lastIndex)
@@ -333,14 +336,12 @@ private fun Buttons(
                         text = stringResource(id = R.string.resume),
                         onClick = {
                             stopwatchActions.start()
-                            startButtonClicked.value = false
                         },
                         color = MaterialTheme.colorScheme.primary,
                     )
                     ClockButton(
                         text = stringResource(id = R.string.reset),
                         onClick = {
-                            startButtonClicked.value = false
                             stopwatchActions.reset()
                             stopwatchActions.clear()
                         },

@@ -1,10 +1,15 @@
 package com.example.clock.data.manager
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.clock.data.model.StopwatchState
-import com.example.clock.data.service.StopwatchService
+import com.example.clock.data.workmanager.worker.STOPWATCH_TAG
+import com.example.clock.data.workmanager.worker.StopwatchWorker
 import com.example.clock.util.GlobalProperties.TIME_FORMAT
 import com.zhuinden.flowcombinetuplekt.combineTuple
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import java.util.Timer
@@ -16,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 class StopwatchManager @Inject constructor(
-    val serviceManager: ServiceManager
+    @ApplicationContext val applicationContext: Context,
 ) {
 
     var lapTimes = mutableStateListOf<String>()
@@ -48,13 +53,19 @@ class StopwatchManager @Inject constructor(
     private var timer: Timer? = null
 
     fun start() {
-        serviceManager.startService(StopwatchService::class.java)
         timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
             duration = duration.plus(1.seconds)
             updateStopwatchState()
         }
         isPlayingFlow.value = true
-        isResetFlow.value = false
+        if (isResetFlow.value) {
+            isResetFlow.value = false
+            val thirdWorkRequest =
+                OneTimeWorkRequestBuilder<StopwatchWorker>().addTag(
+                    STOPWATCH_TAG,
+                ).build()
+            WorkManager.getInstance(applicationContext).enqueue(thirdWorkRequest)
+        }
     }
 
     private fun updateStopwatchState() {
@@ -86,8 +97,8 @@ class StopwatchManager @Inject constructor(
     }
 
     fun reset() {
-        serviceManager.stopService(StopwatchService::class.java)
         isResetFlow.value = true
+        WorkManager.getInstance(applicationContext).cancelAllWorkByTag(STOPWATCH_TAG)
         stop()
         duration = Duration.ZERO
         updateStopwatchState()

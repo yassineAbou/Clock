@@ -4,7 +4,11 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.clock.data.model.Alarm
 import com.example.clock.data.receiver.AlarmBroadcastReceiver
 import com.example.clock.data.receiver.DAYS_SELECTED
@@ -12,16 +16,14 @@ import com.example.clock.data.receiver.HOUR
 import com.example.clock.data.receiver.IS_RECURRING
 import com.example.clock.data.receiver.MINUTE
 import com.example.clock.data.receiver.TITLE
-import com.example.clock.data.repository.AlarmRepository
+import com.example.clock.data.workmanager.worker.SCHEDULED_ALARM_TAG
+import com.example.clock.data.workmanager.worker.ScheduledAlarmWorker
+import com.example.clock.data.workmanager.worker.TIMER_COMPLETED_TAG
+import com.example.clock.data.workmanager.worker.TimerCompletedWorker
 import com.example.clock.util.GlobalProperties.pendingIntentFlags
-import com.example.clock.util.helper.AlarmNotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Random
 import javax.inject.Inject
@@ -30,11 +32,11 @@ import javax.inject.Singleton
 @Singleton
 class ScheduleAlarmManager @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
-    private val alarmRepository: AlarmRepository,
-    private val alarmNotificationHelper: AlarmNotificationHelper,
 ) {
 
-    suspend fun schedule(alarm: Alarm) {
+    private val handler = Handler(Looper.getMainLooper())
+
+    fun schedule(alarm: Alarm) {
         val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(applicationContext, AlarmBroadcastReceiver::class.java).apply {
             putExtra(IS_RECURRING, alarm.isRecurring)
@@ -63,9 +65,15 @@ class ScheduleAlarmManager @Inject constructor(
         } else {
             "One Time Alarm ${alarm.title} scheduled for ${alarm.description.substringAfter('-')} at ${alarm.hour}:${alarm.minute}"
         }
-        withContext(Dispatchers.Main) {
+        handler.post {
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()
         }
+
+        val workRequest8 =
+            OneTimeWorkRequestBuilder<ScheduledAlarmWorker>().addTag(
+                SCHEDULED_ALARM_TAG,
+            ).build()
+        WorkManager.getInstance(applicationContext).enqueue(workRequest8)
 
         if (alarm.isRecurring) {
             alarmManager.setRepeating(
@@ -83,7 +91,7 @@ class ScheduleAlarmManager @Inject constructor(
         }
     }
 
-    suspend fun cancel(alarm: Alarm) {
+    fun cancel(alarm: Alarm) {
         val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alamIntent = Intent(applicationContext, AlarmBroadcastReceiver::class.java)
         val alarmPendingIntent = PendingIntent.getBroadcast(
@@ -94,14 +102,20 @@ class ScheduleAlarmManager @Inject constructor(
         )
         val toastText = "Alarm canceled for ${alarm.hour}:${alarm.minute}"
 
-        withContext(Dispatchers.Main) {
+        val workRequest8 =
+            OneTimeWorkRequestBuilder<ScheduledAlarmWorker>().addTag(
+                SCHEDULED_ALARM_TAG,
+            ).build()
+        WorkManager.getInstance(applicationContext).enqueue(workRequest8)
+
+        handler.post {
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()
         }
 
         alarmManager.cancel(alarmPendingIntent)
     }
 
-    suspend fun snooze() {
+    fun snooze() {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
         calendar.add(Calendar.MINUTE, 10)
@@ -119,7 +133,9 @@ class ScheduleAlarmManager @Inject constructor(
 
     suspend fun clearScheduledAlarms(alarmsList: List<Alarm>) {
         alarmsList.asFlow().buffer().collect {
-            cancel(it)
+            if (it.isScheduled) {
+                cancel(it)
+            }
         }
     }
 }

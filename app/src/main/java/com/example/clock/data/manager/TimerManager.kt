@@ -1,9 +1,13 @@
 package com.example.clock.data.manager
 
 import android.content.Context
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.clock.data.model.TimerState
-import com.example.clock.data.service.TimerCompletedService
-import com.example.clock.data.service.TimerRunningService
+import com.example.clock.data.workmanager.worker.TIMER_COMPLETED_TAG
+import com.example.clock.data.workmanager.worker.TIMER_RUNNING_TAG
+import com.example.clock.data.workmanager.worker.TimerCompletedWorker
+import com.example.clock.data.workmanager.worker.TimerRunningWorker
 import com.example.clock.util.GlobalProperties.TIME_FORMAT
 import com.example.clock.util.helper.CountDownTimerHelper
 import com.zhuinden.flowcombinetuplekt.combineTuple
@@ -19,7 +23,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 class TimerManager @Inject constructor(
-    private val serviceManager: ServiceManager,
     @ApplicationContext val applicationContext: Context,
 ) {
 
@@ -77,7 +80,11 @@ class TimerManager @Inject constructor(
                 handleTimerValues(true, millisUntilFinished.formatTime(), progressValue)
             }
             override fun onTimerFinish() {
-                serviceManager.startService(TimerCompletedService::class.java)
+                val workRequest6 =
+                    OneTimeWorkRequestBuilder<TimerCompletedWorker>().addTag(
+                        TIMER_COMPLETED_TAG,
+                    ).build()
+                WorkManager.getInstance(applicationContext).enqueue(workRequest6)
                 reset()
             }
         }
@@ -89,18 +96,24 @@ class TimerManager @Inject constructor(
     }
 
     fun reset() {
-        serviceManager.stopService(TimerRunningService::class.java)
+        countDownTimerHelper?.restart()
         handleTimerValues(false, timeInMillisFlow.value.formatTime(), 0f)
         isDoneFlow.value = true
-        countDownTimerHelper?.restart()
+        WorkManager.getInstance(applicationContext).cancelAllWorkByTag(TIMER_RUNNING_TAG)
     }
 
     fun start() {
-        serviceManager.startService(TimerRunningService::class.java)
         countDownTimerHelper?.start()
         isPlayingFlow.value = true
-        isDoneFlow.value = false
-        progressFlow.value = 1f
+        if (isDoneFlow.value) {
+            progressFlow.value = 1f
+            isDoneFlow.value = false
+            val fourthWorkRequest =
+                OneTimeWorkRequestBuilder<TimerRunningWorker>().addTag(
+                    TIMER_RUNNING_TAG,
+                ).build()
+            WorkManager.getInstance(applicationContext).enqueue(fourthWorkRequest)
+        }
     }
 
     private fun handleTimerValues(

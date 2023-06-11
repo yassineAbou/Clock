@@ -27,6 +27,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:showOnLockScreen="true"
+            android:launchMode = "singleTop"
             android:theme="@style/Theme.Clock"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -41,13 +42,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".data.service.TimerRunningService" />
-        <service android:name=".data.service.TimerCompletedService" />
-        <service android:name=".data.service.AlarmService" />
-        <service android:name=".data.service.StopwatchService" />
-        <service
-            android:name=".data.service.RescheduleAlarmJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"></service>
 
         <receiver android:name=".data.receiver.StopwatchNotificationBroadcastReceiver" />
         <receiver android:name=".data.receiver.TimerNotificationBroadcastReceiver" />
@@ -58,6 +52,14 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
+
+
     </application>
 
 </manifest>

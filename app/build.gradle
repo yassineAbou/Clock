@@ -26,7 +26,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            debuggable false
+            debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -105,6 +105,14 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
     //accompanist-permissions
     implementation "com.google.accompanist:accompanist-permissions:0.30.1"
+    //work-manager
+    implementation "androidx.work:work-runtime-ktx:2.8.1"
+    implementation 'androidx.hilt:hilt-work:1.0.0'
+
+
+
+
+
 
 
 

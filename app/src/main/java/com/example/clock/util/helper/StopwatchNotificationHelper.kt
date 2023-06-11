@@ -3,6 +3,7 @@ package com.example.clock.util.helper
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -36,7 +37,9 @@ class StopwatchNotificationHelper @Inject constructor(
         "https://www.clock.com/Stopwatch".toUri(),
         applicationContext,
         MainActivity::class.java,
-    )
+    ).apply {
+        flags = FLAG_ACTIVITY_SINGLE_TOP
+    }
 
     private val openStopwatchPendingIntent = PendingIntent.getActivity(
         applicationContext,
@@ -53,9 +56,8 @@ class StopwatchNotificationHelper @Inject constructor(
         NotificationCompat.Builder(applicationContext, STOPWATCH_SERVICE_CHANNEL)
             .setContentTitle("Stopwatch")
             .setSmallIcon(R.drawable.ic_timer)
-            .setContentIntent(openStopwatchPendingIntent)
             .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
-            .setColorized(true)
+            .setContentIntent(openStopwatchPendingIntent)
             .setOngoing(true)
             .setAutoCancel(true)
 
