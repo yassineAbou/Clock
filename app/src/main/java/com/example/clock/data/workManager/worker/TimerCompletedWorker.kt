@@ -1,4 +1,4 @@
-package com.example.clock.data.workmanager.worker
+package com.example.clock.data.workManager.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -33,8 +33,9 @@ class TimerCompletedWorker @AssistedInject constructor(
             )
             setForeground(foregroundInfo)
 
-            timerManager.timerState.collectLatest {
-            }
+            // Ensure the work lasts at least 5 seconds for the notification to be shown
+            // because shorter durations may not provide enough time for the notification to be visible.
+            timerManager.timerState.collectLatest {}
 
             Result.success()
         } catch (e: CancellationException) {
@@ -46,4 +47,3 @@ class TimerCompletedWorker @AssistedInject constructor(
 }
 
 const val TIMER_COMPLETED_TAG = "timerCompletedTag"
-private const val TAG = "TimerCompletedWorker"

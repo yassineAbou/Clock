@@ -4,7 +4,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,7 +22,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.intuit.sdp.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumberPicker(
     modifier: Modifier = Modifier,
@@ -31,11 +29,13 @@ fun NumberPicker(
     timeUnit: String,
     onNumberChange: (TextFieldValue) -> Unit,
     textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.displayLarge,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
 ) {
     val numericKeyboard = KeyboardOptions(keyboardType = KeyboardType.Number)
-    val colors = TextFieldDefaults.textFieldColors(
-        containerColor = backgroundColor,
+    val textFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = backgroundColor,
+        unfocusedContainerColor = backgroundColor,
+        disabledContainerColor = backgroundColor,
         focusedIndicatorColor = backgroundColor,
         unfocusedIndicatorColor = backgroundColor,
     )
@@ -80,7 +80,7 @@ fun NumberPicker(
             onValueChange = { onNumberChange(it) },
             textStyle = textStyle,
             keyboardOptions = numericKeyboard,
-            colors = colors,
+            colors = textFieldColors,
             interactionSource = interactionSource,
         )
     }

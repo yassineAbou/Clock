@@ -1,4 +1,4 @@
-package com.example.clock.data.workmanager.factory
+package com.example.clock.data.workManager.factory
 
 import android.content.Context
 import androidx.work.ListenableWorker

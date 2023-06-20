@@ -1,5 +1,6 @@
 package com.example.clock.ui.timer
 
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -22,7 +23,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,9 +39,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.clock.R
 import com.example.clock.data.model.TimerState
+import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.theme.Red100
 import com.example.clock.util.checkNumberPicker
 import com.example.clock.util.components.BackgroundIndicator
@@ -50,7 +53,6 @@ import com.example.clock.util.components.ClockButton
 import com.example.clock.util.components.NumberPicker
 import com.example.clock.util.parseInt
 
-/*
 @Preview(device = Devices.PIXEL_4_XL)
 @Composable
 private fun TimerScreenPreview() {
@@ -62,18 +64,16 @@ private fun TimerScreenPreview() {
     }
 }
 
-@Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
+@Preview(device = Devices.TABLET, uiMode = ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
 @Composable
 private fun TimerScreenDarkPreview() {
-    ClockTheme(darkTheme = true) {
+    ClockTheme(useDarkTheme = true) {
         TimerScreen(
             timerState = TimerState(isDone = false, timeText = "00:00:10"),
             timerActions = object : TimerActions {},
         )
     }
 }
-
- */
 
 @OptIn(
     ExperimentalAnimationApi::class,
@@ -84,7 +84,8 @@ fun TimerScreen(
     timerState: TimerState,
     timerActions: TimerActions,
 ) {
-    val isDoneTransition = updateTransition(timerState.isDone, label = stringResource(id = R.string.is_done))
+    val isDoneTransition =
+        updateTransition(timerState.isDone, label = stringResource(id = R.string.is_done))
 
     Surface(modifier = modifier) {
         BoxWithConstraints(
@@ -149,7 +150,6 @@ fun TimerScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimerAppBar(modifier: Modifier = Modifier) {
     ClockAppBar(

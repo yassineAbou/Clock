@@ -1,14 +1,37 @@
 package com.example.clock.ui.alarm
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.Start
@@ -16,25 +39,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.clock.data.model.Alarm
-import com.example.clock.ui.theme.Gray300
-import com.example.clock.ui.theme.Purple100
+import com.example.clock.ui.theme.Black100
+import com.example.clock.ui.theme.Blue100
+import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.checkDate
 import com.example.clock.util.checkNumberPicker
 import com.example.clock.util.components.CustomChip
 import com.example.clock.util.components.NumberPicker
+import com.example.clock.util.components.imePaddingIfTrue
 import com.google.gson.Gson
 import com.intuit.sdp.R
 import kotlinx.coroutines.launch
 
-/*
 @Preview(device = Devices.PIXEL_4_XL)
 @Composable
-private fun TimerScreenPreview() {
+private fun CreateAlarmPreview() {
     ClockTheme {
         CreateAlarmScreen(
-            createAlarmState = Alarm(),
+            alarmCreationState = Alarm(),
             alarmActions = object : AlarmActions {},
         )
     }
@@ -42,16 +68,14 @@ private fun TimerScreenPreview() {
 
 @Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
 @Composable
-private fun TimerScreenDarkPreview() {
-    ClockTheme(darkTheme = true) {
+private fun CreateAlarmDarkPreview() {
+    ClockTheme(useDarkTheme = true) {
         CreateAlarmScreen(
-            createAlarmState = Alarm(),
+            alarmCreationState = Alarm(),
             alarmActions = object : AlarmActions {},
         )
     }
 }
-
- */
 
 @Composable
 fun CreateAlarmScreen(
@@ -60,7 +84,8 @@ fun CreateAlarmScreen(
     alarmActions: AlarmActions,
     navigateToAlarmsList: () -> Unit = {},
 ) {
-    val cardContainerColor by animateColorAsState(targetValue = if (isSystemInDarkTheme()) Gray300 else Purple100)
+    val cardContainerColor by animateColorAsState(targetValue = if (isSystemInDarkTheme()) Black100 else Blue100)
+    val isAlarmTitleFocused = rememberSaveable { mutableStateOf(false) }
 
     Surface(modifier = modifier, color = cardContainerColor) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
@@ -79,14 +104,23 @@ fun CreateAlarmScreen(
                 alarmCreationState = alarmCreationState,
                 updateAlarmCreationState = { alarmActions.updateAlarmCreationState(it) },
                 cardContainerColor = cardContainerColor,
+                updateAlarmTitleFocused = { newValue ->
+                    isAlarmTitleFocused.value = newValue
+                },
             )
 
             CustomizeAlarmEvent(
                 modifier = Modifier
                     .align(Center)
+                    .imePaddingIfTrue(
+                        condition = isAlarmTitleFocused.value,
+                    )
                     .background(color = MaterialTheme.colorScheme.surface),
                 alarmCreationState = alarmCreationState,
                 updateAlarmCreationState = { alarmActions.updateAlarmCreationState(it) },
+                updateAlarmTitleFocused = { newValue ->
+                    isAlarmTitleFocused.value = newValue
+                },
             )
             Buttons(
                 modifier = Modifier
@@ -98,11 +132,11 @@ fun CreateAlarmScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CustomizeAlarmEvent(
     modifier: Modifier,
     alarmCreationState: Alarm,
+    updateAlarmTitleFocused: (Boolean) -> Unit,
     updateAlarmCreationState: (Alarm) -> Unit,
 ) {
     Box(modifier = modifier) {
@@ -129,6 +163,7 @@ private fun CustomizeAlarmEvent(
                     .padding(dimensionResource(id = R.dimen._8sdp)),
                 alarmCreationState = alarmCreationState,
                 updateAlarmCreationState = updateAlarmCreationState,
+                updateAlarmTitleFocused = updateAlarmTitleFocused,
             )
         }
     }
@@ -139,6 +174,7 @@ private fun AlarmPicker(
     alarmCreationState: Alarm,
     updateAlarmCreationState: (Alarm) -> Unit,
     modifier: Modifier = Modifier,
+    updateAlarmTitleFocused: (Boolean) -> Unit,
     cardContainerColor: androidx.compose.ui.graphics.Color,
 ) {
     val textStyle = MaterialTheme.typography.displaySmall
@@ -151,7 +187,7 @@ private fun AlarmPicker(
     }
 
     LaunchedEffect(hours, minutes) {
-        launch {
+        this.launch {
             if (alarmCreationState.description.any { char -> char.isDigit() }) {
                 updateAlarmCreationState(
                     alarmCreationState.copy(description = alarmCreationState.checkDate()),
@@ -173,6 +209,7 @@ private fun AlarmPicker(
                         hours = value
                         updateAlarmCreationState(alarmCreationState.copy(hour = hours.text))
                     }
+                    updateAlarmTitleFocused(false)
                 },
                 textStyle = textStyle,
                 backgroundColor = cardContainerColor,
@@ -197,15 +234,13 @@ private fun AlarmPicker(
                         minutes = value
                         updateAlarmCreationState(alarmCreationState.copy(minute = minutes.text))
                     }
+                    updateAlarmTitleFocused(false)
                 },
             )
         }
     }
 }
 
-private const val TAG = "CreateAlarmScreen"
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WeekDays(
     modifier: Modifier = Modifier,
@@ -247,24 +282,36 @@ private fun WeekDays(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AlarmTitle(
     modifier: Modifier = Modifier,
     alarmCreationState: Alarm,
     updateAlarmCreationState: (Alarm) -> Unit,
+    updateAlarmTitleFocused: (Boolean) -> Unit,
 ) {
     var title by remember { mutableStateOf(alarmCreationState.title) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    LaunchedEffect(isFocused) {
+        if (isFocused) {
+            this.launch {
+                updateAlarmTitleFocused(true)
+            }
+        }
+    }
 
     Box(modifier = modifier) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(0.75f),
+            modifier = Modifier
+                .fillMaxWidth(0.75f),
             value = title,
             onValueChange = {
                 title = it
                 updateAlarmCreationState(alarmCreationState.copy(title = title))
             },
             label = { Text("Alarm name") },
+            interactionSource = interactionSource,
         )
     }
 }

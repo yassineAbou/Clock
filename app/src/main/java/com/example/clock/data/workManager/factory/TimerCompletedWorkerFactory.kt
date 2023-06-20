@@ -1,10 +1,10 @@
-package com.example.clock.data.workmanager.factory
+package com.example.clock.data.workManager.factory
 
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.example.clock.data.manager.TimerManager
-import com.example.clock.data.workmanager.worker.TimerCompletedWorker
+import com.example.clock.data.workManager.worker.TimerCompletedWorker
 import com.example.clock.util.helper.MediaPlayerHelper
 import com.example.clock.util.helper.TimerNotificationHelper
 import javax.inject.Inject
@@ -12,7 +12,7 @@ import javax.inject.Inject
 class TimerCompletedWorkerFactory @Inject constructor(
     private val mediaPlayerHelper: MediaPlayerHelper,
     private val timerNotificationHelper: TimerNotificationHelper,
-    private val timerManager: TimerManager
+    private val timerManager: TimerManager,
 ) : ChildWorkerFactory {
 
     override fun create(appContext: Context, params: WorkerParameters): ListenableWorker {

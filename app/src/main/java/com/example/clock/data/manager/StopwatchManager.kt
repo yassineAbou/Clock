@@ -1,15 +1,11 @@
 package com.example.clock.data.manager
 
-import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.clock.data.model.StopwatchState
-import com.example.clock.data.workmanager.worker.STOPWATCH_TAG
-import com.example.clock.data.workmanager.worker.StopwatchWorker
+import com.example.clock.data.workManager.worker.STOPWATCH_TAG
+import com.example.clock.data.workManager.worker.StopwatchWorker
 import com.example.clock.util.GlobalProperties.TIME_FORMAT
 import com.zhuinden.flowcombinetuplekt.combineTuple
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import java.util.Timer
@@ -21,7 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 class StopwatchManager @Inject constructor(
-    @ApplicationContext val applicationContext: Context,
+    private val workRequestManager: WorkRequestManager,
 ) {
 
     var lapTimes = mutableStateListOf<String>()
@@ -59,12 +55,8 @@ class StopwatchManager @Inject constructor(
         }
         isPlayingFlow.value = true
         if (isResetFlow.value) {
+            workRequestManager.enqueueWorker<StopwatchWorker>(STOPWATCH_TAG)
             isResetFlow.value = false
-            val thirdWorkRequest =
-                OneTimeWorkRequestBuilder<StopwatchWorker>().addTag(
-                    STOPWATCH_TAG,
-                ).build()
-            WorkManager.getInstance(applicationContext).enqueue(thirdWorkRequest)
         }
     }
 
@@ -98,7 +90,7 @@ class StopwatchManager @Inject constructor(
 
     fun reset() {
         isResetFlow.value = true
-        WorkManager.getInstance(applicationContext).cancelAllWorkByTag(STOPWATCH_TAG)
+        workRequestManager.cancelWorker(STOPWATCH_TAG)
         stop()
         duration = Duration.ZERO
         updateStopwatchState()

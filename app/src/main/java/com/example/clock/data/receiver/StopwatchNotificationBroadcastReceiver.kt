@@ -3,9 +3,7 @@ package com.example.clock.data.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.work.WorkManager
 import com.example.clock.data.manager.StopwatchManager
-import com.example.clock.data.workmanager.worker.STOPWATCH_TAG
 import com.example.clock.util.helper.StopwatchNotificationHelper
 import com.example.clock.util.safeLet
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,9 +29,9 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
         val pendingResult: PendingResult = goAsync()
         broadcastReceiverScope.launch(Dispatchers.Default) {
             try {
-                val isPlaying = p1?.getBooleanExtra(STOPWATCH_IS_PLAYING_EXTRA, false)
-                val time = p1?.getStringExtra(STOPWATCH_TIME_EXTRA)
-                val lastLapIndex = p1?.getIntExtra(STOPWATCH_LAST_INDEX_EXTRA, 0)
+                val isPlaying = p1?.getBooleanExtra(STOPWATCH_IS_PLAYING, false)
+                val time = p1?.getStringExtra(STOPWATCH_TIME)
+                val lastLapIndex = p1?.getIntExtra(STOPWATCH_LAST_INDEX, 0)
                 val action = p1?.action
 
                 action?.let {
@@ -51,7 +49,7 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
                     isPlaying,
                     lastLapIndex,
                 ) { safeTime, safeIsPlaying, safeLastIndex ->
-                    stopwatchNotificationHelper.updateStopwatchServiceNotification(
+                    stopwatchNotificationHelper.updateStopwatchWorkerNotification(
                         isPlaying = safeIsPlaying,
                         time = safeTime,
                         lastLapIndex = safeLastIndex,
@@ -70,8 +68,8 @@ class StopwatchNotificationBroadcastReceiver : BroadcastReceiver() {
     }
 }
 
-const val STOPWATCH_TIME_EXTRA = "STOPWATCH_TIME_EXTRA"
-const val STOPWATCH_IS_PLAYING_EXTRA = "STOPWATCH_IS_PLAYING_EXTRA"
+const val STOPWATCH_TIME = "STOPWATCH_TIME"
+const val STOPWATCH_IS_PLAYING = "STOPWATCH_IS_PLAYING"
 const val STOPWATCH_RESET_ACTION = "STOPWATCH_RESET_ACTION"
 const val STOPWATCH_LAP_ACTION = "STOPWATCH_LAP_ACTION"
-const val STOPWATCH_LAST_INDEX_EXTRA = "STOPWATCH_LAST_INDEX_EXTRA"
+const val STOPWATCH_LAST_INDEX = "STOPWATCH_LAST_INDEX"

@@ -4,14 +4,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.clock.data.manager.ScheduleAlarmManager
-import com.example.clock.data.workmanager.worker.ALARM_TAG
-import com.example.clock.data.workmanager.worker.AlarmWorker
-import com.example.clock.data.workmanager.worker.RESCHEDULE_ALARM_TAG
-import com.example.clock.data.workmanager.worker.RescheduleAlarmWorker
-import com.example.clock.util.safeLet
+import com.example.clock.data.manager.WorkRequestManager
+import com.example.clock.data.workManager.worker.ALARM_TAG
+import com.example.clock.data.workManager.worker.AlarmWorker
+import com.example.clock.data.workManager.worker.RESCHEDULE_ALARM_TAG
+import com.example.clock.data.workManager.worker.RescheduleAlarmWorker
+import com.example.clock.data.workManager.worker.TIMER_COMPLETED_TAG
+import com.example.clock.data.workManager.worker.TIMER_RUNNING_TAG
+import com.example.clock.data.workManager.worker.TimerCompletedWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,47 +28,40 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var scheduleAlarmManager: ScheduleAlarmManager
 
+    @Inject
+    lateinit var workRequestManager: WorkRequestManager
+
     private val broadcastReceiverScope = CoroutineScope(SupervisorJob())
 
     override fun onReceive(p0: Context?, p1: Intent?) {
         val pendingResult: PendingResult = goAsync()
         broadcastReceiverScope.launch(Dispatchers.Default) {
             try {
-                safeLet(p0, p1) { context, intent ->
+                p1?.let { intent ->
                     when (intent.action) {
-                        "android.intent.action.BOOT_COMPLETED" -> {
-                            val workRequest =
-                                OneTimeWorkRequestBuilder<RescheduleAlarmWorker>().addTag(
-                                    RESCHEDULE_ALARM_TAG,
-                                ).build()
-                            WorkManager.getInstance(context.applicationContext).enqueue(workRequest)
-                        }
-
-                        ACTION_DISMISS -> WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(
-                            ALARM_TAG,
-                        )
-                        ACTION_SNOOZE -> {
-                            scheduleAlarmManager.snooze()
-                            WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(
-                                ALARM_TAG,
+                        "android.intent.action.BOOT_COMPLETED" ->  {
+                            workRequestManager.enqueueWorker<RescheduleAlarmWorker>(
+                                RESCHEDULE_ALARM_TAG
                             )
                         }
-
+                        ACTION_DISMISS -> workRequestManager.cancelWorker(ALARM_TAG)
+                        ACTION_SNOOZE -> {
+                            scheduleAlarmManager.snooze()
+                            workRequestManager.cancelWorker(ALARM_TAG)
+                        }
                         else -> {
                             val isRecurring = intent.getBooleanExtra(IS_RECURRING, false)
-                            val shouldStartService = !isRecurring || alarmIsToday(intent)
+                            val shouldStartWorker = !isRecurring || alarmIsToday(intent)
                             val inputData = Data.Builder()
-                                .putString(TITLE, p1?.getStringExtra(TITLE))
-                                .putString(HOUR, p1?.getStringExtra(HOUR))
-                                .putString(MINUTE, p1?.getStringExtra(MINUTE))
+                                .putString(TITLE, intent.getStringExtra(TITLE))
+                                .putString(HOUR, intent.getStringExtra(HOUR))
+                                .putString(MINUTE, intent.getStringExtra(MINUTE))
                                 .build()
-                            if (shouldStartService) {
-                                val secondWorkRequest =
-                                    OneTimeWorkRequestBuilder<AlarmWorker>().addTag(
-                                        ALARM_TAG,
-                                    ).setInputData(inputData).build()
-                                WorkManager.getInstance(context.applicationContext).enqueue(secondWorkRequest)
-                            } else {
+                            if (shouldStartWorker) {
+                                workRequestManager.enqueueWorker<AlarmWorker>(
+                                    ALARM_TAG,
+                                    inputData
+                                )
                             }
                         }
                     }

@@ -1,4 +1,4 @@
-package com.example.clock.data.workmanager.worker
+package com.example.clock.data.workManager.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.example.clock.data.manager.StopwatchManager
-import com.example.clock.util.helper.STOPWATCH_SERVICE_NOTIFICATION_ID
+import com.example.clock.util.helper.STOPWATCH_WORKER_NOTIFICATION_ID
 import com.example.clock.util.helper.StopwatchNotificationHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -23,7 +23,7 @@ class StopwatchWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return try {
             val foregroundInfo = ForegroundInfo(
-                STOPWATCH_SERVICE_NOTIFICATION_ID,
+                STOPWATCH_WORKER_NOTIFICATION_ID,
                 stopwatchNotificationHelper.getStopwatchBaseNotification().build(),
             )
 
@@ -31,7 +31,7 @@ class StopwatchWorker @AssistedInject constructor(
 
             stopwatchManager.stopwatchState.collectLatest {
                 if (!it.isReset) {
-                    stopwatchNotificationHelper.updateStopwatchServiceNotification(
+                    stopwatchNotificationHelper.updateStopwatchWorkerNotification(
                         time = "${it.hour}:${it.minute}:${it.second}",
                         isPlaying = it.isPlaying,
                         lastLapIndex = stopwatchManager.lapTimes.lastIndex,

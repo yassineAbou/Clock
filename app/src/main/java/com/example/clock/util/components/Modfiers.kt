@@ -3,6 +3,7 @@ package com.example.clock.util.components
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -61,5 +62,13 @@ private fun rememberIsKeyboardOpen(): State<Boolean> {
         viewTreeObserver.addOnGlobalLayoutListener(listener)
 
         awaitDispose { viewTreeObserver.removeOnGlobalLayoutListener(listener) }
+    }
+}
+
+fun Modifier.imePaddingIfTrue(condition: Boolean): Modifier {
+    return if (condition) {
+        this.imePadding()
+    } else {
+        this
     }
 }

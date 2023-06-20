@@ -12,7 +12,7 @@
 
     <application
         android:name=".ClockApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -27,9 +27,11 @@
             android:exported="true"
             android:label="@string/app_name"
             android:showOnLockScreen="true"
+            android:screenOrientation="portrait"
             android:launchMode = "singleTop"
             android:theme="@style/Theme.Clock"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -3,18 +3,20 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-
     }
 }
+
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
-        jcenter()
+        maven("https://jitpack.io")
     }
 }
+
 rootProject.name = "Clock"
-include ':app'
-include ':benchmark'
+
+include(":app")
+include(":benchmark")

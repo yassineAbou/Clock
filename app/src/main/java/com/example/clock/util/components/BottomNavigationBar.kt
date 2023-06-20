@@ -20,7 +20,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.clock.ui.Screen
 import com.example.clock.ui.theme.ClockTheme
 
-/*
 @Preview
 @Composable
 private fun BottomNavigationPreview() {
@@ -35,15 +34,13 @@ private fun BottomNavigationPreview() {
 @Preview
 @Composable
 private fun BottomNavigationPreviewDark() {
-    ClockTheme(darkTheme = true) {
+    ClockTheme(useDarkTheme = true) {
         BottomNavigationBar(
             listBottomBarItems = listBottomBarItems,
             navController = rememberNavController(),
         )
     }
 }
-
- */
 
 data class BottomBarItem(
     val name: String,

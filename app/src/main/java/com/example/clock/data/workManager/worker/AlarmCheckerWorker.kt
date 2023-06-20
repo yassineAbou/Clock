@@ -1,10 +1,10 @@
-package com.example.clock.data.workmanager.worker
+package com.example.clock.data.workManager.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.example.clock.data.manager.WorkRequestManager
 import com.example.clock.data.repository.AlarmRepository
 import com.example.clock.util.helper.AlarmNotificationHelper
 import dagger.assisted.Assisted
@@ -12,11 +12,11 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-
 @HiltWorker
-class ScheduledAlarmWorker @AssistedInject constructor(
+class AlarmCheckerWorker @AssistedInject constructor(
     @Assisted private val alarmRepository: AlarmRepository,
     @Assisted private val alarmNotificationHelper: AlarmNotificationHelper,
+    @Assisted private val workRequestManager: WorkRequestManager,
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
@@ -27,14 +27,14 @@ class ScheduledAlarmWorker @AssistedInject constructor(
                     alarmList.filter { alarm -> alarm.isScheduled }
                 }.firstOrNull()
 
-            if (scheduledAlarms?.isNotEmpty() == true && !alarmNotificationHelper.isNotificationVisible()) {
-                alarmNotificationHelper.displayScheduledAlarmNotification()
+            if (scheduledAlarms?.isNotEmpty() == true && !alarmNotificationHelper.alarmCheckerNotificationPresent()) {
+                alarmNotificationHelper.displayAlarmCheckerNotification()
             }
             if (scheduledAlarms?.isEmpty() == true) {
                 alarmNotificationHelper.removeScheduledAlarmNotification()
             }
 
-            WorkManager.getInstance(applicationContext).cancelAllWorkByTag(SCHEDULED_ALARM_TAG)
+            workRequestManager.cancelWorker(ALARM_CHECKER_TAG)
 
             Result.success()
         } catch (throwable: Throwable) {
@@ -43,6 +43,4 @@ class ScheduledAlarmWorker @AssistedInject constructor(
     }
 }
 
-const val SCHEDULED_ALARM_TAG = "scheduledAlarmTag"
-
-private const val TAG = "ScheduledAlarmWorker"
+const val ALARM_CHECKER_TAG = "alarmCheckerTag"

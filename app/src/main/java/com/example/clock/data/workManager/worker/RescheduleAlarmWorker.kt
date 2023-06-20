@@ -1,11 +1,11 @@
-package com.example.clock.data.workmanager.worker
+package com.example.clock.data.workManager.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.clock.data.manager.ScheduleAlarmManager
+import com.example.clock.data.manager.WorkRequestManager
 import com.example.clock.data.repository.AlarmRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 class RescheduleAlarmWorker @AssistedInject constructor(
     @Assisted private val alarmRepository: AlarmRepository,
     @Assisted private val scheduleAlarmManager: ScheduleAlarmManager,
+    @Assisted private val workRequestManager: WorkRequestManager,
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
@@ -28,7 +29,7 @@ class RescheduleAlarmWorker @AssistedInject constructor(
                 }
                 .firstOrNull { it.isNotEmpty() }
             scheduledAlarms?.forEach { scheduleAlarmManager.schedule(it) }
-            WorkManager.getInstance(applicationContext).cancelAllWorkByTag(RESCHEDULE_ALARM_TAG)
+            workRequestManager.cancelWorker(RESCHEDULE_ALARM_TAG)
 
             Result.success()
         } catch (throwable: Throwable) {

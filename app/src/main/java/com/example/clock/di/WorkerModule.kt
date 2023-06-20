@@ -2,20 +2,20 @@ package com.example.clock.di
 
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
-import com.example.clock.data.workmanager.factory.AlarmWorkerFactory
-import com.example.clock.data.workmanager.factory.ChildWorkerFactory
-import com.example.clock.data.workmanager.factory.RescheduleAlarmWorkerFactory
-import com.example.clock.data.workmanager.factory.ScheduledAlarmWorkerFactory
-import com.example.clock.data.workmanager.factory.StopwatchWorkerFactory
-import com.example.clock.data.workmanager.factory.TimerCompletedWorkerFactory
-import com.example.clock.data.workmanager.factory.TimerRunningWorkerFactory
-import com.example.clock.data.workmanager.factory.WrapperWorkerFactory
-import com.example.clock.data.workmanager.worker.AlarmWorker
-import com.example.clock.data.workmanager.worker.RescheduleAlarmWorker
-import com.example.clock.data.workmanager.worker.ScheduledAlarmWorker
-import com.example.clock.data.workmanager.worker.StopwatchWorker
-import com.example.clock.data.workmanager.worker.TimerCompletedWorker
-import com.example.clock.data.workmanager.worker.TimerRunningWorker
+import com.example.clock.data.workManager.factory.AlarmCheckerWorkerFactory
+import com.example.clock.data.workManager.factory.AlarmWorkerFactory
+import com.example.clock.data.workManager.factory.ChildWorkerFactory
+import com.example.clock.data.workManager.factory.RescheduleAlarmWorkerFactory
+import com.example.clock.data.workManager.factory.StopwatchWorkerFactory
+import com.example.clock.data.workManager.factory.TimerCompletedWorkerFactory
+import com.example.clock.data.workManager.factory.TimerRunningWorkerFactory
+import com.example.clock.data.workManager.factory.WrapperWorkerFactory
+import com.example.clock.data.workManager.worker.AlarmCheckerWorker
+import com.example.clock.data.workManager.worker.AlarmWorker
+import com.example.clock.data.workManager.worker.RescheduleAlarmWorker
+import com.example.clock.data.workManager.worker.StopwatchWorker
+import com.example.clock.data.workManager.worker.TimerCompletedWorker
+import com.example.clock.data.workManager.worker.TimerRunningWorker
 import dagger.Binds
 import dagger.MapKey
 import dagger.Module
@@ -63,6 +63,6 @@ abstract class WorkerModule {
 
     @Binds
     @IntoMap
-    @WorkerKey(ScheduledAlarmWorker::class)
-    abstract fun bindScheduledAlarmWorker(scheduledAlarmWorkerFactory: ScheduledAlarmWorkerFactory): ChildWorkerFactory
+    @WorkerKey(AlarmCheckerWorker::class)
+    abstract fun bindAlarmCheckerWorker(alarmCheckerWorkerFactory: AlarmCheckerWorkerFactory): ChildWorkerFactory
 }

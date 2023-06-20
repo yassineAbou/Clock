@@ -7,8 +7,6 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.clock.data.model.Alarm
 import com.example.clock.data.receiver.AlarmBroadcastReceiver
 import com.example.clock.data.receiver.DAYS_SELECTED
@@ -16,10 +14,8 @@ import com.example.clock.data.receiver.HOUR
 import com.example.clock.data.receiver.IS_RECURRING
 import com.example.clock.data.receiver.MINUTE
 import com.example.clock.data.receiver.TITLE
-import com.example.clock.data.workmanager.worker.SCHEDULED_ALARM_TAG
-import com.example.clock.data.workmanager.worker.ScheduledAlarmWorker
-import com.example.clock.data.workmanager.worker.TIMER_COMPLETED_TAG
-import com.example.clock.data.workmanager.worker.TimerCompletedWorker
+import com.example.clock.data.workManager.worker.ALARM_CHECKER_TAG
+import com.example.clock.data.workManager.worker.AlarmCheckerWorker
 import com.example.clock.util.GlobalProperties.pendingIntentFlags
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.asFlow
@@ -32,6 +28,7 @@ import javax.inject.Singleton
 @Singleton
 class ScheduleAlarmManager @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
+    private val workRequestManager: WorkRequestManager,
 ) {
 
     private val handler = Handler(Looper.getMainLooper())
@@ -69,11 +66,7 @@ class ScheduleAlarmManager @Inject constructor(
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()
         }
 
-        val workRequest8 =
-            OneTimeWorkRequestBuilder<ScheduledAlarmWorker>().addTag(
-                SCHEDULED_ALARM_TAG,
-            ).build()
-        WorkManager.getInstance(applicationContext).enqueue(workRequest8)
+        workRequestManager.enqueueWorker<AlarmCheckerWorker>(ALARM_CHECKER_TAG)
 
         if (alarm.isRecurring) {
             alarmManager.setRepeating(
@@ -102,11 +95,7 @@ class ScheduleAlarmManager @Inject constructor(
         )
         val toastText = "Alarm canceled for ${alarm.hour}:${alarm.minute}"
 
-        val workRequest8 =
-            OneTimeWorkRequestBuilder<ScheduledAlarmWorker>().addTag(
-                SCHEDULED_ALARM_TAG,
-            ).build()
-        WorkManager.getInstance(applicationContext).enqueue(workRequest8)
+        workRequestManager.enqueueWorker<AlarmCheckerWorker>(ALARM_CHECKER_TAG)
 
         handler.post {
             Toast.makeText(applicationContext, toastText, Toast.LENGTH_SHORT).show()

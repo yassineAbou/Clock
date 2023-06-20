@@ -1,10 +1,10 @@
-package com.example.clock.data.workmanager.factory
+package com.example.clock.data.workManager.factory
 
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.example.clock.data.manager.StopwatchManager
-import com.example.clock.data.workmanager.worker.StopwatchWorker
+import com.example.clock.data.workManager.worker.StopwatchWorker
 import com.example.clock.util.helper.StopwatchNotificationHelper
 import javax.inject.Inject
 

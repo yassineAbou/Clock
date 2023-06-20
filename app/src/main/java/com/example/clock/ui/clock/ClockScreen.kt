@@ -1,5 +1,6 @@
 package com.example.clock.ui.clock
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -18,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,15 +34,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.clock.R
+import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.components.ClockAppBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
-/*
 @Preview(device = Devices.PIXEL_4_XL)
 @Composable
 fun ClockScreenPreview() {
@@ -54,14 +56,11 @@ fun ClockScreenPreview() {
 @Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
 @Composable
 fun ClockScreenDarkPreview() {
-    ClockTheme(darkTheme = true) {
+    ClockTheme(useDarkTheme = true) {
         ClockScreen()
     }
 }
 
- */
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClockScreen(
     modifier: Modifier = Modifier,
@@ -76,7 +75,6 @@ fun ClockScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClockScreenAppBar(modifier: Modifier = Modifier) {
     ClockAppBar(
@@ -90,22 +88,22 @@ private fun ClockScreenAppBar(modifier: Modifier = Modifier) {
     )
 }
 
-data class Time(val hours: Int, val minutes: Int, val seconds: Int)
+data class Time(val hour: Int, val minute: Int, val second: Int)
 
 @Composable
 private fun SlidingClock() {
     fun currentTime(): Time {
         val calendar = Calendar.getInstance()
         return Time(
-            hours = calendar.get(Calendar.HOUR_OF_DAY),
-            minutes = calendar.get(Calendar.MINUTE),
-            seconds = calendar.get(Calendar.SECOND),
+            hour = calendar.get(Calendar.HOUR_OF_DAY),
+            minute = calendar.get(Calendar.MINUTE),
+            second = calendar.get(Calendar.SECOND),
         )
     }
 
     var time by remember { mutableStateOf(currentTime()) }
     LaunchedEffect(0) {
-        launch {
+        this.launch {
             while (true) {
                 time = currentTime()
                 delay(1000)
@@ -126,18 +124,18 @@ private fun Clock(time: Time) {
         val paddingSize = dimensionResource(id = com.intuit.sdp.R.dimen._2sdp)
         val padding = Modifier.padding(horizontal = paddingSize)
 
-        NumberColumn(time.hours / 10, 0..2, padding)
-        NumberColumn(time.hours % 10, 0..9, padding)
+        NumberColumn(time.hour / 10, 0..2, padding)
+        NumberColumn(time.hour % 10, 0..9, padding)
 
         Spacer(Modifier.size(16.dp))
 
-        NumberColumn(time.minutes / 10, 0..5, padding)
-        NumberColumn(time.minutes % 10, 0..9, padding)
+        NumberColumn(time.minute / 10, 0..5, padding)
+        NumberColumn(time.minute % 10, 0..9, padding)
 
         Spacer(Modifier.size(16.dp))
 
-        NumberColumn(time.seconds / 10, 0..5, padding)
-        NumberColumn(time.seconds % 10, 0..9, padding)
+        NumberColumn(time.second / 10, 0..5, padding)
+        NumberColumn(time.second % 10, 0..9, padding)
     }
 }
 

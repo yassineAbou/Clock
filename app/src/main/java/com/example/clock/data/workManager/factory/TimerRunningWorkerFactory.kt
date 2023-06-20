@@ -1,10 +1,10 @@
-package com.example.clock.data.workmanager.factory
+package com.example.clock.data.workManager.factory
 
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.example.clock.data.manager.TimerManager
-import com.example.clock.data.workmanager.worker.TimerRunningWorker
+import com.example.clock.data.workManager.worker.TimerRunningWorker
 import com.example.clock.util.helper.TimerNotificationHelper
 import javax.inject.Inject
 

@@ -2,7 +2,7 @@ package com.example.clock
 
 import android.app.Application
 import androidx.work.Configuration
-import com.example.clock.data.workmanager.factory.WrapperWorkerFactory
+import com.example.clock.data.workManager.factory.WrapperWorkerFactory
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package com.example.clock.data.workmanager.worker
+package com.example.clock.data.workManager.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker

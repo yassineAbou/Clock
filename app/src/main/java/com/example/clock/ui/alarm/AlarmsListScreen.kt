@@ -1,33 +1,58 @@
 package com.example.clock.ui.alarm
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlarmOn
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AlarmOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.clock.R
 import com.example.clock.data.model.Alarm
+import com.example.clock.ui.theme.Black100
+import com.example.clock.ui.theme.Blue100
+import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.util.checkDate
 import com.example.clock.util.components.ClockAppBar
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
-import kotlin.time.ExperimentalTime
 
-/*
 @Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
 @Composable
 private fun AlarmsListScreenPreview() {
@@ -42,7 +67,7 @@ private fun AlarmsListScreenPreview() {
 @Preview(device = Devices.PIXEL_4_XL)
 @Composable
 private fun AlarmsListScreenDarkPreview() {
-    ClockTheme(darkTheme = true) {
+    ClockTheme(useDarkTheme = true) {
         AlarmsListScreen(
             alarmActions = object : AlarmActions {},
             alarmsListState = alarmsListPreview,
@@ -50,9 +75,6 @@ private fun AlarmsListScreenDarkPreview() {
     }
 }
 
- */
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun AlarmsListScreen(
     modifier: Modifier = Modifier,
@@ -80,7 +102,6 @@ fun AlarmsListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AlarmsListAppBar(
     modifier: Modifier = Modifier,
@@ -118,7 +139,6 @@ private fun AlarmsListAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun AlarmsList(
     modifier: Modifier = Modifier,
@@ -180,10 +200,13 @@ private fun Alarm(
     onScheduledChange: (Boolean) -> Unit,
     updateAlarmCreationState: (Alarm) -> Unit,
 ) {
+    val cardContainerColor by animateColorAsState(targetValue = if (isSystemInDarkTheme()) Black100 else Blue100)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 20.dp),
+        colors = CardDefaults.cardColors(containerColor = cardContainerColor),
         onClick = {
             navigateToCreateAlarm()
             updateAlarmCreationState(alarm)
@@ -264,9 +287,9 @@ private fun AlarmInfo(
 
 val alarmsListPreview = mutableListOf<Alarm>().apply {
     for (i in 0..20) {
-        val hour = String.format("%02d", i % 24) // format hour with leading zero if needed
-        val minute = "00" // set minute to zero
-        val title = if (i == 0) "zero" else i.toString() // set title to number if not 0
+        val hour = String.format("%02d", i % 24)
+        val minute = "00"
+        val title = if (i == 0) "zero" else i.toString()
         add(Alarm(id = i, hour = hour, minute = minute, title = title, isScheduled = true))
     }
 }.toList()

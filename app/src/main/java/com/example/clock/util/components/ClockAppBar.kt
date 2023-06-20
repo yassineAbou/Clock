@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,17 +16,15 @@ import com.example.clock.ui.theme.ClockTheme
 fun ClockAppBar(
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier.height(48.dp),
         title = title,
-        actions = actions
+        actions = actions,
     )
 }
 
-/*
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun ClockAppBarPreview() {
@@ -36,13 +33,11 @@ private fun ClockAppBarPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun ClockAppBarPreviewDark() {
-    ClockTheme(darkTheme = true) {
+    ClockTheme(useDarkTheme = true) {
         ClockAppBar(title = { Text("Alarm") })
     }
 }
 
- */

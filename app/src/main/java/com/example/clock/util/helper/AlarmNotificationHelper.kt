@@ -1,15 +1,14 @@
 package com.example.clock.util.helper
 
+import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.net.toUri
 import com.example.clock.R
 import com.example.clock.data.receiver.ACTION_DISMISS
@@ -21,7 +20,6 @@ import com.example.clock.util.setIntentAction
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-
 
 @Singleton
 class AlarmNotificationHelper @Inject constructor(
@@ -60,11 +58,11 @@ class AlarmNotificationHelper @Inject constructor(
     )
 
     init {
-        createAlarmNotificationChannel()
+        createAlarmNotificationChannels()
     }
 
     fun getAlarmBaseNotification(title: String, time: String) =
-        NotificationCompat.Builder(applicationContext, ALARM_SERVICE_CHANNEL_ID)
+        NotificationCompat.Builder(applicationContext, ALARM_WORKER_CHANNEL_ID)
             .setContentTitle(time)
             .setContentText(title)
             .setSmallIcon(R.drawable.ic_baseline_alarm_24)
@@ -75,21 +73,22 @@ class AlarmNotificationHelper @Inject constructor(
             .addAction(R.drawable.ic_baseline_snooze_24, "Snooze", snoozeIntentAction)
             .setOngoing(true)
 
-    fun displayScheduledAlarmNotification() {
-        val scheduledAlarmNotification = NotificationCompat.Builder(applicationContext, SCHEDULED_ALARM_CHANNEL_ID)
+    @SuppressLint("MissingPermission")
+    fun displayAlarmCheckerNotification() {
+        val alarmCheckerNotification = NotificationCompat.Builder(applicationContext, ALARM_CHECKER_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_alarm_24)
             .setShowWhen(false)
             .setOngoing(true)
             .build()
-        notificationManager.notify(SCHEDULED_ALARM_NOTIFICATION_ID, scheduledAlarmNotification)
+        notificationManager.notify(ALARM_CHECKER_NOTIFICATION_ID, alarmCheckerNotification)
     }
 
-    fun isNotificationVisible(): Boolean {
+    fun alarmCheckerNotificationPresent(): Boolean {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val activeNotifications = notificationManager.activeNotifications
 
         for (notification in activeNotifications) {
-            if (notification.id == SCHEDULED_ALARM_NOTIFICATION_ID) {
+            if (notification.id == ALARM_CHECKER_NOTIFICATION_ID) {
                 return true
             }
         }
@@ -97,43 +96,43 @@ class AlarmNotificationHelper @Inject constructor(
         return false
     }
 
-    private fun createAlarmNotificationChannel() {
-        val alarmServiceChannel = NotificationChannelCompat.Builder(
-            ALARM_SERVICE_CHANNEL_ID,
+    private fun createAlarmNotificationChannels() {
+        val alarmWorkerChannel = NotificationChannelCompat.Builder(
+            ALARM_WORKER_CHANNEL_ID,
             NotificationManagerCompat.IMPORTANCE_MAX,
         )
-            .setName(applicationContext.getString(R.string.alarm_service_channel_name))
-            .setDescription(applicationContext.getString(R.string.alarm_service_channel_description))
+            .setName(applicationContext.getString(R.string.alarm_worker_channel_name))
+            .setDescription(applicationContext.getString(R.string.alarm_worker_channel_description))
             .setSound(null, null)
             .build()
 
-        val scheduledAlarmChannel = NotificationChannelCompat.Builder(
-            SCHEDULED_ALARM_CHANNEL_ID,
-            NotificationManagerCompat.IMPORTANCE_MAX,
+        val alarmCheckerChannel = NotificationChannelCompat.Builder(
+            ALARM_CHECKER_CHANNEL_ID,
+            NotificationManagerCompat.IMPORTANCE_DEFAULT,
         )
-            .setName(applicationContext.getString(R.string.scheduled_alarm_channel_name))
-            .setDescription(applicationContext.getString(R.string.scheduled_alarm_channel_description))
+            .setName(applicationContext.getString(R.string.alarm_checker_channel_name))
+            .setDescription(applicationContext.getString(R.string.alarm_checker_channel_description))
             .setSound(null, null)
             .build()
 
         notificationManager.createNotificationChannelsCompat(
             listOf(
-                alarmServiceChannel,
-                scheduledAlarmChannel,
+                alarmWorkerChannel,
+                alarmCheckerChannel,
             ),
         )
     }
 
-    fun removeAlarmServiceNotification() {
-        notificationManager.cancel(ALARM_SERVICE_NOTIFICATION_ID)
+    fun removeAlarmWorkerNotification() {
+        notificationManager.cancel(ALARM_WORKER_NOTIFICATION_ID)
     }
 
     fun removeScheduledAlarmNotification() {
-        notificationManager.cancel(SCHEDULED_ALARM_NOTIFICATION_ID)
+        notificationManager.cancel(ALARM_CHECKER_NOTIFICATION_ID)
     }
 }
 
-private const val ALARM_SERVICE_CHANNEL_ID = "alarm_service_channel"
-const val ALARM_SERVICE_NOTIFICATION_ID = 12
-private const val SCHEDULED_ALARM_CHANNEL_ID = "scheduled_alarm_channel"
-const val SCHEDULED_ALARM_NOTIFICATION_ID = 17
+private const val ALARM_WORKER_CHANNEL_ID = "alarm_worker_channel"
+const val ALARM_WORKER_NOTIFICATION_ID = 12
+private const val ALARM_CHECKER_CHANNEL_ID = "alarm_checker_channel"
+const val ALARM_CHECKER_NOTIFICATION_ID = 17

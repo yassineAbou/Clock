@@ -1,5 +1,6 @@
 package com.example.clock.util.helper
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -10,11 +11,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.example.clock.R
-import com.example.clock.data.receiver.STOPWATCH_IS_PLAYING_EXTRA
+import com.example.clock.data.receiver.STOPWATCH_IS_PLAYING
 import com.example.clock.data.receiver.STOPWATCH_LAP_ACTION
-import com.example.clock.data.receiver.STOPWATCH_LAST_INDEX_EXTRA
+import com.example.clock.data.receiver.STOPWATCH_LAST_INDEX
 import com.example.clock.data.receiver.STOPWATCH_RESET_ACTION
-import com.example.clock.data.receiver.STOPWATCH_TIME_EXTRA
+import com.example.clock.data.receiver.STOPWATCH_TIME
 import com.example.clock.data.receiver.StopwatchNotificationBroadcastReceiver
 import com.example.clock.ui.MainActivity
 import com.example.clock.util.GlobalProperties.pendingIntentFlags
@@ -53,7 +54,7 @@ class StopwatchNotificationHelper @Inject constructor(
     }
 
     fun getStopwatchBaseNotification() =
-        NotificationCompat.Builder(applicationContext, STOPWATCH_SERVICE_CHANNEL)
+        NotificationCompat.Builder(applicationContext, STOPWATCH_WORKER_CHANNEL)
             .setContentTitle("Stopwatch")
             .setSmallIcon(R.drawable.ic_timer)
             .setColor(ContextCompat.getColor(applicationContext, R.color.blue))
@@ -61,7 +62,8 @@ class StopwatchNotificationHelper @Inject constructor(
             .setOngoing(true)
             .setAutoCancel(true)
 
-    fun updateStopwatchServiceNotification(
+    @SuppressLint("MissingPermission")
+    fun updateStopwatchWorkerNotification(
         time: String,
         isPlaying: Boolean,
         lastLapIndex: Int,
@@ -91,11 +93,11 @@ class StopwatchNotificationHelper @Inject constructor(
             .addAction(stopResumeIcon, stopResumeLabel, stopResumeIntentAction)
             .addAction(lapResetIcon, lapResetLabel, lapResetIntentAction)
             .build()
-        notificationManager.notify(STOPWATCH_SERVICE_NOTIFICATION_ID, notificationUpdate)
+        notificationManager.notify(STOPWATCH_WORKER_NOTIFICATION_ID, notificationUpdate)
     }
 
     fun removeStopwatchNotification() {
-        notificationManager.cancel(STOPWATCH_SERVICE_NOTIFICATION_ID)
+        notificationManager.cancel(STOPWATCH_WORKER_NOTIFICATION_ID)
     }
 
     private fun stopResumeIntentAction(
@@ -105,9 +107,9 @@ class StopwatchNotificationHelper @Inject constructor(
     ): PendingIntent {
         val broadcastIntent =
             Intent(applicationContext, stopwatchNotificationBroadcastReceiver).apply {
-                putExtra(STOPWATCH_TIME_EXTRA, time)
-                putExtra(STOPWATCH_IS_PLAYING_EXTRA, isPlaying)
-                putExtra(STOPWATCH_LAST_INDEX_EXTRA, lastLapIndex)
+                putExtra(STOPWATCH_TIME, time)
+                putExtra(STOPWATCH_IS_PLAYING, isPlaying)
+                putExtra(STOPWATCH_LAST_INDEX, lastLapIndex)
             }
         return PendingIntent.getBroadcast(
             applicationContext,
@@ -118,18 +120,18 @@ class StopwatchNotificationHelper @Inject constructor(
     }
 
     private fun createStopwatchNotificationChannel() {
-        val stopwatchServiceChannel = NotificationChannelCompat.Builder(
-            STOPWATCH_SERVICE_CHANNEL,
+        val stopwatchWorkerChannel = NotificationChannelCompat.Builder(
+            STOPWATCH_WORKER_CHANNEL,
             NotificationManagerCompat.IMPORTANCE_DEFAULT,
         )
             .setName(applicationContext.getString(R.string.stopwatch_channel))
-            .setDescription(applicationContext.getString(R.string.stopwatch_service_channel_description))
+            .setDescription(applicationContext.getString(R.string.stopwatch_worker_channel_description))
             .setSound(null, null)
             .build()
 
-        notificationManager.createNotificationChannel(stopwatchServiceChannel)
+        notificationManager.createNotificationChannel(stopwatchWorkerChannel)
     }
 }
 
-private const val STOPWATCH_SERVICE_CHANNEL = "stopwatch_service_channel"
-const val STOPWATCH_SERVICE_NOTIFICATION_ID = 1
+private const val STOPWATCH_WORKER_CHANNEL = "stopwatch_worker_channel"
+const val STOPWATCH_WORKER_NOTIFICATION_ID = 1

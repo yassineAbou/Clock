@@ -1,5 +1,6 @@
 package com.example.clock.ui.stopwatch
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -27,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,8 +41,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.clock.R
 import com.example.clock.data.model.StopwatchState
+import com.example.clock.ui.theme.ClockTheme
 import com.example.clock.ui.theme.Red100
 import com.example.clock.util.components.ClockAppBar
 import com.example.clock.util.components.ClockButton
@@ -50,7 +53,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/*
 @Preview(device = Devices.TABLET, uiMode = Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
 @Composable
 private fun StopwatchScreenPreview() {
@@ -71,7 +73,7 @@ private fun StopwatchScreenPreview() {
 @Preview(device = Devices.PIXEL_4_XL)
 @Composable
 private fun StopwatchScreenDarkPreview() {
-    ClockTheme(darkTheme = true) {
+    ClockTheme(useDarkTheme = true) {
         StopwatchScreen(
             stopwatchState = StopwatchState(),
             stopwatchActions = object : StopwatchActions {},
@@ -80,11 +82,6 @@ private fun StopwatchScreenDarkPreview() {
     }
 }
 
- */
-
-@OptIn(
-    ExperimentalMaterial3Api::class,
-)
 @Composable
 fun StopwatchScreen(
     modifier: Modifier = Modifier,
@@ -152,7 +149,6 @@ fun StopwatchScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StopwatchScreenAppBar(
     modifier: Modifier = Modifier,
@@ -259,12 +255,12 @@ private fun Buttons(
     coroutineScope: CoroutineScope,
     lapTimes: List<String>,
 ) {
-    val transition = updateTransition(isReset, label = stringResource(id = R.string.is_reset))
+    val isResetTransition = updateTransition(isReset, label = stringResource(id = R.string.is_reset))
     val startButtonClicked = rememberSaveable { mutableStateOf(false) }
     Box(
         modifier = modifier,
     ) {
-        transition.AnimatedVisibility(
+        isResetTransition.AnimatedVisibility(
             visible = { isStopwatchReset -> isStopwatchReset },
             enter = expandHorizontally(
                 animationSpec = tween(
@@ -294,7 +290,7 @@ private fun Buttons(
                 color = MaterialTheme.colorScheme.primary,
             )
         }
-        transition.AnimatedVisibility(
+        isResetTransition.AnimatedVisibility(
             visible = { isStopwatchReset -> !isStopwatchReset },
             enter = expandHorizontally(
                 animationSpec = tween(

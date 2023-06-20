@@ -1,5 +1,6 @@
 package com.example.clock.util.helper
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -71,6 +72,7 @@ class TimerNotificationHelper @Inject constructor(
             .setAutoCancel(true)
             .setOngoing(true)
 
+    @SuppressLint("MissingPermission")
     fun updateTimerServiceNotification(
         timeText: String,
         isPlaying: Boolean,

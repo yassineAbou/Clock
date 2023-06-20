@@ -6,10 +6,10 @@
     <string name="timer_running_channel_description">Shows a persistent notification when the timer is running</string>
     <string name="timer_completed_channel_name">Timer completed notifications</string>
     <string name="timer_completed_channel_description">Shows a notification when a countdown timer finishes</string>
-    <string name="alarm_service_channel_name">Alarm service channel</string>
-    <string name="alarm_service_channel_description">Shows an alert notification at scheduled time</string>
-    <string name="stopwatch_channel">Stopwatch service channel</string>
-    <string name="stopwatch_service_channel_description">Shows a persistent notification when the stopwatch is running</string>
+    <string name="alarm_worker_channel_name">Alarm worker channel</string>
+    <string name="alarm_worker_channel_description">Shows an alert notification at scheduled time</string>
+    <string name="stopwatch_channel">Stopwatch worker channel</string>
+    <string name="stopwatch_worker_channel_description">Shows a persistent notification when the stopwatch is running</string>
     <string name="add_alarm">AddAlarm</string>
     <string name="stopwatch">Stopwatch</string>
     <string name="start">Start</string>
@@ -28,8 +28,8 @@
     <string name="alarm">Alarm</string>
     <string name="save">Save</string>
     <string name="clear_alarms">Clear alarms</string>
-    <string name="scheduled_alarm_channel_name">Scheduled alarm channel</string>
-    <string name="scheduled_alarm_channel_description">Shows a notification  when any alarm is scheduled</string>
+    <string name="alarm_checker_channel_name">alarm checker channel</string>
+    <string name="alarm_checker_channel_description">Shows a notification  when any alarm is scheduled</string>
     <string name="notification_permission">Notification permission</string>
     <string name="notification_permission_text">You need to allow this permission in order for the app to run properly</string>
     <string name="exact_alarm">Alarms and reminders</string>

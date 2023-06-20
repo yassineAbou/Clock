@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAlarm
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -61,7 +60,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -94,7 +92,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun ClockApp() {
     val navController = rememberNavController()
@@ -104,7 +102,7 @@ private fun ClockApp() {
     val alarmViewModel: AlarmViewModel = viewModel()
 
     LaunchedEffect(navBackStackEntry?.destination?.route) {
-        launch {
+        this.launch {
             isFloatButtonVisible = when (navBackStackEntry?.destination?.route) {
                 Screen.AlarmsList.route -> true
                 else -> false
@@ -221,4 +219,3 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
     }
 }
 
-private const val TAG = "MainActivity"
