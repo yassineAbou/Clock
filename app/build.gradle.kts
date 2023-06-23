@@ -104,8 +104,9 @@ dependencies {
     kapt("androidx.room:room-compiler:2.5.1")
     // Swipe
     implementation("me.saket.swipe:swipe:1.1.1")
-    // intuit
+    // sdp
     implementation("com.intuit.sdp:sdp-android:1.1.0")
+    // ssp
     implementation("com.intuit.ssp:ssp-android:1.1.0")
     // gson
     implementation("com.google.code.gson:gson:2.10.1")
@@ -114,9 +115,6 @@ dependencies {
     // work-manager
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.hilt:hilt-work:1.0.0")
-
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.11")
-    // implementation("com.jakewharton.threetenabp:threetenabp:1.3.1")
-
+    // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }
