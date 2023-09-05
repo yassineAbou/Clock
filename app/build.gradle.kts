@@ -12,7 +12,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.example.clock"
+        applicationId = "com.yassineabou.clock"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
@@ -29,7 +29,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            isDebuggable = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -64,7 +64,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    namespace = "com.example.clock"
+    namespace = "com.yassineabou.clock"
 }
 
 dependencies {
@@ -95,8 +95,8 @@ dependencies {
     // systemUiController
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.46.1")
-    kapt("com.google.dagger:hilt-compiler:2.46.1")
+    implementation("com.google.dagger:hilt-android:2.47")
+    kapt("com.google.dagger:hilt-compiler:2.47")
     // Zhuinden flow-combinetuple
     implementation("com.github.Zhuinden:flow-combinetuple-kt:1.1.1")
     // Room

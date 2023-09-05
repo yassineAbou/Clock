@@ -1,17 +1,22 @@
 <div align="center">  
-  <img src="https://drive.google.com/uc?export=view&id=1g7YekUp6Z96ZGCp-CE6iAB2YmrsZ6_Qw" alt="Weather" style="width: 100px; height: 100px; object-fit: contain; margin-right: 10px;">  
+  <img src="https://i.imgur.com/6JQDkCX.png" alt="Weather" style="width: 100px; height: 100px; object-fit: contain; margin-right: 10px;">  
  <h1 style="display: inline-block; margin: 0; vertical-align: middle;">Clock</h1>  
 </div>  
 
-<p align="center">  
-  <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Kotlin-v1.8.0-blue.svg" alt="Kotlin"></a>  
-<a href="#"><img src="https://img.shields.io/badge/Min%20Version-Android%207-green" alt="Min Version: Android 7"></a>
- <a href="https://gradle.org/releases/">  
-  <img src="https://img.shields.io/badge/Gradle-8-red.svg"  
-       alt="Gradle Version 8"  
-       style="border-radius: 3px; padding: 2px 6px; background-color: #FF0000; color: #fff;">  
-</a>  
-</p>  
+<p align="center">
+  <a href="https://kotlinlang.org/">
+    <img src="https://img.shields.io/badge/Kotlin-1.8.21-blue?logo=kotlin" alt="Kotlin version 1.8.21">
+  </a>
+  <a href="https://gradle.org/releases/">
+    <img src="https://img.shields.io/badge/Gradle-8.0.2-white?logo=gradle" alt="Gradle version 8.0.2">
+  </a>
+  <a href="https://developer.android.com/studio">
+    <img src="https://img.shields.io/badge/Android%20Studio-Flamingo-orange?logo=android-studio" alt="Android Studio Flamingo">
+  </a>
+  <a href="https://developer.android.com/studio/releases/platforms#7.0">
+    <img src="https://img.shields.io/badge/Android%20min%20version-7-brightgreen?logo=android" alt="Android min version 7">
+</a>
+</p> 
 
 Presenting a clock app which was totally made in Jetpack Compose! You can use this app's timer and stopwatch functions, which are linked to workManager.
 The animation is added to the app to increase engagement. Moreover, the time is shown in a stylish sliding clock manner.
@@ -19,24 +24,34 @@ But there's more than that! Also, you can create one time and recurring alarms a
 
 <p align="center">  
   <a href="https://github.com/yassineAbou"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="80px"/></a>  
- <a href="https://github.com/yassineAbou"><img alt="Get it on F-Droid" src="https://f-droid.org/badge/get-it-on.png" height="80px"/></a>  
 </p>  
 
 ## Screenshots
 
 
 <div style="display:flex; flex-wrap:wrap;">
-  <img src="https://drive.google.com/uc?export=view&id=1KiBCosf9LPKXy_ZEUzrW73RPP2kWWIse" style="flex:1; margin:5px;" height="450">
-  <img src="https://drive.google.com/uc?export=view&id=1vT17-84-NOh3tVIwOx1cvyJ-hBvKafOQ" style="flex:1; margin:5px;" height="450">
-  <img src="https://drive.google.com/uc?export=view&id=1rU76yJAMFTWB7paQNIhAvTFh16G6LkfF" style="flex:1; margin:5px;" height="450">
-  <img src="https://drive.google.com/uc?export=view&id=1G-hiJdjIYlglO7M5n9VS5mYyqz4sAfOu" style="flex:1; margin:5px;" height="450">
-  <img src="https://drive.google.com/uc?export=view&id=1G1oZlTH4Nk5bRxgC35xZKDASGhF-GbyG" style="flex:1; margin:5px;" height="450">
-  <img src="https://drive.google.com/uc?export=view&id=1YyNBgOy0b2H5gNgB5MoW29trioK1JaYI" style="flex:1; margin:5px;" height="450">
-  <img src="https://drive.google.com/uc?export=view&id=15zuI8U8CCsdEmpjqKVFOnu5k3Sp2bo7e" style="flex:1; margin:5px;" height="450">
-  <img src="https://drive.google.com/uc?export=view&id=1IcezW7b7S0Cm86Y2sn9zlMBoBhWNxUdJ" style="flex:1; margin:5px;" height="450">
-   <img src="https://drive.google.com/uc?export=view&id=1N7cMDpf1I2cKBVy1DpeFKF3R2vJ4BesK" style="flex:1; margin:5px;" height="450">
-     <img src="https://drive.google.com/uc?export=view&id=1P7JV2olgle_FtgBRC-MH1czz_U2XrPx7" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/J74WooH.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/2HqKXxK.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/bRz9E0Z.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/X3GSEDI.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/qxhtGdZ.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/qlilYzc.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/6vhlhsP.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/uaHOkrt.gif" style="flex:1; margin:5px;" height="450">
+  <img src="https://i.imgur.com/OREtBGb.gif" style="flex:1; margin:5px;" height="450">
+   <img src="https://i.imgur.com/ldPOuBV.gif" style="flex:1; margin:5px;" height="450">
+     <img src="https://i.imgur.com/qfm8Vkm.gif" style="flex:1; margin:5px;" height="450">
 </div>
+
+## Features
+
+<p>For full clock app functionality, permissions vary by Android version:</p>
+
+<ul>
+  <li>On Android 13+, grant notification permission for alarm, timer, and stopwatch alerts.</li>
+  <li>On Android 12, If SCHEDULE_EXACT_ALARM isn't allowed, a dialog appears. Click "Ok" to be guided to the app settings where you can manually grant the permission.</li>
+</ul>
+
 
 ## Architecture
 
@@ -49,35 +64,34 @@ The architecture of this application relies and complies with the following poin
 
 ## Package Structure
 ```  
-com.example.clock       
-├── data                     
-│   ├── local              
-|   ├── manager               
-│   ├── model    
-│   ├── receiver
-│   ├── repository           
-│   └── workManager                     
-│       ├── factory          
-│       └── worker           
+com.yassineabou.clock        # Root Package
+├── data                 # For data operations
+│   ├── local            # Handling local data
+|   ├── manager          # Managing data operations
+│   ├── model            # Data models
+│   ├── receiver         # For receiving broadcasts
+│   ├── repository       # Single source for data
+│   └── workManager      # Handles background tasks
+│       ├── factory      # For creating worker instances
+│       └── worker       # Background task definitions
 |  
-├── di                      
+├── di                   # Dependency Injection: Manages dependencies
 │  
-├── ui                     
-│   ├── alarm          
-│   ├── clock     
-|   ├── stopwatch      
-|   ├── theme     
-|   ├── timer         
-|   ├── MainActivity         
-│   └── Screen       
+├── ui                   # UI Layer: Activity, Screens, ViewModels
+│   ├── alarm            # Manages alarm functionalities
+│   ├── clock            # For clock display
+|   ├── stopwatch        # Manages stopwatch functionalities
+|   ├── theme            # Handles app theme preferences
+|   ├── timer            # Manages timer functionalities
+|   ├── MainActivity     # Main activity hosting all fragments
+│   └── Screen           # Manages different screens
 |  
-├── utils   
-│   ├── components          
-│   ├── helper  
-|   ├── Extensions         
-│   └── GlobalProperties                
-└── ClockApplication      
-  
+├── utils                # Utility Classes / Kotlin extensions for reusability
+│   ├── components       # Reusable UI components
+│   ├── helper           # Provides helper methods
+|   ├── Extensions       # Kotlin extension functions
+│   └── GlobalProperties # Global properties used across the app
+└── ClockApplication     # Application class for global settings
 ```  
 
 
