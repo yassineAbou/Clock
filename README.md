@@ -23,7 +23,7 @@ The animation is added to the app to increase engagement. Moreover, the time is 
 But there's more than that! Also, you can create one time and recurring alarms and edit, enable, and disable them.
 
 <p align="center">  
-  <a href="https://github.com/yassineAbou"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="80px"/></a>  
+  <a href="https://play.google.com/store/apps/details?id=com.yassineabou.clock"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="80px"/></a>  
 </p>  
 
 ## Screenshots
