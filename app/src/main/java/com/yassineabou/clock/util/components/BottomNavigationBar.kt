@@ -3,7 +3,6 @@ package com.yassineabou.clock.util.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.HourglassEmpty
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -88,11 +87,14 @@ val listBottomBarItems = listOf(
         route = Screen.AlarmsList.route,
         icon = Icons.Default.Alarm,
     ),
+    /*
     BottomBarItem(
         name = "Clock",
         route = Screen.Clock.route,
         icon = Icons.Default.Language,
     ),
+
+     */
     BottomBarItem(
         name = "Stopwatch",
         route = Screen.Stopwatch.route,

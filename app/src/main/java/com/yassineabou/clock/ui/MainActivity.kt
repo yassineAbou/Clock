@@ -50,7 +50,6 @@ import com.yassineabou.clock.data.model.TimerState
 import com.yassineabou.clock.ui.alarm.AlarmViewModel
 import com.yassineabou.clock.ui.alarm.AlarmsListScreen
 import com.yassineabou.clock.ui.alarm.CreateAlarmScreen
-import com.yassineabou.clock.ui.clock.ClockScreen
 import com.yassineabou.clock.ui.stopwatch.StopwatchScreen
 import com.yassineabou.clock.ui.stopwatch.StopwatchViewModel
 import com.yassineabou.clock.ui.theme.ClockTheme
@@ -191,9 +190,6 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
                     navigateToCreateAlarm = { navController.navigate(Screen.CreateAlarm.route) },
                 )
             }
-        }
-        composable(Screen.Clock.route) {
-            ClockScreen(modifier = modifier)
         }
         composable(
             route = Screen.Stopwatch.route,

@@ -6,7 +6,6 @@ import androidx.navigation.navDeepLink
 sealed class Screen(val route: String) {
     object AlarmsList : Screen("AlarmsList")
     object CreateAlarm : Screen("CreateAlarm")
-    object Clock : Screen("Clock")
     object Stopwatch : Screen("Stopwatch")
     object Timer : Screen("Timer")
 

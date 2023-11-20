@@ -19,8 +19,7 @@
 </p> 
 
 Presenting a clock app which was totally made in Jetpack Compose! You can use this app's timer and stopwatch functions, which are linked to workManager.
-The animation is added to the app to increase engagement. Moreover, the time is shown in a stylish sliding clock manner.
-But there's more than that! Also, you can create one time and recurring alarms and edit, enable, and disable them.
+The animation is added to the app to increase engagement. Also, you can create one time and recurring alarms and edit, enable, and disable them.
 
 <p align="center">  
   <a href="https://play.google.com/store/apps/details?id=com.yassineabou.clock"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="80px"/></a>  
@@ -32,12 +31,10 @@ But there's more than that! Also, you can create one time and recurring alarms a
 <div style="display:flex; flex-wrap:wrap;">
   <img src="https://i.imgur.com/J74WooH.gif" style="flex:1; margin:5px;" height="450">
   <img src="https://i.imgur.com/2HqKXxK.gif" style="flex:1; margin:5px;" height="450">
-  <img src="https://i.imgur.com/bRz9E0Z.gif" style="flex:1; margin:5px;" height="450">
   <img src="https://i.imgur.com/X3GSEDI.gif" style="flex:1; margin:5px;" height="450">
   <img src="https://i.imgur.com/qxhtGdZ.gif" style="flex:1; margin:5px;" height="450">
   <img src="https://i.imgur.com/qlilYzc.gif" style="flex:1; margin:5px;" height="450">
   <img src="https://i.imgur.com/6vhlhsP.gif" style="flex:1; margin:5px;" height="450">
-  <img src="https://i.imgur.com/uaHOkrt.gif" style="flex:1; margin:5px;" height="450">
   <img src="https://i.imgur.com/OREtBGb.gif" style="flex:1; margin:5px;" height="450">
    <img src="https://i.imgur.com/ldPOuBV.gif" style="flex:1; margin:5px;" height="450">
      <img src="https://i.imgur.com/qfm8Vkm.gif" style="flex:1; margin:5px;" height="450">
@@ -79,7 +76,6 @@ com.yassineabou.clock        # Root Package
 │  
 ├── ui                   # UI Layer: Activity, Screens, ViewModels
 │   ├── alarm            # Manages alarm functionalities
-│   ├── clock            # For clock display
 |   ├── stopwatch        # Manages stopwatch functionalities
 |   ├── theme            # Handles app theme preferences
 |   ├── timer            # Manages timer functionalities
