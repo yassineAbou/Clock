@@ -1,6 +1,8 @@
 package com.yassineabou.clock.data.workManager.worker
 
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -30,6 +32,7 @@ class TimerCompletedWorker @AssistedInject constructor(
             val foregroundInfo = ForegroundInfo(
                 TIMER_COMPLETED_NOTIFICATION_ID,
                 timerNotificationHelper.showTimerCompletedNotification(),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
             )
             setForeground(foregroundInfo)
 
