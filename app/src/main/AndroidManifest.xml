@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -61,6 +62,7 @@
             tools:node="remove">
         </provider>
 
+        <service android:name="androidx.work.impl.foreground.SystemForegroundService" android:foregroundServiceType="mediaPlayback" tools:node="merge" />
 
     </application>
 
