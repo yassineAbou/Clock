@@ -38,7 +38,7 @@ class AlarmWorker @AssistedInject constructor(
             val foregroundInfo = ForegroundInfo(
                 ALARM_WORKER_NOTIFICATION_ID,
                 alarmNotificationHelper.getAlarmBaseNotification(title, time).build(),
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else 0
             )
             setForeground(foregroundInfo)
 

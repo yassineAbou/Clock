@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.yassineabou.clock"
-        minSdk = 29
+        minSdk = 24
         targetSdk = 34
         versionCode = 3
         versionName = "1.3"
