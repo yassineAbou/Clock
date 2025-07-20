@@ -12,8 +12,8 @@ class ClockApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: WrapperWorkerFactory
 
-    override fun getWorkManagerConfiguration(): Configuration =
-        Configuration.Builder()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
             .setMinimumLoggingLevel(android.util.Log.DEBUG)
             .setWorkerFactory(workerFactory)
             .build()
