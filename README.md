@@ -15,8 +15,11 @@
   </a>
   <a href="https://developer.android.com/studio/releases/platforms#7.0">
     <img src="https://img.shields.io/badge/Android%20min%20version-7-brightgreen?logo=android" alt="Android min version 7">
-</a>
-</p> 
+  </a>
+  <a href="https://shields.rbtlog.dev/com.yassineabou.clock">
+    <img src="https://shields.rbtlog.dev/simple/com.yassineabou.clock" alt="RB Status">
+  </a>
+</p>
 
 Presenting a clock app which was totally made in Jetpack Compose! You can use this app's timer and stopwatch functions, which are linked to workManager.
 The animation is added to the app to increase engagement. Also, you can create one time and recurring alarms and edit, enable, and disable them.
